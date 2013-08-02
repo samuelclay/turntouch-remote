@@ -35,7 +35,9 @@ void setup() {
   pinMode(led_north_pin, OUTPUT);
   pinMode(toggle_north_pin, INPUT);
   
+  selected_mode = NORTH;
   reset_leds();
+  set_leds();
 }
 
 
