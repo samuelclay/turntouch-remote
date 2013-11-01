@@ -40,7 +40,7 @@ void setup(void) {
     delay(20); // Just to get a solid reading on the role pin
 
     // read the address pin, establish our role
-    role = !digitalRead(role_pin) ? role_remote : role_receiver;
+    role = digitalRead(role_pin) ? role_remote : role_receiver;
     digitalWrite(role_pin, LOW);
     
     Serial.begin(57600);
@@ -65,7 +65,7 @@ void setup(void) {
         int i = num_toggle_pins;
         while (i--) {
             pinMode(toggle_pins[i], INPUT);
-            digitalWrite(toggle_pins[i], LOW);
+            digitalWrite(toggle_pins[i], HIGH);
         }
         pinMode(8, OUTPUT);
         digitalWrite(8, LOW);
@@ -121,7 +121,7 @@ void run_remote() {
     int i = num_toggle_pins;
     bool toggle_on = false;
     while (i--) {
-        uint8_t state = digitalRead(toggle_pins[i]);
+        uint8_t state = !digitalRead(toggle_pins[i]);
         if (state != toggle_states[i]) {
             printf("Sensor state %d: %d\n", toggle_pins[i], state);
             different = true;
@@ -154,11 +154,12 @@ void run_receiver() {
         while (!done) {
             done = radio.read( toggle_states, num_toggle_pins );
             bool toggle_on = false;
-            Serial.print("\nGot buttons: ");
+            Serial.print("\n:START:");
             for (int i=0; i < num_toggle_pins; i++) {
-                printf("%d ", toggle_states[i]);
+                printf("%d:", toggle_states[i]);
                 if (toggle_states[i]) toggle_on = true;
             }
+            Serial.print("END:");
             digitalWrite(led_pin, toggle_on ? HIGH : LOW);
         }
     }
