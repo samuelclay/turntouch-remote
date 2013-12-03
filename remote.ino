@@ -1,4 +1,4 @@
-#include <SoftwareSerial.h>
+//#include <SoftwareSerial.h>
 #include <avr/power.h>
 #include <avr/sleep.h>
 //#include <avr/interrupt.h>
@@ -12,13 +12,13 @@ void sleepNow(void);
 uint8_t mcucr1, mcucr2;
 
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
-const int rx_pin           = 9;
-const int tx_pin           = 10;
+const int rx_pin           = 2;
+const int tx_pin           = 2;
 const int ce_pin           = 3;
 const int csn_pin          = 7;
 const int led_pin          = 0;
 const int interrupt_pin    = 2;
-const uint8_t toggle_pins[] = { 1,2,8,8 };
+const uint8_t toggle_pins[] = { 1,8,9,10 };
 #else
 const int rx_pin           = 0;
 const int tx_pin           = 1;
@@ -34,7 +34,7 @@ uint8_t toggle_states[num_toggle_pins];
 
 const uint64_t pipe = 0xF2F2F2F200LL;
 RF24 radio(ce_pin, csn_pin);
-SoftwareSerial mySerial(rx_pin, tx_pin);
+//SoftwareSerial mySerial(rx_pin, tx_pin);
 
 int awakems = 0;
 volatile bool different = false;
@@ -42,9 +42,9 @@ volatile bool different = false;
 void setup(void) {
     pinMode(rx_pin, INPUT);
     pinMode(tx_pin, OUTPUT);
-    mySerial.begin(4800);
+//    mySerial.begin(4800);
 //    printf_begin();
-    mySerial.print("\n\nTurn Touch Remote\n\n");
+//    mySerial.print("\n\nTurn Touch Remote\n\n");
 
     radio.begin();
     radio.setChannel(38);
@@ -57,7 +57,7 @@ void setup(void) {
 
     int i = num_toggle_pins;
     while (i--) {
-        pinMode(toggle_pins[i], INPUT);
+        pinMode(toggle_pins[i], INPUT_PULLUP);
         digitalWrite(toggle_pins[i], HIGH);
     }
 
@@ -101,11 +101,11 @@ void run_remote() {
     while (i--) {
         uint8_t state = !digitalRead(toggle_pins[i]);
         if (state != toggle_states[i]) {
-            mySerial.print("Sensor state ");
-            mySerial.print((int)toggle_pins[i]);
-            mySerial.print(": ");
-            mySerial.print(state ? "ON" : "OFF");
-            mySerial.println();
+//            mySerial.print("Sensor state ");
+//            mySerial.print((int)toggle_pins[i]);
+//            mySerial.print(": ");
+//            mySerial.print(state ? "ON" : "OFF");
+//            mySerial.println();
             different = true;
             toggle_states[i] = state;
         }
@@ -115,14 +115,14 @@ void run_remote() {
     // Send the state of the buttons to the LED board
     if (different) {      
         awakems = 0;
-        mySerial.print("Now sending...");
+//        mySerial.print("Now sending...");
         radio.powerUp();
         radio.stopListening();
         bool ok = radio.write(toggle_states, num_toggle_pins);
         if (ok) {
-            mySerial.print("ok\n");
+//            mySerial.print("ok\n");
         } else {
-            mySerial.print("failed\n");
+//            mySerial.print("failed\n");
         }
         radio.startListening();
         digitalWrite(led_pin, toggle_on ? HIGH : LOW);
