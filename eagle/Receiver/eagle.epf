@@ -346,18 +346,12 @@ UsedLibrary="/Users/sclay/projects/code/eagle/sparkfun/SparkFun-Boards.lbr"
 UsedLibrary="/Users/sclay/projects/code/eagle/sparkfun/SparkFun-PowerIC.lbr"
 
 [Win_1]
-Type="Control Panel"
-Loc="54 22 1439 877"
-State=2
-Number=0
-
-[Win_2]
 Type="Board Editor"
-Loc="360 208 1020 820"
-State=2
-Number=3
-File="/Users/sclay/projects/turntouch/remote/eagle/Remote/remote.brd"
-View="-1.23756 -1.23 56.6158 56.23"
+Loc="360 248 959 647"
+State=0
+Number=2
+File="/Users/sclay/Downloads/Tiny_Programmer_v11-2/Tiny_Programmer_v11.brd"
+View="-16.7037 -13.8913 72.6185 17.2356"
 WireWidths=" 0 0.254 0.3048 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0.4064"
 PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 PadDrills=" 0.5 0.6 0.7 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.8"
@@ -396,6 +390,12 @@ ArcDirection=0
 AddLevel=2
 PadsSameType=0
 Layer=16
+
+[Win_2]
+Type="Control Panel"
+Loc="54 22 1439 877"
+State=2
+Number=0
 
 [Desktop]
 Screen="1440 900"
