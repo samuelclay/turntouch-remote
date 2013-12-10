@@ -88,7 +88,15 @@ void setup() {
 void loop() {
     bool button_on = run_remote();
     if (!button_on) {
-//        sleepNow();
+//        if (awakems && (millis() - awakems) > 50) {
+            sleepNow();
+//        } else if (awakems == 0) {
+//            awakems = millis();
+//        } else {
+//            awakems++;
+//        }
+//    } else {
+//        awakems = 0;
     }
 }
 
@@ -234,7 +242,7 @@ void sleepNow(void)
     }
 #endif
     sleep_disable();               
-    sei();                         //enable interrupts again (but INT0 is disabled from above)
+//    sei();                         //enable interrupts again (but INT0 is disabled from above)
     
     radio.powerUp();
     digitalWrite(interrupt_pin, HIGH);

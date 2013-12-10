@@ -85,7 +85,6 @@ tryAgain:
   {
     uint8_t SaveSREG = SREG;
     cli();
-
     if ( (hole == 0) && (entry->callback == 0) )
     {
       hole = entry;
@@ -109,8 +108,9 @@ tryAgain:
     ++entry;
   }
 
-  if ( hole == 0 )
+  if ( hole == 0 ) {
     return;
+  }
 
   uint8_t SaveSREG = SREG;
   cli();
