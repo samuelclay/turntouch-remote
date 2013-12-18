@@ -1,6 +1,7 @@
 # Compiled Object files
 *.slo
 *.lo
+*.d
 *.o
 
 # Compiled Dynamic libraries

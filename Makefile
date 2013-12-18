@@ -11,8 +11,7 @@ FUSE_L     = 0xE2
 FUSE_H     = 0xD7
 AVRDUDE    = avrdude -v -v -v -v -c $(PROGRAMMER) -p $(DEVICE) -P usb
 
-LIBS       = -I "/Applications/Arduino 1.0.5.app/Contents/Resources/Java/hardware/tools/avr/avr/include" \
-             -I./tiny -I./SPI -I.
+LIBS       = -I./tiny -I./SPI -I.
 CFLAGS  =  $(LIBS) \
            -DDEBUG_LEVEL=0 -DARDUINO=1 \
            -MMD -DUSB_VID=null -DUSB_PID=null \
@@ -56,7 +55,7 @@ help:
 
 hex: remote.hex
 
-program: flash fuse
+program: fuse flash
 
 # rule for programming fuse bits:
 fuse:
