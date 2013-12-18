@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <avr/power.h>
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
@@ -14,6 +15,9 @@
 #include "pinchange.h"
 
 void sleepNow(void);
+void wakeup();
+bool run_remote();
+
 #define BODS 7                   //BOD Sleep bit in MCUCR
 #define BODSE 2                  //BOD Sleep enable bit in MCUCR
 uint8_t mcucr1, mcucr2;
@@ -45,6 +49,8 @@ const uint64_t pipe = 0xF2F2F2F200LL;
 RF24 radio(ce_pin, csn_pin);
 
 int awakems = 0;
+
+extern "C" void __cxa_pure_virtual() {}  
 
 void setup() {
 //    pinMode(rx_pin, INPUT);
@@ -215,7 +221,7 @@ void sleepNow(void)
         attachPcInterrupt(button_pins[i], wakeup, CHANGE);
     }
 #else
-    attachInterrupt(0, wakeATMega, CHANGE);
+    attachInterrupt(0, wakeup, CHANGE);
 #endif
 
     ACSR |= _BV(ACD);                         //disable the analog comparator
@@ -249,13 +255,6 @@ void sleepNow(void)
     delay(15);
 }
 
-#if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
 void wakeup() {
     awakems = 0;
 }
-#else
-void wakeATMega() {
-    awakems = 0;
-}
-#endif
-
