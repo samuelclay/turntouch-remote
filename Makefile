@@ -37,7 +37,7 @@ CPP_SRC := SPI/SPI.cpp \
            tiny/Tone.cpp \
            tiny/WMath.cpp \
            tiny/WString.cpp
-SRC +=     pinchange.cpp remote.cpp RF24.cpp
+SRC     := pinchange.cpp remote.cpp RF24.cpp
 
 OBJECTS = $(SRC:.cpp=.o) $(C_SRC:.c=.o) $(CPP_SRC:.cpp=.o) 
 COMPILE = avr-gcc -Wall -Os -DF_CPU=$(F_CPU) $(CFLAGS) -mmcu=$(DEVICE)
