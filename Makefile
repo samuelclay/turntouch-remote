@@ -5,7 +5,7 @@
 # Based on work by Christian Starkjohann, 2008-04-07
 
 DEVICE     = attiny84
-PROGRAMMER = usbtiny
+PROGRAMMER ?= usbtiny
 F_CPU      = 8000000	# in Hz
 FUSE_L     = 0xE2
 FUSE_H     = 0xD7
