@@ -12,4 +12,6 @@
 *.lai
 *.la
 *.a
+*.elf
+*.hex
 .DS_Store

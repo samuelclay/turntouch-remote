@@ -185,7 +185,9 @@ bool run_remote() {
 #endif
         int send_tries = 30;
         while (send_tries--) {
+            digitalWrite(led_pin, HIGH);
             bool ok = radio.write(button_presses, num_button_pins);
+            digitalWrite(led_pin, LOW);
             if (ok) {
 #ifdef SERIAL_PRINT
                 Serial.print("ok");
