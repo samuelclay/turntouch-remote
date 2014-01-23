@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.05" altunitdist="inch" altunit="inch"/>
+<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.05" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -5629,9 +5629,9 @@ Various standard crystals. Proven footprints. Spark Fun Electronics SKU : COM-00
 <part name="R7" library="adafruit" deviceset="R-US_" device="R0805" value="10k"/>
 <part name="R8" library="adafruit" deviceset="R-US_" device="R0805" value="10k"/>
 <part name="U$1" library="solids" deviceset="A99327CT-ND" device=""/>
-<part name="Y1" library="SparkFun" deviceset="CRYSTAL" device="5X3" value="16MHz"/>
-<part name="C2" library="SparkFun" deviceset="CAP" device="0402-CAP" value="18pF"/>
-<part name="C3" library="SparkFun" deviceset="CAP" device="0402-CAP" value="18pF"/>
+<part name="Y1" library="SparkFun" deviceset="CRYSTAL" device="5X3" value="8MHz"/>
+<part name="C2" library="SparkFun" deviceset="CAP" device="0402-CAP" value="15pF"/>
+<part name="C3" library="SparkFun" deviceset="CAP" device="0402-CAP" value="15pF"/>
 <part name="GND3" library="SparkFun" deviceset="GND" device=""/>
 </parts>
 <sheets>
@@ -6037,11 +6037,12 @@ Various standard crystals. Proven footprints. Spark Fun Electronics SKU : COM-00
 <junction x="25.4" y="-2.54"/>
 <pinref part="C2" gate="G$1" pin="2"/>
 <pinref part="Y1" gate="G$1" pin="2"/>
-<label x="28.702" y="-1.778" size="1.016" layer="95"/>
+<label x="30.48" y="-2.54" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
-<wire x1="60.96" y1="20.32" x2="58.42" y2="20.32" width="0.1524" layer="91"/>
-<label x="56.134" y="20.828" size="1.016" layer="95"/>
+<label x="57.15" y="20.32" size="1.016" layer="95" rot="R180" xref="yes"/>
+<pinref part="U1" gate="A" pin="PB1"/>
+<wire x1="57.15" y1="20.32" x2="59.69" y2="20.32" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="XTL2" class="0">
@@ -6051,11 +6052,12 @@ Various standard crystals. Proven footprints. Spark Fun Electronics SKU : COM-00
 <junction x="25.4" y="-7.62"/>
 <pinref part="Y1" gate="G$1" pin="1"/>
 <pinref part="C3" gate="G$1" pin="2"/>
-<label x="28.702" y="-6.858" size="1.016" layer="95"/>
+<label x="30.48" y="-7.62" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
-<wire x1="60.96" y1="17.78" x2="58.42" y2="17.78" width="0.1524" layer="91"/>
-<label x="56.134" y="18.034" size="1.016" layer="95"/>
+<label x="57.15" y="17.78" size="1.016" layer="95" rot="R180" xref="yes"/>
+<pinref part="U1" gate="A" pin="PB2"/>
+<wire x1="57.15" y1="17.78" x2="59.69" y2="17.78" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
