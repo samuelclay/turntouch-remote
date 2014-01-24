@@ -6237,8 +6237,6 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 <rectangle x1="-4.445" y1="5.842" x2="-2.286" y2="6.35" layer="21"/>
 <rectangle x1="2.286" y1="-6.35" x2="4.445" y2="-5.842" layer="21"/>
 <rectangle x1="-4.445" y1="-6.35" x2="-2.286" y2="-5.842" layer="21"/>
-<hole x="0" y="-4.4958" drill="1.8034"/>
-<hole x="0" y="4.4958" drill="1.8034"/>
 <smd name="P$1" x="-6.985" y="2.54" dx="1.6002" dy="1.6002" layer="1"/>
 <smd name="P$3" x="-6.985" y="-2.54" dx="1.6002" dy="1.6002" layer="1"/>
 <smd name="P$4" x="6.985" y="-2.54" dx="1.6002" dy="1.6002" layer="1"/>
@@ -6322,7 +6320,7 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 <plain>
 </plain>
 <instances>
-<instance part="U1" gate="A" x="77.47" y="22.86"/>
+<instance part="U1" gate="A" x="76.2" y="22.86"/>
 <instance part="C1" gate="G$1" x="43.18" y="20.32"/>
 <instance part="ISP1" gate="G$1" x="156.21" y="15.24"/>
 <instance part="JP1" gate="A" x="149.86" y="-3.81"/>
@@ -6387,7 +6385,7 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 </segment>
 <segment>
 <pinref part="U1" gate="A" pin="GND"/>
-<wire x1="59.69" y1="10.16" x2="50.8" y2="10.16" width="0.1524" layer="91"/>
+<wire x1="58.42" y1="10.16" x2="50.8" y2="10.16" width="0.1524" layer="91"/>
 <wire x1="50.8" y1="10.16" x2="50.8" y2="2.54" width="0.1524" layer="91"/>
 <label x="50.8" y="2.54" size="1.778" layer="95" xref="yes"/>
 <pinref part="C1" gate="G$1" pin="2"/>
@@ -6424,7 +6422,7 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 <net name="MISO" class="0">
 <segment>
 <pinref part="U1" gate="A" pin="PA5"/>
-<wire x1="95.25" y1="15.24" x2="99.06" y2="15.24" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="15.24" x2="99.06" y2="15.24" width="0.1524" layer="91"/>
 <label x="99.06" y="15.24" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
@@ -6441,7 +6439,7 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 <net name="MOSI" class="0">
 <segment>
 <pinref part="U1" gate="A" pin="PA6"/>
-<wire x1="95.25" y1="12.7" x2="99.06" y2="12.7" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="12.7" x2="99.06" y2="12.7" width="0.1524" layer="91"/>
 <label x="99.06" y="12.7" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
@@ -6458,7 +6456,7 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 <net name="SCK" class="0">
 <segment>
 <pinref part="U1" gate="A" pin="PA4"/>
-<wire x1="95.25" y1="17.78" x2="99.06" y2="17.78" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="17.78" x2="99.06" y2="17.78" width="0.1524" layer="91"/>
 <label x="99.06" y="17.78" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
@@ -6475,7 +6473,7 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 <net name="BUTTON1" class="0">
 <segment>
 <pinref part="U1" gate="A" pin="PA0"/>
-<wire x1="95.25" y1="27.94" x2="99.06" y2="27.94" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="27.94" x2="99.06" y2="27.94" width="0.1524" layer="91"/>
 <label x="99.06" y="27.94" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
@@ -6489,11 +6487,6 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 </net>
 <net name="BUTTON2" class="0">
 <segment>
-<pinref part="U1" gate="A" pin="PA1"/>
-<wire x1="95.25" y1="25.4" x2="99.06" y2="25.4" width="0.1524" layer="91"/>
-<label x="99.06" y="25.4" size="1.016" layer="95" xref="yes"/>
-</segment>
-<segment>
 <label x="71.12" y="40.64" size="1.778" layer="95" xref="yes"/>
 <wire x1="68.58" y1="43.18" x2="68.58" y2="40.64" width="0.1524" layer="91"/>
 <wire x1="68.58" y1="40.64" x2="71.12" y2="40.64" width="0.1524" layer="91"/>
@@ -6501,13 +6494,13 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 <pinref part="U$2" gate="G$1" pin="S1"/>
 <junction x="68.58" y="40.64"/>
 </segment>
-</net>
-<net name="BUTTON3" class="0">
 <segment>
 <pinref part="U1" gate="A" pin="PA2"/>
-<wire x1="95.25" y1="22.86" x2="99.06" y2="22.86" width="0.1524" layer="91"/>
-<label x="99.06" y="22.86" size="1.016" layer="95" xref="yes"/>
+<wire x1="93.98" y1="22.86" x2="99.06" y2="22.86" width="0.1524" layer="91"/>
+<label x="99.06" y="22.86" size="1.016" layer="95" font="vector" xref="yes"/>
 </segment>
+</net>
+<net name="BUTTON3" class="0">
 <segment>
 <label x="111.76" y="40.64" size="1.778" layer="95" xref="yes"/>
 <wire x1="109.22" y1="43.18" x2="109.22" y2="40.64" width="0.1524" layer="91"/>
@@ -6516,11 +6509,16 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 <pinref part="U$3" gate="G$1" pin="S1"/>
 <junction x="109.22" y="40.64"/>
 </segment>
+<segment>
+<pinref part="U1" gate="A" pin="PA1"/>
+<wire x1="93.98" y1="25.4" x2="99.06" y2="25.4" width="0.1524" layer="91"/>
+<label x="99.06" y="25.4" size="1.016" layer="95" font="vector" xref="yes"/>
+</segment>
 </net>
 <net name="BUTTON4" class="0">
 <segment>
 <pinref part="U1" gate="A" pin="PA3"/>
-<wire x1="95.25" y1="20.32" x2="99.06" y2="20.32" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="20.32" x2="99.06" y2="20.32" width="0.1524" layer="91"/>
 <label x="99.06" y="20.32" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
@@ -6536,7 +6534,7 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 <segment>
 <pinref part="U1" gate="A" pin="VCC"/>
 <pinref part="C1" gate="G$1" pin="1"/>
-<wire x1="59.69" y1="27.94" x2="43.18" y2="27.94" width="0.1524" layer="91"/>
+<wire x1="58.42" y1="27.94" x2="43.18" y2="27.94" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="27.94" x2="43.18" y2="22.86" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="27.94" x2="43.18" y2="30.48" width="0.1524" layer="91"/>
 <junction x="43.18" y="27.94"/>
@@ -6573,9 +6571,8 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 </segment>
 <segment>
 <pinref part="U1" gate="A" pin="PB3"/>
-<wire x1="59.69" y1="15.24" x2="59.69" y2="13.97" width="0.1524" layer="91"/>
-<label x="58.42" y="13.97" size="0.8128" layer="95" rot="R180" xref="yes"/>
-<wire x1="59.69" y1="13.97" x2="58.42" y2="13.97" width="0.1524" layer="91"/>
+<label x="55.88" y="15.24" size="0.8128" layer="95" rot="R180" xref="yes"/>
+<wire x1="58.42" y1="15.24" x2="55.88" y2="15.24" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="CE" class="0">
@@ -6586,8 +6583,8 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 </segment>
 <segment>
 <pinref part="U1" gate="A" pin="PB0"/>
-<wire x1="59.69" y1="22.86" x2="57.15" y2="22.86" width="0.1524" layer="91"/>
-<label x="57.15" y="22.86" size="0.8128" layer="95" rot="R180" xref="yes"/>
+<wire x1="58.42" y1="22.86" x2="55.88" y2="22.86" width="0.1524" layer="91"/>
+<label x="55.88" y="22.86" size="0.8128" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
 <net name="CSN" class="0">
@@ -6598,7 +6595,7 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 </segment>
 <segment>
 <pinref part="U1" gate="A" pin="PA7"/>
-<wire x1="95.25" y1="10.16" x2="99.06" y2="10.16" width="0.1524" layer="91"/>
+<wire x1="93.98" y1="10.16" x2="99.06" y2="10.16" width="0.1524" layer="91"/>
 <label x="99.06" y="10.16" size="0.8128" layer="95" xref="yes"/>
 </segment>
 </net>
@@ -6635,9 +6632,9 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 <label x="30.48" y="-2.54" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
-<label x="57.15" y="20.32" size="1.016" layer="95" rot="R180" xref="yes"/>
+<label x="55.88" y="20.32" size="1.016" layer="95" rot="R180" xref="yes"/>
 <pinref part="U1" gate="A" pin="PB1"/>
-<wire x1="57.15" y1="20.32" x2="59.69" y2="20.32" width="0.1524" layer="91"/>
+<wire x1="55.88" y1="20.32" x2="58.42" y2="20.32" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="XTL2" class="0">
@@ -6650,9 +6647,9 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 <label x="30.48" y="-7.62" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
-<label x="57.15" y="17.78" size="1.016" layer="95" rot="R180" xref="yes"/>
+<label x="55.88" y="17.78" size="1.016" layer="95" rot="R180" xref="yes"/>
 <pinref part="U1" gate="A" pin="PB2"/>
-<wire x1="57.15" y1="17.78" x2="59.69" y2="17.78" width="0.1524" layer="91"/>
+<wire x1="55.88" y1="17.78" x2="58.42" y2="17.78" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
