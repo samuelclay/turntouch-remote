@@ -6040,8 +6040,9 @@ Various standard crystals. Proven footprints. Spark Fun Electronics SKU : COM-00
 <label x="30.48" y="-2.54" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
-<wire x1="60.96" y1="20.32" x2="58.42" y2="20.32" width="0.1524" layer="91"/>
-<label x="58.42" y="20.32" size="1.016" layer="95" rot="R180" xref="yes"/>
+<label x="57.15" y="20.32" size="1.016" layer="95" rot="R180" xref="yes"/>
+<pinref part="U1" gate="A" pin="PB1"/>
+<wire x1="57.15" y1="20.32" x2="59.69" y2="20.32" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="XTL2" class="0">
@@ -6054,8 +6055,9 @@ Various standard crystals. Proven footprints. Spark Fun Electronics SKU : COM-00
 <label x="30.48" y="-7.62" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
-<wire x1="60.96" y1="17.78" x2="58.42" y2="17.78" width="0.1524" layer="91"/>
-<label x="58.42" y="17.78" size="1.016" layer="95" rot="R180" xref="yes"/>
+<label x="57.15" y="17.78" size="1.016" layer="95" rot="R180" xref="yes"/>
+<pinref part="U1" gate="A" pin="PB2"/>
+<wire x1="57.15" y1="17.78" x2="59.69" y2="17.78" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

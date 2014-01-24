@@ -6237,13 +6237,10 @@ Various common sizes : AA, AAA, 20mm coin cell and 12mm coin cell.&lt;br&gt;
 <rectangle x1="-4.445" y1="5.842" x2="-2.286" y2="6.35" layer="21"/>
 <rectangle x1="2.286" y1="-6.35" x2="4.445" y2="-5.842" layer="21"/>
 <rectangle x1="-4.445" y1="-6.35" x2="-2.286" y2="-5.842" layer="21"/>
-<hole x="0" y="-4.4958" drill="1.8034"/>
-<hole x="0" y="4.4958" drill="1.8034"/>
-<smd name="P$1" x="-6.985" y="2.54" dx="3.0988" dy="1.6002" layer="1"/>
-<smd name="P$2" x="-6.985" y="-2.54" dx="3.0988" dy="1.6002" layer="1"/>
-<smd name="P$3" x="-6.985" y="2.54" dx="3.0988" dy="1.6002" layer="1"/>
-<smd name="P$4" x="6.985" y="2.54" dx="3.0988" dy="1.6002" layer="1"/>
-<smd name="P$5" x="6.985" y="-2.54" dx="3.0988" dy="1.6002" layer="1"/>
+<smd name="P$1" x="-6.985" y="2.54" dx="1.6002" dy="1.6002" layer="1"/>
+<smd name="P$3" x="-6.985" y="-2.54" dx="1.6002" dy="1.6002" layer="1"/>
+<smd name="P$4" x="6.985" y="-2.54" dx="1.6002" dy="1.6002" layer="1"/>
+<smd name="P$2" x="6.985" y="2.54" dx="1.6002" dy="1.6002" layer="1"/>
 </package>
 </packages>
 <symbols>

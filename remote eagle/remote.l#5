@@ -52,7 +52,7 @@
 <layer number="57" name="tCAD" color="7" fill="1" visible="no" active="no"/>
 <layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
-<layer number="93" name="Pins" color="2" fill="1" visible="no" active="yes"/>
+<layer number="93" name="Pins" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="94" name="Symbols" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="95" name="Names" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="96" name="Values" color="7" fill="1" visible="yes" active="yes"/>
@@ -124,7 +124,7 @@
 <library>
 <description>Turn Touch Remote Library</description>
 <packages>
-<package name="TL3300E-SWITCH">
+<package name="TL3300">
 <wire x1="-1.905" y1="1.905" x2="1.905" y2="1.905" width="0.1524" layer="21"/>
 <wire x1="1.905" y1="-1.905" x2="1.905" y2="1.905" width="0.1524" layer="21"/>
 <wire x1="1.905" y1="-1.905" x2="-1.905" y2="-1.905" width="0.1524" layer="21"/>
@@ -203,7 +203,7 @@
 <rectangle x1="-4.445" y1="-6.35" x2="-2.286" y2="-5.842" layer="21"/>
 <hole x="0" y="-4.4958" drill="1.8034"/>
 <hole x="0" y="4.4958" drill="1.8034"/>
-<smd name="P$1" x="-6.985" y="2.54" dx="3.0988" dy="1.6002" layer="1"/>
+<smd name="P$1" x="-10.795" y="1.27" dx="1.6002" dy="1.6002" layer="1"/>
 <smd name="P$2" x="-6.985" y="-2.54" dx="3.0988" dy="1.6002" layer="1"/>
 <smd name="P$3" x="-6.985" y="2.54" dx="3.0988" dy="1.6002" layer="1"/>
 <smd name="P$4" x="6.985" y="2.54" dx="3.0988" dy="1.6002" layer="1"/>
@@ -234,12 +234,12 @@
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="TL3300SWITCH">
+<deviceset name="TL3300">
 <gates>
 <gate name="G$1" symbol="TL3300" x="0" y="0"/>
 </gates>
 <devices>
-<device name="" package="TL3300E-SWITCH">
+<device name="SMD" package="TL3300">
 <connects>
 <connect gate="G$1" pin="P" pad="P$1"/>
 <connect gate="G$1" pin="P1" pad="P$2"/>
