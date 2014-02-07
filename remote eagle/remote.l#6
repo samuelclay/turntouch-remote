@@ -203,11 +203,10 @@
 <rectangle x1="-4.445" y1="-6.35" x2="-2.286" y2="-5.842" layer="21"/>
 <hole x="0" y="-4.4958" drill="1.8034"/>
 <hole x="0" y="4.4958" drill="1.8034"/>
-<smd name="P$1" x="-6.985" y="2.54" dx="3.0988" dy="1.6002" layer="1"/>
-<smd name="P$2" x="-6.985" y="-2.54" dx="3.0988" dy="1.6002" layer="1"/>
-<smd name="P$3" x="-6.985" y="2.54" dx="3.0988" dy="1.6002" layer="1"/>
-<smd name="P$4" x="6.985" y="2.54" dx="3.0988" dy="1.6002" layer="1"/>
-<smd name="P$5" x="6.985" y="-2.54" dx="3.0988" dy="1.6002" layer="1"/>
+<smd name="P$1" x="-6.985" y="2.54" dx="1.6002" dy="1.6002" layer="1"/>
+<smd name="P$3" x="-6.985" y="-2.54" dx="1.6002" dy="1.6002" layer="1"/>
+<smd name="P$4" x="6.985" y="-2.54" dx="1.6002" dy="1.6002" layer="1"/>
+<smd name="P$2" x="6.985" y="2.54" dx="1.6002" dy="1.6002" layer="1"/>
 </package>
 </packages>
 <symbols>
@@ -240,12 +239,6 @@
 </gates>
 <devices>
 <device name="SMD" package="TL3300">
-<connects>
-<connect gate="G$1" pin="P" pad="P$1"/>
-<connect gate="G$1" pin="P1" pad="P$2"/>
-<connect gate="G$1" pin="S" pad="P$3"/>
-<connect gate="G$1" pin="S1" pad="P$4"/>
-</connects>
 <technologies>
 <technology name=""/>
 </technologies>
