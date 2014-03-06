@@ -1,15 +1,7 @@
-#include <Arduino.h>
 #include <avr/power.h>
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 #include <SPI.h>
-
-#define SERIAL_PRINT 1
-
-#define PRESS_ACTIVE  1
-#define PRESS_TOGGLE  2
-#define PRESS_MODE    3
-
 #include "nRF24L01.h"
 #include "RF24.h"
 #include "pinchange.h"
@@ -17,19 +9,26 @@
 void sleepNow(void);
 void wakeup();
 bool run_remote();
+void blink(int loops, int loop_time, bool half);
 
 #define BODS 7                   //BOD Sleep bit in MCUCR
 #define BODSE 2                  //BOD Sleep enable bit in MCUCR
 uint8_t mcucr1, mcucr2;
+
+#define SERIAL_PRINT 1
+#define PRESS_ACTIVE  1
+#define PRESS_TOGGLE  2
+#define PRESS_MODE    3
+#define MODE_CHANGE_DURATION 2500 // ms
 
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
 const int rx_pin           = 0;
 const int tx_pin           = 0;
 const int ce_pin           = 3;
 const int csn_pin          = 2;
-const int led_pin          = 1; // 0
-const int interrupt_pin    = 1; // 1
-const uint8_t button_pins[] = { 7,8,9,10 };
+const int led_pin          = 9;
+const int interrupt_pin    = 1;
+const uint8_t button_pins[] = { 7,8,8,10 };
 #else
 const int rx_pin           = 0;
 const int tx_pin           = 1;
@@ -38,23 +37,19 @@ const int csn_pin          = 10;
 const int led_pin          = 4;
 const int interrupt_pin    = 2;
 const uint8_t button_pins[] = { 2,2,2,3 };
-#endif 
+#endif
 
 const uint8_t num_button_pins = sizeof(button_pins);
 uint8_t button_states[num_button_pins];
 uint8_t button_presses[num_button_pins];
 unsigned long button_timestamps[num_button_pins];
 
-const uint64_t pipe = 0xF2F2F2F200LL;
+const uint64_t pipe = (unsigned char)0xF2F2F2F200LL;
 RF24 radio(ce_pin, csn_pin);
 
-int awakems = 0;
-
-extern "C" void __cxa_pure_virtual() {}  
+extern "C" void __cxa_pure_virtual() {}
 
 void setup() {
-//    pinMode(rx_pin, INPUT);
-//    pinMode(tx_pin, OUTPUT);
 #ifdef SERIAL_PRINT
     Serial.begin(9600);
     Serial.print("\n\nTurn Touch Remote\n\n");
@@ -81,37 +76,22 @@ void setup() {
     digitalWrite(interrupt_pin, HIGH);
     pinMode(led_pin, OUTPUT);
     digitalWrite(led_pin, LOW);
-    int blinks = 2;
-    int pause = 250;
-    while (blinks--) {
-        delay(pause);
-        digitalWrite(led_pin, HIGH);
-        delay(pause);
-        digitalWrite(led_pin, LOW);
-    }
+    blink(3, 200, true);
 }
 
 void loop() {
     bool button_on = run_remote();
     if (!button_on) {
-//        if (awakems && (millis() - awakems) > 50) {
-            sleepNow();
-//        } else if (awakems == 0) {
-//            awakems = millis();
-//        } else {
-//            awakems++;
-//        }
-//    } else {
-//        awakems = 0;
+        sleepNow();
     }
 }
 
 bool run_remote() {
-    // Get the current state of buttons, and
-    // Test if the current state is different from the last state we sent
+    // Read the current state of buttons, and test if the current state
+    // is different from the last state we sent
     int i = num_button_pins;
     bool button_on = false;
-    unsigned long button_offset;
+    unsigned long button_offset = 0;
     bool different = false;
     while (i--) {
         bool button_different = false;
@@ -132,81 +112,92 @@ bool run_remote() {
         }
 
         if (state) button_on = true;
-        
+
         if (state && button_different) {
             // Start pressing button
             button_timestamps[i] = millis();
             button_presses[i] = PRESS_ACTIVE;
-              Serial.print("\nStarting active: ");
-              Serial.print((int)i+1);
-              Serial.println();
+#ifdef SERIAL_PRINT
+            Serial.print("\nStarting active: ");
+            Serial.print((int)i+1);
+            Serial.println();
+#endif
         } else if (state && !button_different && button_timestamps[i]) {
             // Check if has hit new mode
             button_offset = millis() - button_timestamps[i];
 
-            if (button_offset >= 500) {
-              Serial.print("\nMode by default: ");
-              Serial.print((int)i+1);
-              Serial.print(" -- ");
-              Serial.print((unsigned long)button_offset);
-              Serial.println();
+            if (button_offset >= MODE_CHANGE_DURATION) {
+#ifdef SERIAL_PRINT
+                Serial.print("\nMode by default: ");
+                Serial.print((int)i+1);
+                Serial.print(" -- ");
+                Serial.print((unsigned long)button_offset);
+                Serial.println();
+#endif
                 button_presses[i] = PRESS_MODE;
                 button_timestamps[i] = 0;
                 different = true;
             }
         } else if (!state && button_different) {
-              Serial.print("\nEnding active: ");
-              Serial.print((int)i+1);
-              Serial.print(" -- ");
-              Serial.print((unsigned long)button_offset);
-              Serial.println();
+            // Button was pressed, now released
+#ifdef SERIAL_PRINT
+            Serial.print("\nEnding active: ");
+            Serial.print((int)i+1);
+            Serial.print(" -- ");
+            Serial.print((unsigned long)button_offset);
+            Serial.println();
+#endif
 
             // Debounce pressed button, seeing if toggle or new mode
             if (button_offset > 10) {
                 button_presses[i] = PRESS_TOGGLE;
             } else {
+#ifdef SERIAL_PRINT
                 Serial.print("\nDebounced, ignored: ");
                 Serial.print((int)i+1);
                 Serial.print(" -- ");
-                Serial.print((unsigned long)button_offset);                
-            }
+                Serial.print((unsigned long)button_offset);
+#endif
+}
             button_timestamps[i] = 0;
         } else if (button_presses[i]) {
             button_presses[i] = 0;
         }
-        
+
     }
 
     // Send the state of the buttons to the LED board
-    if (different) {      
-        awakems = 0;
-#ifdef SERIAL_PRINT        
+    if (different) {
+#ifdef SERIAL_PRINT
         Serial.print("...");
 #endif
         int send_tries = 30;
         while (send_tries--) {
-            digitalWrite(led_pin, HIGH);
             bool ok = radio.write(button_presses, num_button_pins);
-            digitalWrite(led_pin, LOW);
             if (ok) {
 #ifdef SERIAL_PRINT
                 Serial.print("ok");
                 Serial.println();
+                blink(3, 50, true);
 #endif
                 break;
             } else {
 #ifdef SERIAL_PRINT
+                blink(3, 20, false);
                 Serial.print(".");
 #endif
             }
         }
         if (!send_tries) {
+#ifdef SERIAL_PRINT
+            blink(6, 100, false);
             Serial.print("failed.\n");
+#endif
         }
         digitalWrite(led_pin, button_on ? HIGH : LOW);
         different = false;
     }
-    
+
     return button_on;
 }
 
@@ -230,7 +221,7 @@ void sleepNow(void)
     ADCSRA &= ~_BV(ADEN);                     //disable ADC
     set_sleep_mode(SLEEP_MODE_PWR_DOWN);
     sleep_enable();
-    
+
     //turn off the brown-out detector.
     //must have an ATtiny45 or ATtiny85 rev C or later for software to be able to disable the BOD.
     //current while sleeping will be <0.5uA if BOD is disabled, <25uA if not.
@@ -249,14 +240,23 @@ void sleepNow(void)
         detachPcInterrupt(button_pins[p]);
     }
 #endif
-    sleep_disable();               
+    sleep_disable();
 //    sei();                         //enable interrupts again (but INT0 is disabled from above)
-    
+
     radio.powerUp();
     digitalWrite(interrupt_pin, HIGH);
     delay(15);
 }
 
 void wakeup() {
-    awakems = 0;
+}
+
+void blink(int loops, int loop_time, bool half) {
+    // return;
+    while (loops--) {
+        digitalWrite(led_pin, HIGH);
+        delay(loop_time);
+        digitalWrite(led_pin, LOW);
+        delay(loop_time / (half ? 2 : 1));
+    }
 }

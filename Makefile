@@ -94,7 +94,10 @@ core:
 	avr-ar rcs core.a $(C_SRC:.c=.o) $(CPP_SRC:.cpp=.o)
     
 # file targets:
-remote.elf: $(OBJECTS) core
+
+code: $(OBJECTS) core
+
+remote.elf: code core
 	$(COMPILE) -o remote.elf $(SRC:.cpp=.o) core.a -L. -lm
 
 remote.hex: remote.elf
