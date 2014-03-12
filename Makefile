@@ -7,7 +7,7 @@
 DEVICE     = attiny84
 PROGRAMMER ?= usbtiny
 F_CPU      = 8000000	# in Hz
-FUSE_L     = 0xE2
+FUSE_L     = 0xFF
 FUSE_H     = 0xD7
 AVRDUDE    = avrdude -v -v -v -v -c $(PROGRAMMER) -p $(DEVICE) -P usb
 

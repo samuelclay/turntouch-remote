@@ -6285,8 +6285,8 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <parts>
 <part name="ATTINY84" library="Atmel_By_element14_Batch_1" deviceset="ATTINY84-20SSU" device="" value=""/>
 <part name="C1" library="adafruit" deviceset="C-US" device="C0805" value=".1uf"/>
-<part name="ISP1" library="adafruit" deviceset="AVRISP" device="-6"/>
-<part name="JP1" library="pinhead" deviceset="PINHD-2X4" device=""/>
+<part name="ISP" library="adafruit" deviceset="AVRISP" device="-6"/>
+<part name="NRF24L01" library="pinhead" deviceset="PINHD-2X4" device=""/>
 <part name="R5" library="adafruit" deviceset="R-US_" device="R0805" value="10k"/>
 <part name="R6" library="adafruit" deviceset="R-US_" device="R0805" value="10K"/>
 <part name="R7" library="adafruit" deviceset="R-US_" device="R0805" value="10k"/>
@@ -6308,8 +6308,8 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <instances>
 <instance part="ATTINY84" gate="A" x="76.2" y="22.86"/>
 <instance part="C1" gate="G$1" x="43.18" y="20.32"/>
-<instance part="ISP1" gate="G$1" x="156.21" y="15.24"/>
-<instance part="JP1" gate="A" x="149.86" y="-3.81"/>
+<instance part="ISP" gate="G$1" x="156.21" y="15.24"/>
+<instance part="NRF24L01" gate="A" x="149.86" y="-3.81"/>
 <instance part="R5" gate="G$1" x="132.08" y="-3.81"/>
 <instance part="R6" gate="G$1" x="132.08" y="-11.43"/>
 <instance part="R7" gate="G$1" x="172.72" y="-3.81"/>
@@ -6377,12 +6377,12 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <pinref part="BAT2" gate="G$1" pin="-"/>
 </segment>
 <segment>
-<pinref part="ISP1" gate="G$1" pin="GND"/>
+<pinref part="ISP" gate="G$1" pin="GND"/>
 <wire x1="171.45" y1="12.7" x2="173.99" y2="12.7" width="0.1524" layer="91"/>
 <label x="173.99" y="12.7" size="0.8128" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="JP1" gate="A" pin="1"/>
+<pinref part="NRF24L01" gate="A" pin="1"/>
 <wire x1="147.32" y1="1.27" x2="139.7" y2="1.27" width="0.1524" layer="91"/>
 <label x="139.7" y="1.27" size="0.8128" layer="95" rot="R180" xref="yes"/>
 </segment>
@@ -6406,7 +6406,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <label x="99.06" y="15.24" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="ISP1" gate="G$1" pin="MISO"/>
+<pinref part="ISP" gate="G$1" pin="MISO"/>
 <wire x1="143.51" y1="17.78" x2="140.97" y2="17.78" width="0.1524" layer="91"/>
 <label x="140.97" y="17.78" size="0.8128" layer="95" rot="R180" xref="yes"/>
 </segment>
@@ -6423,7 +6423,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <label x="99.06" y="12.7" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="ISP1" gate="G$1" pin="MOSI"/>
+<pinref part="ISP" gate="G$1" pin="MOSI"/>
 <wire x1="171.45" y1="15.24" x2="173.99" y2="15.24" width="0.1524" layer="91"/>
 <label x="173.99" y="15.24" size="0.8128" layer="95" xref="yes"/>
 </segment>
@@ -6440,7 +6440,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <label x="99.06" y="17.78" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="ISP1" gate="G$1" pin="SCK"/>
+<pinref part="ISP" gate="G$1" pin="SCK"/>
 <wire x1="143.51" y1="15.24" x2="140.97" y2="15.24" width="0.1524" layer="91"/>
 <label x="140.97" y="15.24" size="0.8128" layer="95" rot="R180" xref="yes"/>
 </segment>
@@ -6525,12 +6525,12 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <pinref part="BAT2" gate="G$1" pin="+"/>
 </segment>
 <segment>
-<pinref part="ISP1" gate="G$1" pin="VCC"/>
+<pinref part="ISP" gate="G$1" pin="VCC"/>
 <wire x1="171.45" y1="17.78" x2="173.99" y2="17.78" width="0.1524" layer="91"/>
 <label x="173.99" y="17.78" size="0.8128" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="JP1" gate="A" pin="2"/>
+<pinref part="NRF24L01" gate="A" pin="2"/>
 <wire x1="154.94" y1="1.27" x2="162.56" y2="1.27" width="0.1524" layer="91"/>
 <label x="162.56" y="1.27" size="0.8128" layer="95" xref="yes"/>
 </segment>
@@ -6542,7 +6542,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 </net>
 <net name="RESET" class="0">
 <segment>
-<pinref part="ISP1" gate="G$1" pin="RST"/>
+<pinref part="ISP" gate="G$1" pin="RST"/>
 <wire x1="143.51" y1="12.7" x2="140.97" y2="12.7" width="0.1524" layer="91"/>
 <label x="140.97" y="12.7" size="0.8128" layer="95" rot="R180" xref="yes"/>
 <pinref part="R8" gate="G$1" pin="2"/>
@@ -6557,7 +6557,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 </net>
 <net name="CE" class="0">
 <segment>
-<pinref part="JP1" gate="A" pin="3"/>
+<pinref part="NRF24L01" gate="A" pin="3"/>
 <wire x1="147.32" y1="-1.27" x2="139.7" y2="-1.27" width="0.1524" layer="91"/>
 <label x="139.7" y="-1.27" size="0.8128" layer="95" rot="R180" xref="yes"/>
 </segment>
@@ -6569,7 +6569,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 </net>
 <net name="CSN" class="0">
 <segment>
-<pinref part="JP1" gate="A" pin="4"/>
+<pinref part="NRF24L01" gate="A" pin="4"/>
 <wire x1="154.94" y1="-1.27" x2="162.56" y2="-1.27" width="0.1524" layer="91"/>
 <label x="162.56" y="-1.27" size="0.8128" layer="95" xref="yes"/>
 </segment>
@@ -6581,14 +6581,14 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 </net>
 <net name="N$2" class="0">
 <segment>
-<pinref part="JP1" gate="A" pin="5"/>
+<pinref part="NRF24L01" gate="A" pin="5"/>
 <pinref part="R5" gate="G$1" pin="2"/>
 <wire x1="147.32" y1="-3.81" x2="137.16" y2="-3.81" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$3" class="0">
 <segment>
-<pinref part="JP1" gate="A" pin="7"/>
+<pinref part="NRF24L01" gate="A" pin="7"/>
 <wire x1="147.32" y1="-6.35" x2="139.7" y2="-6.35" width="0.1524" layer="91"/>
 <wire x1="139.7" y1="-6.35" x2="139.7" y2="-11.43" width="0.1524" layer="91"/>
 <pinref part="R6" gate="G$1" pin="2"/>
@@ -6597,7 +6597,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 </net>
 <net name="N$4" class="0">
 <segment>
-<pinref part="JP1" gate="A" pin="6"/>
+<pinref part="NRF24L01" gate="A" pin="6"/>
 <pinref part="R7" gate="G$1" pin="1"/>
 <wire x1="154.94" y1="-3.81" x2="167.64" y2="-3.81" width="0.1524" layer="91"/>
 </segment>

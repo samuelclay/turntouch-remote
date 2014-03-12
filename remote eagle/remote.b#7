@@ -664,12 +664,14 @@ design rules under a new name.
 </pass>
 </autorouter>
 <elements>
-<element name="ATTINY84" library="Atmel_By_element14_Batch_1" package="SOIC127P600X175-14N" value="" x="8.89" y="7.62" rot="MR0">
+<element name="ATTINY84" library="Atmel_By_element14_Batch_1" package="SOIC127P600X175-14N" value="" x="8.89" y="7.62" smashed="yes" rot="MR0">
 <attribute name="PACKAGE" value="SOIC-14" x="-25.4" y="-1.27" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="OC_NEWARK" value="03P2040" x="-25.4" y="-1.27" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="MPN" value="ATTINY84-20SSU" x="-25.4" y="-1.27" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="SUPPLIER" value="Atmel" x="-25.4" y="-1.27" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="OC_FARNELL" value="1636955" x="-25.4" y="-1.27" size="1.778" layer="28" rot="MR0" display="off"/>
+<attribute name="NAME" x="12.6492" y="1.9812" size="1.016" layer="26" font="vector" ratio="10" rot="SMR0"/>
+<attribute name="VALUE" x="12.3444" y="15.0368" size="2.0828" layer="28" ratio="10" rot="SMR0"/>
 </element>
 <element name="C1" library="adafruit" package="C0805" value=".1uf" x="8.636" y="14.986" rot="MR0"/>
 <element name="ISP1" library="adafruit" package="AVRISP" value="AVRISP-6" x="46.686" y="22.044" rot="MR180"/>

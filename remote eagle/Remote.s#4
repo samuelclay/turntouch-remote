@@ -6283,7 +6283,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 </class>
 </classes>
 <parts>
-<part name="ATTINY84" library="Atmel_By_element14_Batch_1" deviceset="ATTINY84-20SSU" device=""/>
+<part name="ATTINY84" library="Atmel_By_element14_Batch_1" deviceset="ATTINY84-20SSU" device="" value=""/>
 <part name="C1" library="adafruit" deviceset="C-US" device="C0805" value=".1uf"/>
 <part name="ISP1" library="adafruit" deviceset="AVRISP" device="-6"/>
 <part name="JP1" library="pinhead" deviceset="PINHD-2X4" device=""/>

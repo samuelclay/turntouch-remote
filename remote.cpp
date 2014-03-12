@@ -23,10 +23,10 @@ uint8_t mcucr1, mcucr2;
 #define MODE_CHANGE_DURATION 2500 // ms
 
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
-const int ce_pin           = 3;
-const int csn_pin          = 2;
-const int led_pin          = 9;
-const uint8_t button_pins[] = { 7,8,8,10 };
+const int ce_pin           = 2;
+const int csn_pin          = 3;
+const int led_pin          = 0;
+const uint8_t button_pins[] = { 7,8,9,10 };
 #else
 const int rx_pin           = 0;
 const int tx_pin           = 1;
@@ -47,14 +47,14 @@ extern "C" void __cxa_pure_virtual() {}
 
 void setup() {
 #ifdef SERIAL_PRINT
-    Serial.begin(9600);
+    Serial.begin(115200);
     Serial.print("\n\nTurn Touch Remote\n\n");
 #endif
     radio.begin();
     radio.setChannel(38);
     radio.setDataRate(RF24_250KBPS);
     radio.setAutoAck(pipe, true);
-    radio.setRetries(1, 0);
+    radio.setRetries(3, 3);
 
     radio.openWritingPipe(pipe);
     radio.stopListening();
@@ -126,6 +126,7 @@ bool run_remote() {
                 Serial.print((int)i+1);
                 Serial.print(" -- ");
                 Serial.print((unsigned long)button_offset);
+                Serial.print("ms");
                 Serial.println();
 #endif
                 button_presses[i] = PRESS_MODE;
@@ -164,10 +165,11 @@ bool run_remote() {
     if (different) {
         awakems = 0;
 #ifdef SERIAL_PRINT
-        Serial.print("...");
+        Serial.print("[diff]");
 #endif
         int send_tries = 3;
-        while (send_tries--) {
+        while (send_tries--) {            
+            Serial.print("!");
             bool ok = radio.write(button_presses, num_button_pins);
             if (ok) {
 #ifdef SERIAL_PRINT
@@ -183,9 +185,10 @@ bool run_remote() {
 #endif
             }
         }
-        if (!send_tries) {
+
+        if (send_tries <= 0) {
 #ifdef SERIAL_PRINT
-            blink(3, 300, true);
+            blink(2, 100, true);
             Serial.print("failed.\n");
 #endif
         }
