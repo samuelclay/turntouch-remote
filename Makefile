@@ -7,7 +7,7 @@
 DEVICE     = attiny84
 PROGRAMMER ?= usbtiny
 F_CPU      = 8000000	# in Hz
-FUSE_L     = 0xFF
+FUSE_L     = 0xE2
 FUSE_H     = 0xD7
 AVRDUDE    = avrdude -v -v -v -v -c $(PROGRAMMER) -p $(DEVICE) -P usb
 
@@ -26,7 +26,6 @@ C_SRC   := tiny/pins_arduino.c \
            tiny/wiring_pulse.c \
            tiny/wiring_shift.c
 CPP_SRC := SPI/SPI.cpp \
-           tiny/HardwareSerial.cpp \
            tiny/main.cpp \
            tiny/Print.cpp \
            tiny/TinyDebugSerial.cpp \

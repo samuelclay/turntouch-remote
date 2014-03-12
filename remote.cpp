@@ -6,28 +6,26 @@
 #include "RF24.h"
 #include "pinchange.h"
 
+
 void sleepNow(void);
 void wakeup();
 bool run_remote();
 void blink(int loops, int loop_time, bool half);
 
-#define BODS 7                   //BOD Sleep bit in MCUCR
-#define BODSE 2                  //BOD Sleep enable bit in MCUCR
+#define BODS 7      // BOD Sleep bit in MCUCR
+#define BODSE 2     // BOD Sleep enable bit in MCUCR
 uint8_t mcucr1, mcucr2;
 
-#define SERIAL_PRINT 1
+#define SERIAL_PRINT  1
 #define PRESS_ACTIVE  1
 #define PRESS_TOGGLE  2
 #define PRESS_MODE    3
 #define MODE_CHANGE_DURATION 2500 // ms
 
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
-const int rx_pin           = 0;
-const int tx_pin           = 0;
 const int ce_pin           = 3;
 const int csn_pin          = 2;
 const int led_pin          = 9;
-const int interrupt_pin    = 1;
 const uint8_t button_pins[] = { 7,8,8,10 };
 #else
 const int rx_pin           = 0;
@@ -35,7 +33,6 @@ const int tx_pin           = 1;
 const int ce_pin           = 9;
 const int csn_pin          = 10;
 const int led_pin          = 4;
-const int interrupt_pin    = 2;
 const uint8_t button_pins[] = { 2,2,2,3 };
 #endif
 
@@ -43,10 +40,9 @@ const uint8_t num_button_pins = sizeof(button_pins);
 uint8_t button_states[num_button_pins];
 uint8_t button_presses[num_button_pins];
 unsigned long button_timestamps[num_button_pins];
-
-const uint64_t pipe = (unsigned char)0xF2F2F2F200LL;
+volatile int awakems = 0;
+const uint64_t pipe = 1;
 RF24 radio(ce_pin, csn_pin);
-
 extern "C" void __cxa_pure_virtual() {}
 
 void setup() {
@@ -72,8 +68,6 @@ void setup() {
     }
 
     // Turn LED's ON until we start getting keys
-    pinMode(interrupt_pin, INPUT);
-    digitalWrite(interrupt_pin, HIGH);
     pinMode(led_pin, OUTPUT);
     digitalWrite(led_pin, LOW);
     blink(3, 200, true);
@@ -149,17 +143,17 @@ bool run_remote() {
 #endif
 
             // Debounce pressed button, seeing if toggle or new mode
-            if (button_offset > 10) {
+            // if (button_offset > 10) {
                 button_presses[i] = PRESS_TOGGLE;
-            } else {
-#ifdef SERIAL_PRINT
-                Serial.print("\nDebounced, ignored: ");
-                Serial.print((int)i+1);
-                Serial.print(" -- ");
-                Serial.print((unsigned long)button_offset);
-#endif
-}
-            button_timestamps[i] = 0;
+                button_timestamps[i] = 0;
+//             } else {
+// #ifdef SERIAL_PRINT
+//                 Serial.print("\nDebounced, ignored: ");
+//                 Serial.print((int)i+1);
+//                 Serial.print(" -- ");
+//                 Serial.print((unsigned long)button_offset);
+// #endif
+//             }
         } else if (button_presses[i]) {
             button_presses[i] = 0;
         }
@@ -168,17 +162,18 @@ bool run_remote() {
 
     // Send the state of the buttons to the LED board
     if (different) {
+        awakems = 0;
 #ifdef SERIAL_PRINT
         Serial.print("...");
 #endif
-        int send_tries = 30;
+        int send_tries = 3;
         while (send_tries--) {
             bool ok = radio.write(button_presses, num_button_pins);
             if (ok) {
 #ifdef SERIAL_PRINT
                 Serial.print("ok");
                 Serial.println();
-                blink(3, 50, true);
+                blink(5, 25, true);
 #endif
                 break;
             } else {
@@ -190,11 +185,11 @@ bool run_remote() {
         }
         if (!send_tries) {
 #ifdef SERIAL_PRINT
-            blink(6, 100, false);
+            blink(3, 300, true);
             Serial.print("failed.\n");
 #endif
         }
-        digitalWrite(led_pin, button_on ? HIGH : LOW);
+        // digitalWrite(led_pin, button_on ? HIGH : LOW);
         different = false;
     }
 
@@ -203,7 +198,6 @@ bool run_remote() {
 
 void sleepNow(void)
 {
-    digitalWrite(interrupt_pin, LOW);
     radio.powerDown();
 
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
@@ -244,15 +238,15 @@ void sleepNow(void)
 //    sei();                         //enable interrupts again (but INT0 is disabled from above)
 
     radio.powerUp();
-    digitalWrite(interrupt_pin, HIGH);
     delay(15);
 }
 
 void wakeup() {
+    awakems = 0;
 }
 
 void blink(int loops, int loop_time, bool half) {
-    // return;
+    return;
     while (loops--) {
         digitalWrite(led_pin, HIGH);
         delay(loop_time);
