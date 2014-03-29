@@ -880,7 +880,8 @@ design rules under a new name.
 <via x="15.494" y="26.924" extent="1-16" drill="0.6" diameter="0.1778"/>
 <wire x1="15.494" y1="26.924" x2="25.621" y2="26.924" width="0.254" layer="1"/>
 <wire x1="25.621" y1="26.924" x2="32.228" y2="20.317" width="0.254" layer="1"/>
-<wire x1="32.128" y1="9.247" x2="32.228" y2="20.317" width="0" layer="19" extent="1-1"/>
+<wire x1="32.228" y1="20.317" x2="32.228" y2="9.347" width="0.4064" layer="1"/>
+<wire x1="32.228" y1="9.347" x2="32.128" y2="9.247" width="0.4064" layer="1"/>
 </signal>
 <signal name="VCC">
 <contactref element="ATTINY84" pad="1"/>

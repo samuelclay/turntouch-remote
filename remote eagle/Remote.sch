@@ -6159,14 +6159,14 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <label x="140.97" y="17.78" size="0.8128" layer="95" rot="R180" xref="yes"/>
 </segment>
 <segment>
-<wire x1="147.32" y1="-7.62" x2="139.7" y2="-7.62" width="0.1524" layer="91"/>
-<label x="139.7" y="-7.62" size="0.8128" layer="95" rot="R180" xref="yes"/>
-<pinref part="RADIO" gate="A" pin="7"/>
+<pinref part="RADIO" gate="A" pin="6"/>
+<wire x1="154.94" y1="-5.08" x2="162.56" y2="-5.08" width="0.1524" layer="91"/>
+<label x="162.56" y="-5.08" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="ATTINY84" gate="A" pin="PA6"/>
-<wire x1="93.98" y1="12.7" x2="99.06" y2="12.7" width="0.1524" layer="91"/>
-<label x="99.06" y="12.7" size="1.016" layer="95" font="vector" xref="yes"/>
+<pinref part="ATTINY84" gate="A" pin="PA5"/>
+<wire x1="93.98" y1="15.24" x2="99.06" y2="15.24" width="0.1524" layer="91"/>
+<label x="99.06" y="15.24" size="1.016" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="MOSI" class="0">
@@ -6176,14 +6176,14 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <label x="173.99" y="15.24" size="0.8128" layer="95" xref="yes"/>
 </segment>
 <segment>
-<wire x1="154.94" y1="-5.08" x2="162.56" y2="-5.08" width="0.1524" layer="91"/>
-<label x="162.56" y="-5.08" size="0.8128" layer="95" xref="yes"/>
-<pinref part="RADIO" gate="A" pin="6"/>
+<pinref part="RADIO" gate="A" pin="7"/>
+<wire x1="147.32" y1="-7.62" x2="139.7" y2="-7.62" width="0.1524" layer="91"/>
+<label x="139.7" y="-7.62" size="1.016" layer="95" font="vector" rot="R180" xref="yes"/>
 </segment>
 <segment>
-<pinref part="ATTINY84" gate="A" pin="PA5"/>
-<wire x1="93.98" y1="15.24" x2="99.06" y2="15.24" width="0.1524" layer="91"/>
-<label x="99.06" y="15.24" size="1.016" layer="95" font="vector" xref="yes"/>
+<pinref part="ATTINY84" gate="A" pin="PA6"/>
+<wire x1="93.98" y1="12.7" x2="99.06" y2="12.7" width="0.1524" layer="91"/>
+<label x="99.06" y="12.7" size="1.016" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="SCK" class="0">

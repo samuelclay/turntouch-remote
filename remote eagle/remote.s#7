@@ -6283,7 +6283,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 </class>
 </classes>
 <parts>
-<part name="ATTINY84" library="Atmel_By_element14_Batch_1" deviceset="ATTINY84-20SSU" device="" value=""/>
+<part name="TINY84" library="Atmel_By_element14_Batch_1" deviceset="ATTINY84-20SSU" device="" value=""/>
 <part name="C1" library="adafruit" deviceset="C-US" device="C0805" value=".1uf"/>
 <part name="ISP1" library="adafruit" deviceset="AVRISP" device="-6"/>
 <part name="JP1" library="pinhead" deviceset="PINHD-2X4" device=""/>
@@ -6306,7 +6306,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <plain>
 </plain>
 <instances>
-<instance part="ATTINY84" gate="A" x="76.2" y="22.86"/>
+<instance part="TINY84" gate="A" x="76.2" y="22.86"/>
 <instance part="C1" gate="G$1" x="43.18" y="20.32"/>
 <instance part="ISP1" gate="G$1" x="156.21" y="15.24"/>
 <instance part="JP1" gate="A" x="149.86" y="-3.81"/>
@@ -6364,7 +6364,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <junction x="139.7" y="40.64"/>
 </segment>
 <segment>
-<pinref part="ATTINY84" gate="A" pin="GND"/>
+<pinref part="TINY84" gate="A" pin="GND"/>
 <wire x1="58.42" y1="10.16" x2="50.8" y2="10.16" width="0.1524" layer="91"/>
 <wire x1="50.8" y1="10.16" x2="50.8" y2="2.54" width="0.1524" layer="91"/>
 <label x="50.8" y="2.54" size="1.778" layer="95" xref="yes"/>
@@ -6401,7 +6401,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 </net>
 <net name="MISO" class="0">
 <segment>
-<pinref part="ATTINY84" gate="A" pin="PA5"/>
+<pinref part="TINY84" gate="A" pin="PA5"/>
 <wire x1="93.98" y1="15.24" x2="99.06" y2="15.24" width="0.1524" layer="91"/>
 <label x="99.06" y="15.24" size="1.016" layer="95" xref="yes"/>
 </segment>
@@ -6418,7 +6418,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 </net>
 <net name="MOSI" class="0">
 <segment>
-<pinref part="ATTINY84" gate="A" pin="PA6"/>
+<pinref part="TINY84" gate="A" pin="PA6"/>
 <wire x1="93.98" y1="12.7" x2="99.06" y2="12.7" width="0.1524" layer="91"/>
 <label x="99.06" y="12.7" size="1.016" layer="95" xref="yes"/>
 </segment>
@@ -6435,7 +6435,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 </net>
 <net name="SCK" class="0">
 <segment>
-<pinref part="ATTINY84" gate="A" pin="PA4"/>
+<pinref part="TINY84" gate="A" pin="PA4"/>
 <wire x1="93.98" y1="17.78" x2="99.06" y2="17.78" width="0.1524" layer="91"/>
 <label x="99.06" y="17.78" size="1.016" layer="95" xref="yes"/>
 </segment>
@@ -6452,7 +6452,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 </net>
 <net name="BUTTON1" class="0">
 <segment>
-<pinref part="ATTINY84" gate="A" pin="PA0"/>
+<pinref part="TINY84" gate="A" pin="PA0"/>
 <wire x1="93.98" y1="27.94" x2="99.06" y2="27.94" width="0.1524" layer="91"/>
 <label x="99.06" y="27.94" size="1.016" layer="95" xref="yes"/>
 </segment>
@@ -6475,7 +6475,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <junction x="68.58" y="40.64"/>
 </segment>
 <segment>
-<pinref part="ATTINY84" gate="A" pin="PA2"/>
+<pinref part="TINY84" gate="A" pin="PA2"/>
 <wire x1="93.98" y1="22.86" x2="99.06" y2="22.86" width="0.1524" layer="91"/>
 <label x="99.06" y="22.86" size="1.016" layer="95" font="vector" xref="yes"/>
 </segment>
@@ -6490,14 +6490,14 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <junction x="109.22" y="40.64"/>
 </segment>
 <segment>
-<pinref part="ATTINY84" gate="A" pin="PA1"/>
+<pinref part="TINY84" gate="A" pin="PA1"/>
 <wire x1="93.98" y1="25.4" x2="99.06" y2="25.4" width="0.1524" layer="91"/>
 <label x="99.06" y="25.4" size="1.016" layer="95" font="vector" xref="yes"/>
 </segment>
 </net>
 <net name="BUTTON4" class="0">
 <segment>
-<pinref part="ATTINY84" gate="A" pin="PA3"/>
+<pinref part="TINY84" gate="A" pin="PA3"/>
 <wire x1="93.98" y1="20.32" x2="99.06" y2="20.32" width="0.1524" layer="91"/>
 <label x="99.06" y="20.32" size="1.016" layer="95" xref="yes"/>
 </segment>
@@ -6512,7 +6512,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 </net>
 <net name="VCC" class="0">
 <segment>
-<pinref part="ATTINY84" gate="A" pin="VCC"/>
+<pinref part="TINY84" gate="A" pin="VCC"/>
 <pinref part="C1" gate="G$1" pin="1"/>
 <wire x1="58.42" y1="27.94" x2="43.18" y2="27.94" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="27.94" x2="43.18" y2="22.86" width="0.1524" layer="91"/>
@@ -6550,7 +6550,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <wire x1="140.97" y1="8.89" x2="140.97" y2="12.7" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="ATTINY84" gate="A" pin="PB3"/>
+<pinref part="TINY84" gate="A" pin="PB3"/>
 <label x="55.88" y="15.24" size="0.8128" layer="95" rot="R180" xref="yes"/>
 <wire x1="58.42" y1="15.24" x2="55.88" y2="15.24" width="0.1524" layer="91"/>
 </segment>
@@ -6562,7 +6562,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <label x="139.7" y="-1.27" size="0.8128" layer="95" rot="R180" xref="yes"/>
 </segment>
 <segment>
-<pinref part="ATTINY84" gate="A" pin="PB2"/>
+<pinref part="TINY84" gate="A" pin="PB2"/>
 <wire x1="58.42" y1="17.78" x2="55.88" y2="17.78" width="0.1524" layer="91"/>
 <label x="55.88" y="17.78" size="0.8128" layer="95" rot="R180" xref="yes"/>
 </segment>
@@ -6574,7 +6574,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <label x="162.56" y="-1.27" size="0.8128" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="ATTINY84" gate="A" pin="PA7"/>
+<pinref part="TINY84" gate="A" pin="PA7"/>
 <wire x1="93.98" y1="10.16" x2="99.06" y2="10.16" width="0.1524" layer="91"/>
 <label x="99.06" y="10.16" size="0.8128" layer="95" xref="yes"/>
 </segment>
@@ -6612,7 +6612,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <pinref part="C5" gate="G$1" pin="2"/>
 </segment>
 <segment>
-<pinref part="ATTINY84" gate="A" pin="PB0"/>
+<pinref part="TINY84" gate="A" pin="PB0"/>
 <wire x1="58.42" y1="22.86" x2="55.88" y2="22.86" width="0.1524" layer="91"/>
 <label x="55.88" y="22.86" size="0.8128" layer="95" font="fixed" rot="R180" xref="yes"/>
 </segment>
@@ -6627,7 +6627,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <pinref part="C6" gate="G$1" pin="2"/>
 </segment>
 <segment>
-<pinref part="ATTINY84" gate="A" pin="PB1"/>
+<pinref part="TINY84" gate="A" pin="PB1"/>
 <wire x1="58.42" y1="20.32" x2="55.88" y2="20.32" width="0.1524" layer="91"/>
 <label x="55.88" y="20.32" size="0.8128" layer="95" rot="R180" xref="yes"/>
 </segment>

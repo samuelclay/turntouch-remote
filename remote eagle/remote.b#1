@@ -151,7 +151,7 @@
 <wire x1="7.112" y1="48.26" x2="7.112" y2="40.132" width="0.4064" layer="22"/>
 <wire x1="7.112" y1="40.132" x2="1.524" y2="40.132" width="0.4064" layer="22"/>
 <wire x1="1.524" y1="40.132" x2="1.524" y2="42.672" width="0.4064" layer="22"/>
-<text x="49.784" y="24.384" size="1.778" layer="25" rot="MR0">Turn Touch Remote
+<text x="49.784" y="24.384" size="1.778" layer="26" rot="MR0">Turn Touch Remote
 13 March 2014 - Rev. 3</text>
 </plain>
 <libraries>
