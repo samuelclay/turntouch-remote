@@ -16,7 +16,7 @@ void blink(int loops, int loop_time, bool half);
 #define BODSE 2     // BOD Sleep enable bit in MCUCR
 uint8_t mcucr1, mcucr2;
 
-#define SERIAL_PRINT  1
+// #define SERIAL_PRINT  1
 #define PRESS_ACTIVE  1
 #define PRESS_TOGGLE  2
 #define PRESS_MODE    3
@@ -54,7 +54,7 @@ void setup() {
     radio.setChannel(38);
     radio.setDataRate(RF24_250KBPS);
     radio.setAutoAck(pipe, true);
-    radio.setRetries(3, 3);
+    radio.setRetries(0, 0);
 
     radio.openWritingPipe(pipe);
     radio.stopListening();
