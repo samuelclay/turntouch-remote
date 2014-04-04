@@ -6215,10 +6215,10 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <circle x="0" y="0" radius="3.556" width="0.1524" layer="21"/>
 <circle x="0" y="0" radius="1.016" width="0.0508" layer="21"/>
 <circle x="0" y="0" radius="0.762" width="0.0508" layer="21"/>
-<smd name="P$1" x="-5.585" y="3.74" dx="2.54" dy="1.27" layer="1"/>
-<smd name="P$3" x="-5.585" y="-3.84" dx="2.54" dy="1.27" layer="1"/>
-<smd name="P$4" x="5.485" y="-3.94" dx="2.54" dy="1.27" layer="1"/>
-<smd name="P$2" x="5.585" y="3.74" dx="2.54" dy="1.27" layer="1"/>
+<smd name="P$1" x="-5.585" y="3.74" dx="2.54" dy="3.556" layer="1"/>
+<smd name="P$3" x="-5.585" y="-3.84" dx="2.54" dy="3.556" layer="1"/>
+<smd name="P$4" x="5.485" y="-3.94" dx="2.54" dy="3.556" layer="1"/>
+<smd name="P$2" x="5.585" y="3.74" dx="2.54" dy="3.556" layer="1"/>
 <wire x1="-5.1" y1="5.1" x2="5.1" y2="5.1" width="0.127" layer="21"/>
 <wire x1="5.1" y1="5.1" x2="5.1" y2="-5.1" width="0.127" layer="21"/>
 <wire x1="5.1" y1="-5.1" x2="-5.1" y2="-5.1" width="0.127" layer="21"/>
