@@ -37,6 +37,7 @@ const uint8_t button_pins[] = { 2,2,2,3 };
 #endif
 
 const uint8_t num_button_pins = sizeof(button_pins);
+uint8_t button_debounces[num_button_pins];
 uint8_t button_states[num_button_pins];
 uint8_t button_presses[num_button_pins];
 unsigned long button_timestamps[num_button_pins];
@@ -44,6 +45,11 @@ volatile int awakems = 0;
 const uint64_t pipe = 1;
 RF24 radio(ce_pin, csn_pin);
 extern "C" void __cxa_pure_virtual() {}
+
+// the following variables are long's because the time, measured in miliseconds,
+// will quickly become a bigger number than can be stored in an int.
+volatile long lastDebounceTime = 0;  // the last time the output pin was toggled
+long debounceDelay = 10;    // the debounce time; increase if the output flickers
 
 void setup() {
 #ifdef SERIAL_PRINT
@@ -54,7 +60,7 @@ void setup() {
     radio.setChannel(38);
     radio.setDataRate(RF24_250KBPS);
     radio.setAutoAck(pipe, true);
-    radio.setRetries(0, 0);
+    radio.setRetries(6, 1);
 
     radio.openWritingPipe(pipe);
     radio.stopListening();
@@ -76,7 +82,12 @@ void setup() {
 void loop() {
     bool button_on = run_remote();
     if (!button_on) {
-        sleepNow();
+        if (awakems > 5000) {
+            awakems = 0;
+            sleepNow();
+        } else {
+            awakems += 1;
+        }
     }
 }
 
@@ -97,6 +108,7 @@ bool run_remote() {
             Serial.print(": ");
             Serial.print(state ? "ON  " : "OFF ");
 #endif
+            awakems = 0;
             different = true;
             button_different = true;
             button_states[i] = state;
@@ -167,31 +179,7 @@ bool run_remote() {
 #ifdef SERIAL_PRINT
         Serial.print("[diff]");
 #endif
-        int send_tries = 3;
-        while (send_tries--) {            
-            Serial.print("!");
-            bool ok = radio.write(button_presses, num_button_pins);
-            if (ok) {
-#ifdef SERIAL_PRINT
-                Serial.print("ok");
-                Serial.println();
-                blink(5, 25, true);
-#endif
-                break;
-            } else {
-#ifdef SERIAL_PRINT
-                blink(3, 20, false);
-                Serial.print(".");
-#endif
-            }
-        }
-
-        if (send_tries <= 0) {
-#ifdef SERIAL_PRINT
-            blink(2, 100, true);
-            Serial.print("failed.\n");
-#endif
-        }
+        bool ok = radio.write(button_presses, num_button_pins);
         // digitalWrite(led_pin, button_on ? HIGH : LOW);
         different = false;
     }
