@@ -21,6 +21,7 @@ uint8_t mcucr1, mcucr2;
 #define PRESS_TOGGLE  2
 #define PRESS_MODE    3
 #define MODE_CHANGE_DURATION 2500 // ms
+#define BUTTON_DEBOUNCE_DURATION 25 // ms
 
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
 const int ce_pin           = 2;
@@ -37,7 +38,7 @@ const uint8_t button_pins[] = { 2,2,2,3 };
 #endif
 
 const uint8_t num_button_pins = sizeof(button_pins);
-uint8_t button_debounces[num_button_pins];
+unsigned long button_debounces[num_button_pins];
 uint8_t button_states[num_button_pins];
 uint8_t button_presses[num_button_pins];
 unsigned long button_timestamps[num_button_pins];
@@ -45,11 +46,6 @@ volatile int awakems = 0;
 const uint64_t pipe = 1;
 RF24 radio(ce_pin, csn_pin);
 extern "C" void __cxa_pure_virtual() {}
-
-// the following variables are long's because the time, measured in miliseconds,
-// will quickly become a bigger number than can be stored in an int.
-volatile long lastDebounceTime = 0;  // the last time the output pin was toggled
-long debounceDelay = 10;    // the debounce time; increase if the output flickers
 
 void setup() {
 #ifdef SERIAL_PRINT
@@ -80,7 +76,10 @@ void setup() {
 }
 
 void loop() {
-    bool button_on = run_remote();
+    bool button_on = false;
+    if (awakems > 1) {
+        button_on = run_remote();
+    }
     if (!button_on) {
         if (awakems > 5000) {
             awakems = 0;
@@ -97,27 +96,29 @@ bool run_remote() {
     int i = num_button_pins;
     bool button_on = false;
     unsigned long button_offset = 0;
+    unsigned long button_debounce = 0;
     bool different = false;
     while (i--) {
         bool button_different = false;
         uint8_t state = !digitalRead(button_pins[i]);
-        if (state != button_states[i]) {
-#ifdef SERIAL_PRINT
-            Serial.print("Sensor state #");
-            Serial.print((int)i+1);
-            Serial.print(": ");
-            Serial.print(state ? "ON  " : "OFF ");
-#endif
-            awakems = 0;
-            different = true;
-            button_different = true;
-            button_states[i] = state;
-            if (button_timestamps[i]) {
-                button_offset = millis() - button_timestamps[i];
-            }
-        }
 
         if (state) button_on = true;
+        
+        if (state && !button_debounces[i]) {
+            awakems = 0;
+            button_debounces[i] = millis();
+        }
+        if (state != button_states[i]) {
+            if ((millis() - button_debounces[i]) > BUTTON_DEBOUNCE_DURATION) {
+                different = true;
+                button_different = true;
+                button_states[i] = state;
+                button_debounces[i] = 0;
+                if (button_timestamps[i]) {
+                    button_offset = millis() - button_timestamps[i];
+                }
+            }
+        }
 
         if (state && button_different) {
             // Start pressing button
@@ -191,16 +192,10 @@ void sleepNow(void)
 {
     radio.powerDown();
 
-#if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
-//    GIMSK |= _BV(INT0);                       //enable INT0
-//    MCUCR &= ~(_BV(ISC01) | _BV(ISC00));      //INT0 on low level
     int i = num_button_pins;
     while (i--) {
         attachPcInterrupt(button_pins[i], wakeup, CHANGE);
     }
-#else
-    attachInterrupt(0, wakeup, CHANGE);
-#endif
 
     ACSR |= _BV(ACD);                         //disable the analog comparator
     ADCSRA &= ~_BV(ADEN);                     //disable ADC
@@ -218,15 +213,12 @@ void sleepNow(void)
     sei();                         //ensure interrupts enabled so we can wake up again
     sleep_cpu();                   //go to sleep
     cli();                         //wake up here, disable interrupts
-#if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
-//    GIMSK = 0x00;                  //disable INT0
     int p = num_button_pins;
     while (p--) {
         detachPcInterrupt(button_pins[p]);
     }
-#endif
     sleep_disable();
-//    sei();                         //enable interrupts again (but INT0 is disabled from above)
+    sei();                         //enable interrupts again (but INT0 is disabled from above)
 
     radio.powerUp();
     delay(15);
@@ -234,6 +226,11 @@ void sleepNow(void)
 
 void wakeup() {
     awakems = 0;
+    int p = num_button_pins;
+    while (p--) {
+        // button_debounces[p] = 0;
+        // button_states[p] = 0;
+    }
 }
 
 void blink(int loops, int loop_time, bool half) {
