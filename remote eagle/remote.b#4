@@ -823,7 +823,10 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="21.59" y1="36.83" x2="21.59" y2="35.048" width="0.1524" layer="1"/>
 <wire x1="21.59" y1="35.048" x2="20.27" y2="33.728" width="0.1524" layer="1"/>
 <wire x1="31.496" y1="37.084" x2="30.988" y2="37.592" width="0.1524" layer="1"/>
-<wire x1="30.988" y1="37.592" x2="23.622" y2="37.592" width="0.1524" layer="1"/>
+<wire x1="30.988" y1="37.592" x2="28.956" y2="37.592" width="0.1524" layer="1"/>
+<wire x1="28.956" y1="37.592" x2="27.686" y2="36.322" width="0.1524" layer="1"/>
+<wire x1="27.686" y1="36.322" x2="26.416" y2="37.592" width="0.1524" layer="1"/>
+<wire x1="26.416" y1="37.592" x2="23.622" y2="37.592" width="0.1524" layer="1"/>
 <wire x1="30.988" y1="37.592" x2="27.686" y2="36.322" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SCK">

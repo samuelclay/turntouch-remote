@@ -835,8 +835,8 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="25.654" y1="26.416" x2="19.05" y2="33.02" width="0.1524" layer="1"/>
 <wire x1="19.05" y1="33.02" x2="19.05" y2="35.048" width="0.1524" layer="1"/>
 <wire x1="19.05" y1="35.048" x2="20.27" y2="36.268" width="0.1524" layer="1"/>
-<wire x1="30.226" y1="36.322" x2="28.956" y2="34.036" width="0.1524" layer="16"/>
-<wire x1="28.956" y1="34.036" x2="21.486" y2="35.052" width="0.1524" layer="16"/>
+<wire x1="30.226" y1="36.322" x2="28.956" y2="35.052" width="0.1524" layer="16"/>
+<wire x1="28.956" y1="35.052" x2="21.486" y2="35.052" width="0.1524" layer="16"/>
 <wire x1="21.486" y1="35.052" x2="20.27" y2="36.268" width="0.1524" layer="16"/>
 </signal>
 <signal name="BUTTON1">
@@ -891,7 +891,7 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="22.81" y1="33.728" x2="26.216" y2="33.728" width="0.1524" layer="16"/>
 <wire x1="26.216" y1="33.728" x2="27.432" y2="32.512" width="0.1524" layer="16"/>
 <wire x1="27.432" y1="32.512" x2="34.544" y2="32.512" width="0.1524" layer="16"/>
-<wire x1="34.544" y1="32.512" x2="34.544" y2="32.258" width="0.1524" layer="16"/>
+<wire x1="34.544" y1="32.512" x2="34.544" y2="32.258" width="0" layer="19" extent="1-16"/>
 <wire x1="33.7058" y1="20.066" x2="33.7058" y2="18.6182" width="0.1524" layer="1"/>
 <wire x1="33.7058" y1="18.6182" x2="33.782" y2="18.542" width="0.1524" layer="1"/>
 <via x="33.782" y="18.542" extent="1-16" drill="0.3302" diameter="0.1524"/>

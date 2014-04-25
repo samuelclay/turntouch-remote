@@ -825,7 +825,6 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="28.956" y1="37.592" x2="27.686" y2="36.322" width="0.1524" layer="1"/>
 <wire x1="27.686" y1="36.322" x2="26.416" y2="37.592" width="0.1524" layer="1"/>
 <wire x1="26.416" y1="37.592" x2="22.352" y2="37.592" width="0.1524" layer="1"/>
-<wire x1="30.988" y1="37.592" x2="27.686" y2="36.322" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SCK">
 <contactref element="ATTINY84" pad="9"/>

@@ -805,8 +805,8 @@ Please make sure your boards conform to these design rules.</description>
 <contactref element="ISP" pad="1"/>
 <contactref element="RADIO" pad="6"/>
 <contactref element="ATTINY84" pad="8"/>
-<wire x1="28.7782" y1="27.686" x2="28.7782" y2="31.3182" width="0.1524" layer="1"/>
-<wire x1="28.7782" y1="31.3182" x2="30.226" y2="33.782" width="0.1524" layer="1"/>
+<wire x1="28.7782" y1="27.686" x2="28.7782" y2="32.3342" width="0.1524" layer="1"/>
+<wire x1="28.7782" y1="32.3342" x2="30.226" y2="33.782" width="0.1524" layer="1"/>
 <wire x1="22.81" y1="36.268" x2="22.81" y2="35.6862" width="0.1524" layer="1"/>
 <wire x1="22.81" y1="35.6862" x2="28.7782" y2="27.686" width="0.1524" layer="1"/>
 </signal>

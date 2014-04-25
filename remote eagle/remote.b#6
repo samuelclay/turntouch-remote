@@ -742,8 +742,8 @@ Please make sure your boards conform to these design rules.</description>
 <element name="C6" library="SparkFun-Passives" package="0805" value="15pF" x="29.718" y="11.684" rot="R180"/>
 <element name="U$2" library="remote" package="TL3300" value="TL3300SMD" x="23.114" y="24.384" rot="MR270"/>
 <element name="U$3" library="remote" package="TL3300" value="TL3300SMD" x="8.382" y="8.382" rot="MR270"/>
-<element name="U$4" library="remote" package="TL3300" value="TL3300SMD" x="23.114" y="8.382" rot="MR270"/>
-<element name="U$1" library="remote" package="TL3300" value="TL3300SMD" x="8.382" y="24.384" rot="MR270"/>
+<element name="U$4" library="remote" package="TL3300" value="TL3300SMD" x="8.382" y="24.384" rot="MR270"/>
+<element name="U$1" library="remote" package="TL3300" value="TL3300SMD" x="23.114" y="8.382" rot="MR270"/>
 </elements>
 <signals>
 <signal name="GND">
@@ -842,29 +842,49 @@ Please make sure your boards conform to these design rules.</description>
 <contactref element="ATTINY84" pad="13"/>
 <contactref element="U$1" pad="P$3"/>
 <contactref element="U$1" pad="P$4"/>
-<wire x1="10.922" y1="17.399" x2="28.7782" y2="21.336" width="0" layer="19" extent="1-16"/>
-<wire x1="10.922" y1="31.369" x2="10.922" y2="17.399" width="0" layer="19" extent="16-16"/>
+<wire x1="28.7782" y1="21.336" x2="23.876" y2="21.336" width="0.1524" layer="1"/>
+<via x="23.876" y="21.336" extent="1-16" drill="0.3302"/>
+<wire x1="23.876" y1="21.336" x2="23.876" y2="16.002" width="0.1524" layer="16"/>
+<wire x1="23.876" y1="16.002" x2="24.638" y2="15.24" width="0.1524" layer="16"/>
+<wire x1="24.638" y1="15.24" x2="25.527" y2="15.24" width="0.1524" layer="16"/>
+<wire x1="25.527" y1="15.24" x2="25.654" y2="15.367" width="0.1524" layer="16"/>
+<wire x1="25.527" y1="15.24" x2="25.527" y2="1.524" width="0.1524" layer="16"/>
+<wire x1="25.527" y1="1.524" x2="25.654" y2="1.397" width="0.1524" layer="16"/>
 </signal>
 <signal name="BUTTON2">
 <contactref element="ATTINY84" pad="11"/>
 <contactref element="U$2" pad="P$3"/>
 <contactref element="U$2" pad="P$4"/>
-<wire x1="28.7782" y1="23.876" x2="25.654" y2="31.369" width="0" layer="19" extent="1-16"/>
-<wire x1="25.654" y1="17.399" x2="28.7782" y2="23.876" width="0" layer="19" extent="1-16"/>
+<wire x1="28.7782" y1="23.876" x2="26.67" y2="23.876" width="0.1524" layer="1"/>
+<via x="26.67" y="23.876" extent="1-16" drill="0.3302"/>
+<wire x1="26.67" y1="23.876" x2="26.67" y2="30.353" width="0.1524" layer="16"/>
+<wire x1="26.67" y1="30.353" x2="25.654" y2="31.369" width="0.1524" layer="16"/>
+<wire x1="25.654" y1="17.399" x2="25.654" y2="22.86" width="0.1524" layer="16"/>
+<wire x1="25.654" y1="22.86" x2="26.67" y2="23.876" width="0.1524" layer="16"/>
 </signal>
 <signal name="BUTTON3">
 <contactref element="ATTINY84" pad="12"/>
 <contactref element="U$3" pad="P$3"/>
 <contactref element="U$3" pad="P$4"/>
-<wire x1="10.922" y1="15.367" x2="28.7782" y2="22.606" width="0" layer="19" extent="1-16"/>
-<wire x1="10.922" y1="1.397" x2="10.922" y2="15.367" width="0" layer="19" extent="16-16"/>
+<wire x1="28.7782" y1="22.606" x2="23.368" y2="22.606" width="0.1524" layer="1"/>
+<wire x1="23.368" y1="22.606" x2="18.796" y2="27.178" width="0.1524" layer="1"/>
+<via x="18.796" y="27.178" extent="1-16" drill="0.3302"/>
+<wire x1="18.796" y1="27.178" x2="18.796" y2="22.606" width="0.1524" layer="16"/>
+<wire x1="18.796" y1="22.606" x2="11.43" y2="15.24" width="0.1524" layer="16"/>
+<wire x1="11.43" y1="15.24" x2="11.049" y2="15.24" width="0.1524" layer="16"/>
+<wire x1="11.049" y1="15.24" x2="10.922" y2="15.367" width="0.1524" layer="16"/>
+<wire x1="10.922" y1="15.367" x2="10.922" y2="1.397" width="0.1524" layer="16"/>
 </signal>
 <signal name="BUTTON4">
 <contactref element="ATTINY84" pad="10"/>
 <contactref element="U$4" pad="P$3"/>
 <contactref element="U$4" pad="P$4"/>
-<wire x1="25.654" y1="15.367" x2="28.7782" y2="25.146" width="0" layer="19" extent="1-16"/>
-<wire x1="25.654" y1="1.397" x2="25.654" y2="15.367" width="0" layer="19" extent="16-16"/>
+<wire x1="28.7782" y1="25.146" x2="22.86" y2="25.146" width="0.1524" layer="1"/>
+<wire x1="22.86" y1="25.146" x2="18.796" y2="29.21" width="0.1524" layer="1"/>
+<via x="18.796" y="29.21" extent="1-16" drill="0.3302"/>
+<wire x1="18.796" y1="29.21" x2="13.081" y2="29.21" width="0.1524" layer="16"/>
+<wire x1="13.081" y1="29.21" x2="10.922" y2="31.369" width="0.1524" layer="16"/>
+<wire x1="10.922" y1="31.369" x2="10.922" y2="17.399" width="0.1524" layer="16"/>
 </signal>
 <signal name="VCC">
 <contactref element="ATTINY84" pad="1"/>
