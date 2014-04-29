@@ -20,7 +20,7 @@ uint8_t mcucr1, mcucr2;
 #define PRESS_ACTIVE  1
 #define PRESS_TOGGLE  2
 #define PRESS_MODE    3
-#define MODE_CHANGE_DURATION 2500 // ms
+#define MODE_CHANGE_DURATION 750 // ms
 #define BUTTON_DEBOUNCE_DURATION 25 // ms
 
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
@@ -226,11 +226,6 @@ void sleepNow(void)
 
 void wakeup() {
     awakems = 0;
-    int p = num_button_pins;
-    while (p--) {
-        // button_debounces[p] = 0;
-        // button_states[p] = 0;
-    }
 }
 
 void blink(int loops, int loop_time, bool half) {
