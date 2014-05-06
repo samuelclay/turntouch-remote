@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
+<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -218,14 +218,18 @@
 <circle x="0" y="0" radius="3.556" width="0.1524" layer="21"/>
 <circle x="0" y="0" radius="1.016" width="0.0508" layer="21"/>
 <circle x="0" y="0" radius="0.762" width="0.0508" layer="21"/>
-<smd name="P$1" x="-5.585" y="3.74" dx="2.54" dy="1.27" layer="1"/>
-<smd name="P$3" x="-5.585" y="-3.84" dx="2.54" dy="1.27" layer="1"/>
-<smd name="P$4" x="5.485" y="-3.94" dx="2.54" dy="1.27" layer="1"/>
-<smd name="P$2" x="5.585" y="3.74" dx="2.54" dy="1.27" layer="1"/>
+<smd name="P$1" x="-5.585" y="3.74" dx="2.54" dy="3.556" layer="1"/>
+<smd name="P$3" x="-5.585" y="-3.84" dx="2.54" dy="3.556" layer="1"/>
+<smd name="P$4" x="5.485" y="-3.94" dx="2.54" dy="3.556" layer="1"/>
+<smd name="P$2" x="5.585" y="3.74" dx="2.54" dy="3.556" layer="1"/>
 <wire x1="-5.1" y1="5.1" x2="5.1" y2="5.1" width="0.127" layer="21"/>
 <wire x1="5.1" y1="5.1" x2="5.1" y2="-5.1" width="0.127" layer="21"/>
 <wire x1="5.1" y1="-5.1" x2="-5.1" y2="-5.1" width="0.127" layer="21"/>
 <wire x1="-5.1" y1="-5.1" x2="-5.1" y2="5.1" width="0.127" layer="21"/>
+<wire x1="-11.43" y1="11.43" x2="11.43" y2="11.43" width="0.127" layer="21" style="shortdash"/>
+<wire x1="11.43" y1="11.43" x2="11.43" y2="-11.43" width="0.127" layer="21" style="shortdash"/>
+<wire x1="11.43" y1="-11.43" x2="-11.43" y2="-11.43" width="0.127" layer="21" style="shortdash"/>
+<wire x1="-11.43" y1="-11.43" x2="-11.43" y2="11.43" width="0.127" layer="21" style="shortdash"/>
 </package>
 </packages>
 <symbols>
@@ -293,9 +297,16 @@
 </deviceset>
 <deviceset name="5GSH9">
 <gates>
+<gate name="G$1" symbol="5GSH9" x="0" y="0"/>
 </gates>
 <devices>
-<device name="">
+<device name="" package="5GSH9">
+<connects>
+<connect gate="G$1" pin="P" pad="P$1"/>
+<connect gate="G$1" pin="P1" pad="P$2"/>
+<connect gate="G$1" pin="S" pad="P$3"/>
+<connect gate="G$1" pin="S1" pad="P$4"/>
+</connects>
 <technologies>
 <technology name=""/>
 </technologies>
