@@ -27,7 +27,7 @@ uint8_t mcucr1, mcucr2;
 const int ce_pin           = 2;
 const int csn_pin          = 3;
 const int led_pin          = 0;
-const uint8_t button_pins[] = { 7,8,9,10 };
+const uint8_t button_pins[] = { 9,10,7,8 };
 #else
 const int rx_pin           = 0;
 const int tx_pin           = 1;
@@ -52,11 +52,14 @@ void setup() {
     Serial.begin(115200);
     Serial.print("\n\nTurn Touch Remote\n\n");
 #endif
+
+    blink(2, 100, true);
+    
     radio.begin();
-    radio.setChannel(38);
+    radio.setChannel(92);
     radio.setDataRate(RF24_250KBPS);
     radio.setAutoAck(pipe, true);
-    radio.setRetries(6, 1);
+    radio.setRetries(1, 15);
 
     radio.openWritingPipe(pipe);
     radio.stopListening();
@@ -69,7 +72,6 @@ void setup() {
         button_presses[i] = 0;
     }
 
-    // Turn LED's ON until we start getting keys
     pinMode(led_pin, OUTPUT);
     digitalWrite(led_pin, LOW);
     blink(3, 200, true);
@@ -81,7 +83,7 @@ void loop() {
         button_on = run_remote();
     }
     if (!button_on) {
-        if (awakems > 5000) {
+        if (awakems > 1000) {
             awakems = 0;
             sleepNow();
         } else {
