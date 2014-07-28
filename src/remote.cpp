@@ -2,8 +2,8 @@
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 #include <SPI.h>
+#include <RF24.h>
 #include "nRF24L01.h"
-#include "RF24.h"
 #include "pinchange.h"
 
 

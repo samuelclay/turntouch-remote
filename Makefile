@@ -9,39 +9,46 @@ PROGRAMMER ?= usbtiny
 F_CPU      = 8000000	# in Hz
 FUSE_L     = 0xFF
 FUSE_H     = 0xD7
-AVRDUDE    = avrdude -v -v -v -v -c $(PROGRAMMER) -p $(DEVICE) -P usb
+FUSE_E     = 0xFF
+AVRDUDE_FUSE = avrdude -v -v -v -v -c $(PROGRAMMER) -p $(DEVICE) -P usb
+AVRDUDE    = $(AVRDUDE_FUSE) -B1
 
-LIBS       = -I./tiny -I./SPI -I.
+LIBS       = -I./libs/tiny 
+LIBS       += -I./libs/SPI
+LIBS       += -I./libs/RF24
+LIBS       += -I./libs
+
 CFLAGS  =  $(LIBS) \
            -DDEBUG_LEVEL=0 -DARDUINO=1 \
            -MMD -DUSB_VID=null -DUSB_PID=null \
            -fno-exceptions -ffunction-sections -fdata-sections \
            -Wl,--gc-sections
 
-C_SRC   := tiny/pins_arduino.c \
-           tiny/WInterrupts.c \
-           tiny/wiring.c \
-           tiny/wiring_analog.c \
-           tiny/wiring_digital.c \
-           tiny/wiring_pulse.c \
-           tiny/wiring_shift.c
-CPP_SRC := SPI/SPI.cpp \
-           tiny/main.cpp \
-           tiny/Print.cpp \
-           tiny/TinyDebugSerial.cpp \
-           tiny/TinyDebugSerial115200.cpp \
-           tiny/TinyDebugSerial38400.cpp \
-           tiny/TinyDebugSerial9600.cpp \
-           tiny/TinyDebugSerialErrors.cpp \
-           tiny/Tone.cpp \
-           tiny/WMath.cpp \
-           tiny/WString.cpp
-SRC     := pinchange.cpp remote.cpp RF24.cpp
+C_SRC   := libs/tiny/pins_arduino.c \
+           libs/tiny/WInterrupts.c \
+           libs/tiny/wiring.c \
+           libs/tiny/wiring_analog.c \
+           libs/tiny/wiring_digital.c \
+           libs/tiny/wiring_pulse.c \
+           libs/tiny/wiring_shift.c
+CPP_SRC := libs/SPI/SPI.cpp \
+           libs/RF24/RF24.cpp \
+           libs/tiny/main.cpp \
+           libs/tiny/Print.cpp \
+           libs/tiny/TinyDebugSerial.cpp \
+           libs/tiny/TinyDebugSerial115200.cpp \
+           libs/tiny/TinyDebugSerial38400.cpp \
+           libs/tiny/TinyDebugSerial9600.cpp \
+           libs/tiny/TinyDebugSerialErrors.cpp \
+           libs/tiny/Tone.cpp \
+           libs/tiny/WMath.cpp \
+           libs/tiny/WString.cpp
+SRC     := src/pinchange.cpp src/remote.cpp
 
 OBJECTS = $(SRC:.cpp=.o) $(C_SRC:.c=.o) $(CPP_SRC:.cpp=.o) 
 COMPILE = avr-gcc -Wall -Os -DF_CPU=$(F_CPU) $(CFLAGS) -mmcu=$(DEVICE)
 
-all: program
+all: clean remote.hex program
 
 # symbolic targets:
 help:
@@ -60,15 +67,15 @@ program: fuse flash
 fuse:
 	@[ "$(FUSE_H)" != "" -a "$(FUSE_L)" != "" ] || \
 		{ echo "*** Edit Makefile and choose values for FUSE_L and FUSE_H!"; exit 1; }
-	$(AVRDUDE) -e -Uefuse:w:0xFF:m -U hfuse:w:$(FUSE_H):m -U lfuse:w:$(FUSE_L):m
+	$(AVRDUDE_FUSE) -e -U lfuse:w:$(FUSE_L):m -U hfuse:w:$(FUSE_H):m -U efuse:w:$(FUSE_E):m
 
 # rule for uploading firmware:
 flash: remote.hex
-	$(AVRDUDE) -U flash:w:remote.hex:i
+	$(AVRDUDE) -U flash:w:build/remote.hex:i
 
 # rule for deleting dependent files (those which can be built by Make):
 clean:
-	rm -f remote.hex remote.lst remote.obj remote.cof remote.list remote.map remote.eep.hex remote.elf *.o remote.s tiny/*.o avr/*.o *.d
+	rm -f build/* *.o **/*.o **/**/*.o *.d **/*.d **/**/*.d **/**/*.lst
 
 # Generic rule for compiling C files:
 .c.o:
@@ -90,23 +97,23 @@ clean:
 	$(COMPILE) -S $< -o $@
 
 core:
-	avr-ar rcs core.a $(C_SRC:.c=.o) $(CPP_SRC:.cpp=.o)
+	avr-ar rcs build/core.a $(C_SRC:.c=.o) $(CPP_SRC:.cpp=.o)
     
 # file targets:
 
 code: $(OBJECTS) core
 
 remote.elf: code core
-	$(COMPILE) -o remote.elf $(SRC:.cpp=.o) core.a -L. -lm
+	$(COMPILE) -o build/remote.elf $(SRC:.cpp=.o) build/core.a -L. -lm
 
 remote.hex: remote.elf
-	rm -f remote.hex remote.eep.hex
-	avr-objcopy -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 -O ihex remote.elf remote.hex
-	avr-objcopy -O ihex -R .eeprom remote.elf remote.hex
-	avr-size remote.hex
+	rm -f build/remote.hex build/remote.eep.hex
+	avr-objcopy -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 -O ihex build/remote.elf build/remote.hex
+	avr-objcopy -O ihex -R .eeprom build/remote.elf build/remote.hex
+	avr-size build/remote.hex
 
 disasm: remote.elf
-	avr-objdump -d remote.elf
+	avr-objdump -d build/remote.elf
 
 cpp:
-	$(COMPILE) -E remote.c
+	$(COMPILE) -E build/remote.c
