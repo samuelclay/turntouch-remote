@@ -14,7 +14,7 @@ void blink(int loops, int loop_time, bool half);
 // #define BODSE 2     // BOD Sleep enable bit in MCUCR
 uint8_t mcucr1, mcucr2;
 
-// #define SERIAL_PRINT  1
+#define SERIAL_PRINT  1
 #define PRESS_ACTIVE  1
 #define PRESS_TOGGLE  2
 #define PRESS_MODE    3
@@ -44,21 +44,21 @@ RH_NRF24 radio(ce_pin, csn_pin);
 extern "C" void __cxa_pure_virtual() {}
 
 void setup() {
-#ifdef SERIAL_PRINT
     Serial.begin(115200);
     Serial.print("\n\nTurn Touch Remote\n\n");
-#endif
 
     blink(2, 100, true);
     
     if (!radio.init())
         Serial.println("init failed");
   // Defaults after init are 2.402 GHz (channel 2), 2Mbps, 0dBm
-    if (!radio.setChannel(1))
+    if (!radio.setChannel(92))
         Serial.println("setChannel failed");
     if (!radio.setRF(RH_NRF24::DataRate250kbps, RH_NRF24::TransmitPower0dBm))
         Serial.println("setRF failed");    
-
+    if (!radio.setNetworkAddress((uint8_t*)"tt003", 5))
+        Serial.println("setNetworkAddress failed");
+    
     int i = num_button_pins;
     while (i--) {
         pinMode(button_pins[i], INPUT_PULLUP);
@@ -122,9 +122,9 @@ bool run_remote() {
             button_timestamps[i] = millis();
             button_presses[i] = PRESS_ACTIVE;
 #ifdef SERIAL_PRINT
-            Serial.print("\nStarting active: ");
+            Serial.print(" --> Starting active: ");
             Serial.print((int)i+1);
-            Serial.println();
+            Serial.print(" -- ");
 #endif
         } else if (state && !button_different && button_timestamps[i]) {
             // Check if has hit new mode
@@ -132,12 +132,11 @@ bool run_remote() {
 
             if (button_offset >= MODE_CHANGE_DURATION) {
 #ifdef SERIAL_PRINT
-                Serial.print("\nMode by default: ");
+                Serial.print("\n --> Mode by default: ");
                 Serial.print((int)i+1);
                 Serial.print(" -- ");
                 Serial.print((unsigned long)button_offset);
-                Serial.print("ms");
-                Serial.println();
+                Serial.print("ms -- ");
 #endif
                 button_presses[i] = PRESS_MODE;
                 button_timestamps[i] = 0;
@@ -146,11 +145,11 @@ bool run_remote() {
         } else if (!state && button_different) {
             // Button was pressed, now released
 #ifdef SERIAL_PRINT
-            Serial.print("\nEnding active: ");
+            Serial.print(" --> Ending active: ");
             Serial.print((int)i+1);
             Serial.print(" -- ");
             Serial.print((unsigned long)button_offset);
-            Serial.println();
+            Serial.print(" -- ");
 #endif
 
             // Debounce pressed button, seeing if toggle or new mode
@@ -173,30 +172,31 @@ bool run_remote() {
 
     // Send the state of the buttons to the LED board
     if (different) {
+        digitalWrite(led_pin, HIGH);
+        
         awakems = 0;
-#ifdef SERIAL_PRINT
-        Serial.print("[diff]");
-#endif
-        blink(3, 20, true);
-        radio.send(button_presses, num_button_pins);
-        radio.waitPacketSent();
-        uint8_t buf[RH_NRF24_MAX_MESSAGE_LEN];
-        uint8_t len = sizeof(buf);
+        int tries_left = 10;
+        while (tries_left--) {
+            radio.send(button_presses, num_button_pins);
+            radio.waitPacketSent();
+            uint8_t buf[RH_NRF24_MAX_MESSAGE_LEN];
+            uint8_t len = sizeof(buf);
 
-        if (radio.waitAvailableTimeout(500)) { 
-            if (radio.recv(buf, &len)) {
-                Serial.print("got reply: ");
-                Serial.println((char*)buf);
-                blink(5, 25, true);
+            if (radio.waitAvailableTimeout(25)) { 
+                if (radio.recv(buf, &len)) {
+                    Serial.print("got reply: ");
+                    Serial.println((char*)buf);
+                    break;
+                } else {
+                    Serial.print(" ... recv failed!");
+                }
             } else {
-                Serial.println("recv failed");
-                blink(2, 300, true);
+                Serial.print(" ... no reply ... ");
             }
-        } else {
-                Serial.println("No reply, is nrf24_server running?");
-                blink(3, 200, true);
         }
         different = false;
+        digitalWrite(led_pin, LOW);
+        radio.setModeIdle();
     }
 
     return button_on;
@@ -204,8 +204,6 @@ bool run_remote() {
 
 void sleepNow(void)
 {
-    // radio.powerDown();
-
     int i = num_button_pins;
     while (i--) {
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
@@ -242,7 +240,6 @@ void sleepNow(void)
     sleep_disable();
     sei();                         //enable interrupts again (but INT0 is disabled from above)
 
-    // radio.powerUp();
     delay(15);
 }
 
