@@ -4,49 +4,46 @@
 # Copyright: (c) 2013 by Turn Touch / NewsBlur
 # Based on work by Christian Starkjohann, 2008-04-07
 
-DEVICE       = atmega328p
-PROGRAMMER  ?= usbtiny
-F_CPU        = 8000000  # Hz
-FUSE_L       = 0xFF
-FUSE_H       = 0xD9
-FUSE_E       = 0x01
+DEVICE     = attiny84
+PROGRAMMER ?= usbtiny
+F_CPU      = 8000000	# in Hz
+FUSE_L     = 0xFF
+FUSE_H     = 0xD7
+FUSE_E     = 0xFF
 AVRDUDE_FUSE = avrdude -v -v -v -v -c $(PROGRAMMER) -p $(DEVICE) -P usb
-AVRDUDE      = $(AVRDUDE_FUSE) -B1
+AVRDUDE    = $(AVRDUDE_FUSE) -B1
 
-LIBS         = -I./libs/arduino 
-LIBS        += -I./libs/atmega328
-LIBS        += -I./libs/SPI
-LIBS        += -I./libs/RadioHead
-LIBS        += -I./libs/pinchange/mega
-LIBS        += -I./libs
+LIBS       = -I./libs/tiny 
+LIBS       += -I./libs/SPI
+LIBS       += -I./libs/RF24
+LIBS       += -I./libs
 
-CFLAGS       = $(LIBS) \
-               -DDEBUG_LEVEL=0 -DARDUINO=100 \
-               -fno-exceptions -ffunction-sections -fdata-sections \
-               -Wl,--gc-sections
-CPPFLAGS     = -std=c++0x \
-               -felide-constructors
-              
-C_SRC       := libs/arduino/wiring.o \
-               libs/arduino/wiring_analog.o \
-               libs/arduino/wiring_digital.o \
-               libs/arduino/wiring_pulse.o \
-               libs/arduino/wiring_shift.o \
-               libs/arduino/hooks.o
-CPP_SRC     := libs/arduino/main.o \
-               libs/arduino/HardwareSerial.o \
-               libs/arduino/Print.o \
-               libs/arduino/Tone.o \
-               libs/arduino/WMath.o \
-               libs/arduino/WString.o \
-               libs/SPI/SPI.o \
-               libs/RadioHead/RH_NRF24.o \
-               libs/RadioHead/RHNRFSPIDriver.o \
-               libs/RadioHead/RHHardwareSPI.o \
-               libs/RadioHead/RHGenericDriver.o \
-               libs/RadioHead/RHGenericSPI.o \
-               libs/RadioHead/RHSPIDriver.o
-SRC         := src/remote.cpp
+CFLAGS  =  $(LIBS) \
+           -DDEBUG_LEVEL=0 -DARDUINO=1 \
+           -MMD -DUSB_VID=null -DUSB_PID=null \
+           -fno-exceptions -ffunction-sections -fdata-sections \
+           -Wl,--gc-sections
+
+C_SRC   := libs/tiny/pins_arduino.c \
+           libs/tiny/WInterrupts.c \
+           libs/tiny/wiring.c \
+           libs/tiny/wiring_analog.c \
+           libs/tiny/wiring_digital.c \
+           libs/tiny/wiring_pulse.c \
+           libs/tiny/wiring_shift.c
+CPP_SRC := libs/SPI/SPI.cpp \
+           libs/RF24/RF24.cpp \
+           libs/tiny/main.cpp \
+           libs/tiny/Print.cpp \
+           libs/tiny/TinyDebugSerial.cpp \
+           libs/tiny/TinyDebugSerial115200.cpp \
+           libs/tiny/TinyDebugSerial38400.cpp \
+           libs/tiny/TinyDebugSerial9600.cpp \
+           libs/tiny/TinyDebugSerialErrors.cpp \
+           libs/tiny/Tone.cpp \
+           libs/tiny/WMath.cpp \
+           libs/tiny/WString.cpp
+SRC     := src/pinchange.cpp src/remote.cpp
 
 OBJECTS = $(SRC:.cpp=.o) $(C_SRC:.c=.o) $(CPP_SRC:.cpp=.o) 
 COMPILE = avr-gcc -Wall -Os -DF_CPU=$(F_CPU) $(CFLAGS) -mmcu=$(DEVICE)
@@ -85,7 +82,7 @@ clean:
 	$(COMPILE) -g -c $< -o $@
 
 .cpp.o:
-	$(COMPILE) $(CPPFLAGS) -g -c $< -o $@
+	$(COMPILE) -g -c $< -o $@
 
 # Generic rule for assembling Assembler source files:
 .S.o:
