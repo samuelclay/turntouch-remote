@@ -2,6 +2,7 @@
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 #include <SPI.h>
+#include <new.h>
 #include <pinchange.h>
 #include <RH_NRF24.h>
 
@@ -33,7 +34,7 @@ const int led_pin          = 4;
 const uint8_t button_pins[] = { 5,6,7,8 };
 #endif
 
-const uint8_t num_button_pins = sizeof(button_pins);
+const uint8_t num_button_pins = 4;
 unsigned long button_debounces[num_button_pins];
 uint8_t button_states[num_button_pins];
 uint8_t button_presses[num_button_pins];
@@ -41,7 +42,6 @@ unsigned long button_timestamps[num_button_pins];
 volatile int awakems = 0;
 const uint64_t pipe = 1;
 RH_NRF24 radio(ce_pin, csn_pin);
-extern "C" void __cxa_pure_virtual() {}
 
 void setup() {
     Serial.begin(115200);
@@ -56,8 +56,6 @@ void setup() {
         Serial.println("setChannel failed");
     if (!radio.setRF(RH_NRF24::DataRate250kbps, RH_NRF24::TransmitPower0dBm))
         Serial.println("setRF failed");    
-    if (!radio.setNetworkAddress((uint8_t*)"tt003", 5))
-        Serial.println("setNetworkAddress failed");
     
     int i = num_button_pins;
     while (i--) {
@@ -93,7 +91,6 @@ bool run_remote() {
     int i = num_button_pins;
     bool button_on = false;
     unsigned long button_offset = 0;
-    unsigned long button_debounce = 0;
     bool different = false;
     while (i--) {
         bool button_different = false;
@@ -177,15 +174,21 @@ bool run_remote() {
         awakems = 0;
         int tries_left = 10;
         while (tries_left--) {
-            radio.send(button_presses, num_button_pins);
+            for (uint8_t i=0; i < sizeof(button_presses); i++) {
+                Serial.print(button_presses[i], HEX);
+            }
+            uint8_t len = sizeof(button_presses);
+            radio.send(button_presses, len);
             radio.waitPacketSent();
-            uint8_t buf[RH_NRF24_MAX_MESSAGE_LEN];
-            uint8_t len = sizeof(buf);
+            uint8_t buf[num_button_pins];
 
             if (radio.waitAvailableTimeout(25)) { 
                 if (radio.recv(buf, &len)) {
-                    Serial.print("got reply: ");
-                    Serial.println((char*)buf);
+                    Serial.print(" --> Received: ");
+                    for (uint8_t i=0; i < sizeof(buf); i++) {
+                        Serial.print(buf[i], HEX);
+                    }
+                    Serial.println();
                     break;
                 } else {
                     Serial.print(" ... recv failed!");

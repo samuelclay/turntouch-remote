@@ -377,7 +377,7 @@ void PCintPort::enable(PCintPin* p, PCIntvoidFuncPtr userFunc, uint8_t mode) {
 
 int8_t PCintPort::addPin(uint8_t arduinoPin, PCIntvoidFuncPtr userFunc, uint8_t mode)
 {
-	PCintPin* tmp;
+	PCintPin* tmp = firstPin;
 
 	// Add to linked list, starting with firstPin. If pin already exists, just enable.
 	if (firstPin != NULL) {
@@ -398,7 +398,7 @@ int8_t PCintPort::addPin(uint8_t arduinoPin, PCIntvoidFuncPtr userFunc, uint8_t 
 	p->mask = digitalPinToBitMask(arduinoPin); // the mask
 
 	if (firstPin == NULL) firstPin=p;
-	else tmp->next=p;
+	else if (tmp) tmp->next=p;
 
 #ifdef DEBUG
 	Serial.print("addPin. pin given: "); Serial.print(arduinoPin, DEC);
@@ -472,7 +472,7 @@ void PCintPort::detachInterrupt(uint8_t arduinoPin)
 // common code for isr handler. "port" is the PCINT number.
 // there isn't really a good way to back-map ports and masks to pins.
 void PCintPort::PCint() {
-	uint8_t thisChangedPin; //MIKE
+    // uint8_t thisChangedPin; //MIKE
 
 	#ifdef FLASH
 	if (*led_port & led_mask) *led_port&=not_led_mask;
@@ -511,7 +511,7 @@ void PCintPort::PCint() {
 		while (p) {
 			// Trigger interrupt if the bit is high and it's set to trigger on mode RISING or CHANGE
 			// Trigger interrupt if the bit is low and it's set to trigger on mode FALLING or CHANGE
-			thisChangedPin=p->mask & changedPins; // PinChangeIntSpeedTest makes this 3673... weird.  But GOOD!!!
+            // thisChangedPin=p->mask & changedPins; // PinChangeIntSpeedTest makes this 3673... weird.  But GOOD!!!
 			if (p->mask & changedPins) {
 				#ifndef NO_PIN_STATE
 				PCintPort::pinState=PCintPort::curr & p->mask ? HIGH : LOW;
