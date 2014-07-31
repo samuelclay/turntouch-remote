@@ -184,8 +184,14 @@ bool run_remote() {
             for (uint8_t i=0; i < sizeof(button_presses); i++) {
                 Serial.print(button_presses[i], HEX);
             }
-            uint8_t len = sizeof(button_presses);
-            bool sent = radio.send(button_presses, len);
+            uint8_t data = 0;
+            for (uint8_t i=0; i < sizeof(button_presses); i++) {
+                data |= (button_presses[i] << 2*i);
+            }
+            uint8_t len = sizeof(data);
+            bool sent = radio.send(&data, len);
+            Serial.print(" sent:");
+            Serial.print(data, BIN);
             radio.waitPacketSent();
             uint8_t buf[num_button_pins];
             
