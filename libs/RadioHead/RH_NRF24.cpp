@@ -177,7 +177,7 @@ bool RH_NRF24::send(const uint8_t* data, uint8_t len)
     _buf[3] = _txHeaderFlags;
     memcpy(_buf+RH_NRF24_HEADER_LEN, data, len);
     setModeTx();
-    spiBurstWrite(RH_NRF24_COMMAND_W_TX_PAYLOAD_NOACK, _buf, len + RH_NRF24_HEADER_LEN);
+    spiBurstWrite(RH_NRF24_COMMAND_W_ACK_PAYLOAD(0), _buf, len + RH_NRF24_HEADER_LEN);
     // Radio will return to Standby II mode after transmission is complete
     _txGood++;
     return true;

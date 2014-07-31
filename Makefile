@@ -10,7 +10,7 @@ F_CPU        = 8000000  # Hz
 FUSE_L       = 0xFF
 FUSE_H       = 0xD9
 FUSE_E       = 0x01
-AVRDUDE_FUSE = avrdude -v -v -v -v -c $(PROGRAMMER) -p $(DEVICE) -P usb
+AVRDUDE_FUSE = avrdude -v -c $(PROGRAMMER) -p $(DEVICE) -P usb
 AVRDUDE      = $(AVRDUDE_FUSE) -B1
 
 LIBS         = -I./libs/arduino 
@@ -42,6 +42,8 @@ CPP_SRC     := libs/arduino/main.o \
                libs/SPI/SPI.o \
                libs/RadioHead/RH_NRF24.o \
                libs/RadioHead/RHNRFSPIDriver.o \
+               libs/RadioHead/RHDatagram.o \
+               libs/RadioHead/RHReliableDatagram.o \
                libs/RadioHead/RHHardwareSPI.o \
                libs/RadioHead/RHGenericDriver.o \
                libs/RadioHead/RHGenericSPI.o \

@@ -31,7 +31,7 @@ const uint8_t button_pins[] = { 9,10,7,8 };
 const int ce_pin           = 9;
 const int csn_pin          = 10;
 const int led_pin          = 4;
-const uint8_t button_pins[] = { 5,6,7,8 };
+const uint8_t button_pins[] = { 5,7,6,8 };
 #endif
 
 const uint8_t num_button_pins = 4;
@@ -54,8 +54,15 @@ void setup() {
   // Defaults after init are 2.402 GHz (channel 2), 2Mbps, 0dBm
     if (!radio.setChannel(92))
         Serial.println("setChannel failed");
-    if (!radio.setRF(RH_NRF24::DataRate250kbps, RH_NRF24::TransmitPower0dBm))
+    if (!radio.setRF(RH_NRF24::DataRate250kbps, RH_NRF24::TransmitPowerm18dBm))
         Serial.println("setRF failed");    
+
+    uint8_t retryDelay = 0x02;
+    uint8_t retryCount = 0x0A;
+    radio.spiWriteRegister(RH_NRF24_REG_04_SETUP_RETR, ((retryDelay << 4) & RH_NRF24_ARD) | (retryCount & RH_NRF24_ARC));
+
+    radio.spiWriteRegister(RH_NRF24_REG_1D_FEATURE, RH_NRF24_EN_DPL | RH_NRF24_EN_DYN_ACK | RH_NRF24_EN_ACK_PAY);
+    radio.spiWriteRegister(RH_NRF24_REG_01_EN_AA, 0x01);
     
     int i = num_button_pins;
     while (i--) {
@@ -172,29 +179,30 @@ bool run_remote() {
         digitalWrite(led_pin, HIGH);
         
         awakems = 0;
-        int tries_left = 10;
+        int tries_left = 1;
         while (tries_left--) {
             for (uint8_t i=0; i < sizeof(button_presses); i++) {
                 Serial.print(button_presses[i], HEX);
             }
             uint8_t len = sizeof(button_presses);
-            radio.send(button_presses, len);
+            bool sent = radio.send(button_presses, len);
             radio.waitPacketSent();
             uint8_t buf[num_button_pins];
-
-            if (radio.waitAvailableTimeout(25)) { 
-                if (radio.recv(buf, &len)) {
-                    Serial.print(" --> Received: ");
-                    for (uint8_t i=0; i < sizeof(buf); i++) {
-                        Serial.print(buf[i], HEX);
-                    }
-                    Serial.println();
-                    break;
-                } else {
-                    Serial.print(" ... recv failed!");
+            
+            if (!sent) { 
+                Serial.println(" ... send failed!");
+            } else if (radio.recv(buf, &len)) {
+                Serial.print(" --> Received: ");
+                for (uint8_t i=0; i < sizeof(buf); i++) {
+                    Serial.print(buf[i], HEX);
                 }
+                Serial.println();
+                break;
             } else {
-                Serial.print(" ... no reply ... ");
+                Serial.print("\n ... no reply ... ");
+                if (!tries_left) {
+                    Serial.println("\n ... gave up!");
+                }
             }
         }
         different = false;
