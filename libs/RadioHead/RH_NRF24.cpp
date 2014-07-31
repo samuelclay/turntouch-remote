@@ -186,8 +186,10 @@ bool RH_NRF24::send(const uint8_t* data, uint8_t len)
 bool RH_NRF24::waitPacketSent()
 {
     // If we are not currently in transmit mode, there is no packet to wait for
-    if (_mode != RHModeTx)
-	return false;
+    if (_mode != RHModeTx) {
+        Serial.print(" ! not in TX mode ! ");
+	    return false;
+    }
 
     // Wait for either the Data Sent or Max ReTries flag, signalling the 
     // end of transmission
@@ -198,8 +200,13 @@ bool RH_NRF24::waitPacketSent()
 
     // Must clear RH_NRF24_MAX_RT if it is set, else no further comm
     spiWriteRegister(RH_NRF24_REG_07_STATUS, RH_NRF24_TX_DS | RH_NRF24_MAX_RT);
-    if (status & RH_NRF24_MAX_RT)
-	flushTx();
+    if (status & RH_NRF24_MAX_RT) {
+        Serial.print(" - flushing tx - ");
+	    flushTx();
+    }
+    if (status & RH_NRF24_RX_DR) {
+        Serial.print(" - Got RX ack - ");
+    }
     setModeIdle();
     // Return true if data sent, false if MAX_RT
     return status & RH_NRF24_TX_DS;

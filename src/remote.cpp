@@ -55,10 +55,13 @@ void setup() {
     if (!radio.setChannel(92))
         Serial.println("setChannel failed");
     if (!radio.setRF(RH_NRF24::DataRate250kbps, RH_NRF24::TransmitPowerm18dBm))
-        Serial.println("setRF failed");    
-
+        Serial.println("setRF failed"); 
+    uint8_t address[] = {0xE7, 0xE7, 0xE7};
+    if (!radio.setNetworkAddress(address, sizeof(address)))
+        Serial.println("setNetworkAddress failed");
+        
     uint8_t retryDelay = 0x02;
-    uint8_t retryCount = 0x0A;
+    uint8_t retryCount = 0x0F;
     radio.spiWriteRegister(RH_NRF24_REG_04_SETUP_RETR, ((retryDelay << 4) & RH_NRF24_ARD) | (retryCount & RH_NRF24_ARC));
 
     radio.spiWriteRegister(RH_NRF24_REG_1D_FEATURE, RH_NRF24_EN_DPL | RH_NRF24_EN_DYN_ACK | RH_NRF24_EN_ACK_PAY);
