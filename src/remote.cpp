@@ -31,7 +31,7 @@ const uint8_t button_pins[] = { 9,10,7,8 };
 const int ce_pin           = 9;
 const int csn_pin          = 10;
 const int led_pin          = 4;
-const uint8_t button_pins[] = { 5,7,6,8 };
+const uint8_t button_pins[] = { 5,6,7,8 };
 #endif
 
 const uint8_t num_button_pins = 4;
