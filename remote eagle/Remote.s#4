@@ -10576,7 +10576,7 @@ Standard 1-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <part name="GND9" library="SparkFun" deviceset="GND" device=""/>
 <part name="IC1" library="atmel" deviceset="MEGA8" device="-MI" value="ATmega328p"/>
 <part name="Y3" library="remote" deviceset="CRYSTAL" device="5X3.2" value="16MHz"/>
-<part name="JP2" library="SparkFun-Connectors" deviceset="M01" device="PTH" value="Serial"/>
+<part name="SERIAL" library="SparkFun-Connectors" deviceset="M01" device="PTH" value="Serial"/>
 <part name="GND11" library="SparkFun" deviceset="GND" device=""/>
 <part name="P+4" library="supply1" deviceset="VCC" device=""/>
 <part name="GND12" library="SparkFun" deviceset="GND" device=""/>
@@ -10653,7 +10653,7 @@ Standard 1-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <attribute name="NAME" x="93.98" y="100.33" size="1.778" layer="95" rot="R270"/>
 <attribute name="VALUE" x="102.616" y="102.616" size="1.778" layer="96" rot="R270"/>
 </instance>
-<instance part="JP2" gate="G$1" x="96.52" y="33.02"/>
+<instance part="SERIAL" gate="G$1" x="96.52" y="33.02"/>
 <instance part="GND11" gate="1" x="10.16" y="33.02"/>
 <instance part="P+4" gate="VCC" x="5.08" y="45.72"/>
 <instance part="GND12" gate="1" x="10.16" y="60.96"/>
@@ -11184,7 +11184,7 @@ Standard 1-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <label x="71.12" y="45.72" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="JP2" gate="G$1" pin="1"/>
+<pinref part="SERIAL" gate="G$1" pin="1"/>
 <wire x1="104.14" y1="33.02" x2="109.22" y2="33.02" width="0.1524" layer="91"/>
 <label x="109.22" y="33.02" size="1.016" layer="95" xref="yes"/>
 </segment>

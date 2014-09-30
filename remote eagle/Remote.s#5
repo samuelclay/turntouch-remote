@@ -2073,21 +2073,22 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <rectangle x1="3.3655" y1="6.7945" x2="3.4925" y2="6.9215" layer="25"/>
 </package>
 <package name="20MMCOINCELL">
-<smd name="P$1" x="0" y="8.5" dx="2.6" dy="3" layer="1"/>
-<smd name="P$2" x="0" y="-12.9" dx="3.6" dy="3" layer="1"/>
+<smd name="P$1" x="0" y="12.954" dx="4.318" dy="3.302" layer="1"/>
+<smd name="P$2" x="0" y="-12.954" dx="4.318" dy="3.302" layer="1"/>
 <wire x1="-3" y1="11" x2="-8" y2="6" width="0.127" layer="21" curve="90"/>
-<wire x1="-8" y1="6" x2="-8" y2="-13" width="0.127" layer="21"/>
-<wire x1="-8" y1="-13" x2="-7" y2="-14" width="0.127" layer="21" curve="90"/>
-<wire x1="-7" y1="-14" x2="-6" y2="-13" width="0.127" layer="21" curve="90"/>
-<wire x1="-6" y1="-13" x2="-6" y2="-9" width="0.127" layer="21"/>
+<wire x1="-8" y1="6" x2="-8" y2="-7.92" width="0.127" layer="21"/>
+<wire x1="-8" y1="-7.92" x2="-7" y2="-8.92" width="0.127" layer="21" curve="90"/>
+<wire x1="-7" y1="-8.92" x2="-6" y2="-7.92" width="0.127" layer="21" curve="90"/>
+<wire x1="-6" y1="-7.92" x2="-6" y2="-9" width="0.127" layer="21"/>
 <wire x1="-6" y1="-9" x2="6" y2="-9" width="0.127" layer="21"/>
-<wire x1="6" y1="-9" x2="6" y2="-13" width="0.127" layer="21"/>
-<wire x1="6" y1="-13" x2="7" y2="-14" width="0.127" layer="21" curve="90"/>
-<wire x1="7" y1="-14" x2="8" y2="-13" width="0.127" layer="21" curve="90"/>
-<wire x1="8" y1="-13" x2="8" y2="6" width="0.127" layer="21"/>
+<wire x1="6" y1="-9" x2="6" y2="-7.92" width="0.127" layer="21"/>
+<wire x1="6" y1="-7.92" x2="7" y2="-8.92" width="0.127" layer="21" curve="90"/>
+<wire x1="7" y1="-8.92" x2="8" y2="-7.92" width="0.127" layer="21" curve="90"/>
+<wire x1="8" y1="-7.92" x2="8" y2="6" width="0.127" layer="21"/>
 <wire x1="8" y1="6" x2="3" y2="11" width="0.127" layer="21" curve="90"/>
 <wire x1="3" y1="11" x2="-3" y2="11" width="0.127" layer="21"/>
 <circle x="0" y="0" radius="10" width="0.127" layer="21"/>
+<smd name="P$3" x="0" y="0" dx="10.922" dy="7.112" layer="1"/>
 </package>
 </packages>
 <symbols>

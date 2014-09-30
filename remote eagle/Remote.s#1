@@ -10947,7 +10947,7 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <part name="P+4" library="supply1" deviceset="VCC" device=""/>
 <part name="GND12" library="SparkFun" deviceset="GND" device=""/>
 <part name="P+5" library="supply1" deviceset="VCC" device=""/>
-<part name="JP2" library="SparkFun-Connectors" deviceset="M02" device="PTH"/>
+<part name="JP2" library="SparkFun-Connectors" deviceset="M02" device="PTH" value="Serial"/>
 </parts>
 <sheets>
 <sheet>
