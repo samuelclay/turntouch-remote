@@ -2073,21 +2073,22 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <rectangle x1="3.3655" y1="6.7945" x2="3.4925" y2="6.9215" layer="25"/>
 </package>
 <package name="20MMCOINCELL">
-<smd name="P$1" x="0" y="8.5" dx="2.6" dy="3" layer="1"/>
-<smd name="P$2" x="0" y="-12.9" dx="3.6" dy="3" layer="1"/>
+<smd name="P$1" x="0" y="14.605" dx="4.318" dy="3.302" layer="1"/>
+<smd name="P$2" x="0" y="-14.605" dx="4.318" dy="3.302" layer="1"/>
 <wire x1="-3" y1="11" x2="-8" y2="6" width="0.127" layer="21" curve="90"/>
-<wire x1="-8" y1="6" x2="-8" y2="-13" width="0.127" layer="21"/>
-<wire x1="-8" y1="-13" x2="-7" y2="-14" width="0.127" layer="21" curve="90"/>
-<wire x1="-7" y1="-14" x2="-6" y2="-13" width="0.127" layer="21" curve="90"/>
-<wire x1="-6" y1="-13" x2="-6" y2="-9" width="0.127" layer="21"/>
+<wire x1="-8" y1="6" x2="-8" y2="-7.92" width="0.127" layer="21"/>
+<wire x1="-8" y1="-7.92" x2="-7" y2="-8.92" width="0.127" layer="21" curve="90"/>
+<wire x1="-7" y1="-8.92" x2="-6" y2="-7.92" width="0.127" layer="21" curve="90"/>
+<wire x1="-6" y1="-7.92" x2="-6" y2="-9" width="0.127" layer="21"/>
 <wire x1="-6" y1="-9" x2="6" y2="-9" width="0.127" layer="21"/>
-<wire x1="6" y1="-9" x2="6" y2="-13" width="0.127" layer="21"/>
-<wire x1="6" y1="-13" x2="7" y2="-14" width="0.127" layer="21" curve="90"/>
-<wire x1="7" y1="-14" x2="8" y2="-13" width="0.127" layer="21" curve="90"/>
-<wire x1="8" y1="-13" x2="8" y2="6" width="0.127" layer="21"/>
+<wire x1="6" y1="-9" x2="6" y2="-7.92" width="0.127" layer="21"/>
+<wire x1="6" y1="-7.92" x2="7" y2="-8.92" width="0.127" layer="21" curve="90"/>
+<wire x1="7" y1="-8.92" x2="8" y2="-7.92" width="0.127" layer="21" curve="90"/>
+<wire x1="8" y1="-7.92" x2="8" y2="6" width="0.127" layer="21"/>
 <wire x1="8" y1="6" x2="3" y2="11" width="0.127" layer="21" curve="90"/>
 <wire x1="3" y1="11" x2="-3" y2="11" width="0.127" layer="21"/>
 <circle x="0" y="0" radius="10" width="0.127" layer="21"/>
+<smd name="P$3" x="0" y="0" dx="7.112" dy="10.922" layer="1"/>
 </package>
 </packages>
 <symbols>
@@ -10575,7 +10576,7 @@ Standard 1-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <part name="GND9" library="SparkFun" deviceset="GND" device=""/>
 <part name="IC1" library="atmel" deviceset="MEGA8" device="-MI" value="ATmega328p"/>
 <part name="Y3" library="remote" deviceset="CRYSTAL" device="5X3.2" value="16MHz"/>
-<part name="JP2" library="SparkFun-Connectors" deviceset="M01" device="PTH" value="Serial"/>
+<part name="SERIAL" library="SparkFun-Connectors" deviceset="M01" device="PTH" value="Serial"/>
 <part name="GND11" library="SparkFun" deviceset="GND" device=""/>
 <part name="P+4" library="supply1" deviceset="VCC" device=""/>
 <part name="GND12" library="SparkFun" deviceset="GND" device=""/>
@@ -10652,7 +10653,7 @@ Standard 1-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <attribute name="NAME" x="93.98" y="100.33" size="1.778" layer="95" rot="R270"/>
 <attribute name="VALUE" x="102.616" y="102.616" size="1.778" layer="96" rot="R270"/>
 </instance>
-<instance part="JP2" gate="G$1" x="96.52" y="33.02"/>
+<instance part="SERIAL" gate="G$1" x="96.52" y="33.02"/>
 <instance part="GND11" gate="1" x="10.16" y="33.02"/>
 <instance part="P+4" gate="VCC" x="5.08" y="45.72"/>
 <instance part="GND12" gate="1" x="10.16" y="60.96"/>
@@ -11183,7 +11184,7 @@ Standard 1-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <label x="71.12" y="45.72" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="JP2" gate="G$1" pin="1"/>
+<pinref part="SERIAL" gate="G$1" pin="1"/>
 <wire x1="104.14" y1="33.02" x2="109.22" y2="33.02" width="0.1524" layer="91"/>
 <label x="109.22" y="33.02" size="1.016" layer="95" xref="yes"/>
 </segment>
