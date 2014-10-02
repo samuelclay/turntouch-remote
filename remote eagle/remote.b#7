@@ -3111,7 +3111,7 @@ Please make sure your boards conform to these design rules.</description>
 </element>
 <element name="JP2" library="SparkFun-Connectors" package="1X02" value="Serial" x="8.636" y="35.814" smashed="yes"/>
 <element name="H1" library="holes" package="3,0-PAD" value="MOUNT-PAD-ROUND3.0" x="3.302" y="35.306"/>
-<element name="H2" library="holes" package="3,0-PAD" value="MOUNT-PAD-ROUND3.0" x="35.306" y="3.302"/>
+<element name="H2" library="holes" package="3,0-PAD" value="MOUNT-PAD-ROUND3.0" x="35.052" y="3.556"/>
 </elements>
 <signals>
 <signal name="GND">
@@ -3445,16 +3445,16 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="31.242" y1="22.86" x2="33.147" y2="24.765" width="0.254" layer="1"/>
 <wire x1="33.147" y1="24.765" x2="36.449" y2="24.765" width="0.254" layer="1"/>
 <wire x1="36.449" y1="24.765" x2="37.338" y2="23.876" width="0.254" layer="1"/>
-<wire x1="37.338" y1="23.876" x2="37.338" y2="7.366" width="0.254" layer="1"/>
-<wire x1="37.338" y1="7.366" x2="37.338" y2="7.3351" width="0.1524" layer="1"/>
-<wire x1="37.338" y1="7.3351" x2="36.83" y2="6.858" width="0.254" layer="1"/>
-<wire x1="36.83" y1="6.858" x2="31.75" y2="6.858" width="0.254" layer="1"/>
+<wire x1="37.338" y1="23.876" x2="37.338" y2="7.62" width="0.254" layer="1"/>
+<wire x1="37.338" y1="7.62" x2="37.338" y2="7.3351" width="0.1524" layer="1"/>
+<wire x1="37.338" y1="7.3351" x2="36.703" y2="6.731" width="0.254" layer="1"/>
+<wire x1="36.703" y1="6.731" x2="31.623" y2="6.731" width="0.254" layer="1"/>
 <wire x1="19.574" y1="5.334" x2="18.542" y2="4.318" width="0.254" layer="1"/>
 <wire x1="18.542" y1="4.318" x2="17.78" y2="3.556" width="0.254" layer="1"/>
 <wire x1="17.78" y1="3.556" x2="17.78" y2="2.794" width="0.254" layer="1"/>
 <wire x1="17.78" y1="2.794" x2="17.526" y2="2.54" width="0.254" layer="1"/>
 <wire x1="17.526" y1="2.54" x2="16.7949" y2="1.778" width="0.254" layer="1"/>
-<via x="37.338" y="7.366" extent="1-16" drill="0.6604"/>
+<via x="37.338" y="7.62" extent="1-16" drill="0.6604"/>
 <contactref element="C9" pad="1"/>
 <contactref element="C8" pad="1"/>
 <wire x1="17.13" y1="37.084" x2="17.13" y2="35.56" width="0.1524" layer="1"/>
@@ -3475,7 +3475,7 @@ Please make sure your boards conform to these design rules.</description>
 <via x="35.56" y="16.129" extent="1-16" drill="0.3302"/>
 <wire x1="35.56" y1="16.129" x2="36.195" y2="16.129" width="0.1524" layer="16"/>
 <wire x1="36.195" y1="16.129" x2="37.338" y2="14.986" width="0.1524" layer="16"/>
-<wire x1="37.338" y1="14.986" x2="37.338" y2="7.366" width="0.1524" layer="16"/>
+<wire x1="37.338" y1="14.986" x2="37.338" y2="7.62" width="0.1524" layer="16"/>
 <wire x1="31.254" y1="16.244" x2="30.976" y2="16.244" width="0.1524" layer="1"/>
 <wire x1="30.976" y1="16.244" x2="30.48" y2="15.748" width="0.1524" layer="1"/>
 <wire x1="31.13" y1="21.209" x2="31.13" y2="22.86" width="0.254" layer="1"/>
@@ -3515,7 +3515,7 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="30.48" y1="5.715" x2="24.257" y2="5.715" width="0.254" layer="1"/>
 <wire x1="24.257" y1="5.715" x2="22.892" y2="4.35" width="0.254" layer="1"/>
 <wire x1="22.892" y1="4.35" x2="22.892" y2="4.302" width="0.1524" layer="1"/>
-<wire x1="30.48" y1="5.715" x2="31.75" y2="6.858" width="0.254" layer="1"/>
+<wire x1="30.48" y1="5.715" x2="31.623" y2="6.731" width="0.254" layer="1"/>
 </signal>
 <signal name="RESET">
 <contactref element="J1" pad="5"/>

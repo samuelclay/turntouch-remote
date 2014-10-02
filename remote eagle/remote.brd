@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.01" unitdist="inch" unit="mm" style="dots" multiple="1" display="yes" altdistance="0.005" altunitdist="inch" altunit="inch"/>
+<grid distance="0.01" unitdist="inch" unit="inch" style="dots" multiple="1" display="yes" altdistance="0.005" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -148,8 +148,8 @@
 Rev. 10</text>
 <text x="20.32" y="15.494" size="1.524" layer="25" font="vector" rot="R90" align="top-center">TURN TOUCH</text>
 <text x="8.128" y="37.592" size="0.508" layer="25">GND Serial</text>
-<hole x="3.302" y="35.306" drill="3.048"/>
-<hole x="35.306" y="3.302" drill="3.048"/>
+<hole x="3.302" y="35.306" drill="2.59999375"/>
+<hole x="35.306" y="3.302" drill="2.59999375"/>
 </plain>
 <libraries>
 <library name="SparkFun-Passives">
