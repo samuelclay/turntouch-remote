@@ -3289,7 +3289,7 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="27.813" y1="20.955" x2="26.924" y2="21.844" width="0.1524" layer="1"/>
 <wire x1="21.892" y1="2.302" x2="21.892" y2="4.27" width="0.1524" layer="1"/>
 <wire x1="21.892" y1="4.27" x2="21.59" y2="4.572" width="0.1524" layer="1"/>
-<via x="21.59" y="4.572" extent="1-16" drill="0.6" shape="square"/>
+<via x="21.59" y="4.572" extent="1-16" drill="0.3302" shape="octagon"/>
 <wire x1="21.59" y1="4.572" x2="21.59" y2="13.208" width="0.1524" layer="16"/>
 <wire x1="21.59" y1="13.208" x2="22.606" y2="14.224" width="0.1524" layer="16"/>
 <wire x1="22.606" y1="14.224" x2="22.606" y2="21.336" width="0.1524" layer="16"/>

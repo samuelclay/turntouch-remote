@@ -149,6 +149,8 @@
 Rev. 10</text>
 <text x="20.32" y="15.494" size="1.524" layer="25" font="vector" rot="R90" align="top-center">TURN TOUCH</text>
 <text x="8.128" y="37.592" size="0.508" layer="25">GND Serial</text>
+<hole x="3.048" y="35.56" drill="3.048"/>
+<hole x="35.052" y="3.556" drill="3.048"/>
 </plain>
 <libraries>
 <library name="SparkFun-Passives">
@@ -3219,11 +3221,11 @@ Please make sure your boards conform to these design rules.</description>
 <via x="19.558" y="36.322" extent="1-16" drill="0.3302"/>
 <wire x1="19.558" y1="36.322" x2="19.192" y2="36.322" width="0.1524" layer="1"/>
 <wire x1="19.192" y1="36.322" x2="18.43" y2="37.084" width="0.1524" layer="1"/>
-<wire x1="26.892" y1="4.302" x2="30.21" y2="4.302" width="0.1524" layer="1"/>
-<wire x1="30.21" y1="4.302" x2="32.004" y2="6.096" width="0.1524" layer="1"/>
-<via x="32.004" y="6.096" extent="1-16" drill="0.3302"/>
-<wire x1="32.004" y1="6.096" x2="33.274" y2="7.366" width="0.1524" layer="16"/>
-<wire x1="33.274" y1="7.366" x2="35.052" y2="7.366" width="0.1524" layer="16"/>
+<wire x1="26.892" y1="4.302" x2="31.226" y2="4.302" width="0.1524" layer="1"/>
+<wire x1="31.226" y1="4.302" x2="32.512" y2="5.588" width="0.1524" layer="1"/>
+<via x="32.512" y="5.588" extent="1-16" drill="0.3302"/>
+<wire x1="32.512" y1="5.588" x2="34.29" y2="7.366" width="0.1524" layer="16"/>
+<wire x1="34.29" y1="7.366" x2="35.052" y2="7.366" width="0.1524" layer="16"/>
 <wire x1="35.306" y1="7.366" x2="35.052" y2="7.366" width="0.1524" layer="16"/>
 <wire x1="35.052" y1="7.366" x2="35.306" y2="7.62" width="0.1524" layer="16"/>
 <wire x1="1.397" y1="10.922" x2="15.367" y2="10.922" width="0.3048" layer="16"/>
@@ -3426,8 +3428,8 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="36.449" y1="24.765" x2="37.338" y2="23.876" width="0.254" layer="1"/>
 <wire x1="37.338" y1="23.876" x2="37.338" y2="7.62" width="0.254" layer="1"/>
 <wire x1="37.338" y1="7.62" x2="37.338" y2="7.3351" width="0.1524" layer="1"/>
-<wire x1="37.338" y1="7.3351" x2="36.83" y2="6.858" width="0.254" layer="1"/>
-<wire x1="36.83" y1="6.858" x2="31.623" y2="6.858" width="0.254" layer="1"/>
+<wire x1="37.338" y1="7.3351" x2="36.576" y2="6.604" width="0.254" layer="1"/>
+<wire x1="36.576" y1="6.604" x2="31.369" y2="6.604" width="0.254" layer="1"/>
 <wire x1="19.574" y1="5.334" x2="18.542" y2="4.318" width="0.254" layer="1"/>
 <wire x1="18.542" y1="4.318" x2="17.78" y2="3.556" width="0.254" layer="1"/>
 <wire x1="17.78" y1="3.556" x2="17.78" y2="2.794" width="0.254" layer="1"/>
@@ -3494,7 +3496,7 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="30.48" y1="5.715" x2="24.257" y2="5.715" width="0.254" layer="1"/>
 <wire x1="24.257" y1="5.715" x2="22.892" y2="4.35" width="0.254" layer="1"/>
 <wire x1="22.892" y1="4.35" x2="22.892" y2="4.302" width="0.1524" layer="1"/>
-<wire x1="30.48" y1="5.715" x2="31.623" y2="6.858" width="0.254" layer="1"/>
+<wire x1="30.48" y1="5.715" x2="31.369" y2="6.604" width="0.254" layer="1"/>
 </signal>
 <signal name="RESET">
 <contactref element="J1" pad="5"/>

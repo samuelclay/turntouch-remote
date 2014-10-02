@@ -2814,18 +2814,20 @@ We've spent an enormous amount of time creating and checking these footprints an
 <description>&lt;b&gt;Mounting Holes and Pads&lt;/b&gt;&lt;p&gt;
 &lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
 <packages>
-<package name="3,0-PAD">
-<description>&lt;b&gt;MOUNTING PAD&lt;/b&gt; 3.0 mm, round</description>
+<package name="3,0">
+<description>&lt;b&gt;MOUNTING HOLE&lt;/b&gt; 3.0 mm with drill center</description>
 <wire x1="-2.159" y1="0" x2="0" y2="-2.159" width="2.4892" layer="51" curve="90" cap="flat"/>
 <wire x1="0" y1="2.159" x2="2.159" y2="0" width="2.4892" layer="51" curve="-90" cap="flat"/>
 <circle x="0" y="0" radius="3.429" width="0.1524" layer="21"/>
 <circle x="0" y="0" radius="0.762" width="0.4572" layer="51"/>
-<circle x="0" y="0" radius="3.556" width="1.016" layer="39"/>
-<circle x="0" y="0" radius="3.556" width="1.016" layer="40"/>
-<circle x="0" y="0" radius="3.556" width="1.016" layer="43"/>
+<circle x="0" y="0" radius="3.048" width="2.032" layer="39"/>
+<circle x="0" y="0" radius="3.048" width="2.032" layer="43"/>
+<circle x="0" y="0" radius="3.048" width="2.032" layer="40"/>
+<circle x="0" y="0" radius="3.048" width="2.032" layer="41"/>
+<circle x="0" y="0" radius="3.048" width="2.032" layer="42"/>
 <circle x="0" y="0" radius="1.6" width="0.2032" layer="21"/>
-<pad name="B3,0" x="0" y="0" drill="3" diameter="5.842"/>
 <text x="-1.27" y="-3.81" size="1.27" layer="48">3,0</text>
+<hole x="0" y="0" drill="3"/>
 </package>
 </packages>
 </library>
@@ -3110,8 +3112,8 @@ Please make sure your boards conform to these design rules.</description>
 <attribute name="NAME" x="25.902" y="23.296" size="0.508" layer="25" font="vector" ratio="10" rot="R180"/>
 </element>
 <element name="JP2" library="SparkFun-Connectors" package="1X02" value="Serial" x="8.636" y="35.814" smashed="yes"/>
-<element name="H1" library="holes" package="3,0-PAD" value="MOUNT-PAD-ROUND3.0" x="3.302" y="35.306"/>
-<element name="H2" library="holes" package="3,0-PAD" value="MOUNT-PAD-ROUND3.0" x="35.052" y="3.556"/>
+<element name="H1" library="holes" package="3,0" value="MOUNT-HOLE3.0" x="3.302" y="35.306"/>
+<element name="H2" library="holes" package="3,0" value="MOUNT-HOLE3.0" x="35.052" y="3.556"/>
 </elements>
 <signals>
 <signal name="GND">
