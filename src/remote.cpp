@@ -4,7 +4,7 @@
 #include <SPI.h>
 #include <new.h>
 #include <pinchange.h>
-#include <RH_NRF24.h>
+#include <RH_RF22.h>
 
 void sleepNow(void);
 void wakeup();
@@ -41,31 +41,34 @@ uint8_t button_presses[num_button_pins];
 unsigned long button_timestamps[num_button_pins];
 volatile int awakems = 0;
 const uint64_t pipe = 1;
-RH_NRF24 radio(ce_pin, csn_pin);
+RH_RF22 radio;
 
 void setup() {
     Serial.begin(115200);
     Serial.print("\n\nTurn Touch Remote\n\n");
+
+    pinMode(led_pin, OUTPUT);
+    digitalWrite(led_pin, LOW);
 
     blink(2, 100, true);
     
     if (!radio.init())
         Serial.println("init failed");
   // Defaults after init are 2.402 GHz (channel 2), 2Mbps, 0dBm
-    if (!radio.setChannel(92))
-        Serial.println("setChannel failed");
-    if (!radio.setRF(RH_NRF24::DataRate250kbps, RH_NRF24::TransmitPowerm18dBm))
-        Serial.println("setRF failed"); 
-    uint8_t address[] = {0xE7, 0xE7, 0xE7};
-    if (!radio.setNetworkAddress(address, sizeof(address)))
-        Serial.println("setNetworkAddress failed");
+    // if (!radio.setChannel(92))
+    //     Serial.println("setChannel failed");
+    // if (!radio.setRF(RH_NRF24::DataRate250kbps, RH_NRF24::TransmitPowerm18dBm))
+    //     Serial.println("setRF failed");
+    // uint8_t address[] = {0xE7, 0xE7, 0xE7};
+    // if (!radio.setNetworkAddress(address, sizeof(address)))
+    //     Serial.println("setNetworkAddress failed");
         
-    uint8_t retryDelay = 0x02;
-    uint8_t retryCount = 0x0F;
-    radio.spiWriteRegister(RH_NRF24_REG_04_SETUP_RETR, ((retryDelay << 4) & RH_NRF24_ARD) | (retryCount & RH_NRF24_ARC));
-
-    radio.spiWriteRegister(RH_NRF24_REG_1D_FEATURE, RH_NRF24_EN_DPL | RH_NRF24_EN_DYN_ACK | RH_NRF24_EN_ACK_PAY);
-    radio.spiWriteRegister(RH_NRF24_REG_01_EN_AA, 0x01);
+    // uint8_t retryDelay = 0x02;
+    // uint8_t retryCount = 0x0F;
+    // radio.spiWriteRegister(RH_NRF24_REG_04_SETUP_RETR, ((retryDelay << 4) & RH_NRF24_ARD) | (retryCount & RH_NRF24_ARC));
+    //
+    // radio.spiWriteRegister(RH_NRF24_REG_1D_FEATURE, RH_NRF24_EN_DPL | RH_NRF24_EN_DYN_ACK | RH_NRF24_EN_ACK_PAY);
+    // radio.spiWriteRegister(RH_NRF24_REG_01_EN_AA, 0x01);
     
     int i = num_button_pins;
     while (i--) {
@@ -75,8 +78,6 @@ void setup() {
         button_presses[i] = 0;
     }
 
-    pinMode(led_pin, OUTPUT);
-    digitalWrite(led_pin, LOW);
     blink(3, 200, true);
 }
 
