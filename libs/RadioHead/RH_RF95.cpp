@@ -1,7 +1,7 @@
 // RH_RF22.cpp
 //
 // Copyright (C) 2011 Mike McCauley
-// $Id: RH_RF95.cpp,v 1.3 2014/07/23 09:40:42 mikem Exp mikem $
+// $Id: RH_RF95.cpp,v 1.5 2014/09/17 22:41:47 mikem Exp $
 
 #include <RH_RF95.h>
 
@@ -52,6 +52,12 @@ bool RH_RF95::init()
 //	Serial.println(spiRead(RH_RF95_REG_01_OP_MODE), HEX);
 	return false; // No device present?
     }
+
+    // Add by Adrien van den Bossche <vandenbo@univ-tlse2.fr> for Teensy
+    // ARM M4 requires the below. else pin interrupt doesn't work properly.
+    // On all other platforms, its innocuous, belt and braces
+    pinMode(_interruptPin, INPUT); 
+
     // Set up interrupt handler
     // Since there are a limited number of interrupt glue functions isr*() available,
     // we can only support a limited number of devices simultaneously
@@ -69,6 +75,7 @@ bool RH_RF95::init()
 	return false; // Too many devices, not enough interrupt vectors
     _interruptCount++;
 
+
     // Set up FIFO
     // We configure so that we can use the entire 256 byte FIFO for either receive
     // or transmit, but not both at the same time
@@ -81,11 +88,6 @@ bool RH_RF95::init()
     // RX mode is implmented with RXCONTINUOUS
     // max message data length is 255 - 4 = 251 octets
 
-    // Add by Adrien van den Bossche <vandenbo@univ-tlse2.fr> for Teensy
-    // ARM M4 requires the below. else pin interrupt doesn't work properly.
-    // On all other platforms, its innocuous, belt and braces
-    pinMode(_interruptPin, INPUT); 
-
     setModeIdle();
 
     // Set up default configuration
@@ -97,7 +99,6 @@ bool RH_RF95::init()
     setFrequency(434.0);
     // Lowish power
     setTxPower(13);
-//    setTxPower(20);
 
     return true;
 }
@@ -247,7 +248,7 @@ bool RH_RF95::printRegisters()
     uint8_t i;
     for (i = 0; i < sizeof(registers); i++)
     {
-	Serial.print(i, HEX);
+	Serial.print(registers[i], HEX);
 	Serial.print(": ");
 	Serial.println(spiRead(registers[i]), HEX);
     }
@@ -279,6 +280,16 @@ void RH_RF95::setModeIdle()
     }
 }
 
+bool RH_RF95::sleep()
+{
+    if (_mode != RHModeSleep)
+    {
+	spiWrite(RH_RF95_REG_01_OP_MODE, RH_RF95_MODE_SLEEP);
+	_mode = RHModeSleep;
+    }
+    return true;
+}
+
 void RH_RF95::setModeRx()
 {
     if (_mode != RHModeRx)
@@ -301,18 +312,31 @@ void RH_RF95::setModeTx()
 
 void RH_RF95::setTxPower(int8_t power)
 {
-    if (power > 20)
-	power = 20;
+    if (power > 23)
+	power = 23;
     if (power < 5)
 	power = 5;
-    // RFM95/96/97/98 does not have RFO pins connected to anything. ONly PA_BOOST
+
+    // For RH_RF95_PA_DAC_ENABLE, manual says '+20dBm on PA_BOOST when OutputPower=0xf'
+    // RH_RF95_PA_DAC_ENABLE actually adds about 3dBm to all power levels. We will us it
+    // for 21, 22 and 23dBm
+    if (power > 20)
+    {
+	spiWrite(RH_RF95_REG_4D_PA_DAC, RH_RF95_PA_DAC_ENABLE);
+	power -= 3;
+    }
+    else
+    {
+	spiWrite(RH_RF95_REG_4D_PA_DAC, RH_RF95_PA_DAC_DISABLE);
+    }
+
+    // RFM95/96/97/98 does not have RFO pins connected to anything. Only PA_BOOST
     // pin is connected, so must use PA_BOOST
     // Pout = 2 + OutputPower.
-    // The documentation is pretty confusing on this topic: PaSelect says the max poer is 20dBm,
+    // The documentation is pretty confusing on this topic: PaSelect says the max power is 20dBm,
     // but OutputPower claims it would be 17dBm.
     // My measurements show 20dBm is correct
     spiWrite(RH_RF95_REG_09_PA_CONFIG, RH_RF95_PA_SELECT | (power-5));
-//    spiWrite(RH_RF95_REG_09_PA_CONFIG, 0); // no power
 }
 
 // Sets registers from a canned modem configuration structure

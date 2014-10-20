@@ -20,7 +20,7 @@ uint8_t mcucr1, mcucr2;
 #define PRESS_TOGGLE  2
 #define PRESS_MODE    3
 #define MODE_CHANGE_DURATION 750 // ms
-#define BUTTON_DEBOUNCE_DURATION 25 // ms
+#define BUTTON_DEBOUNCE_DURATION 50 // ms
 
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
 const int ce_pin           = 2;
@@ -225,6 +225,7 @@ bool run_remote() {
 
 void sleepNow(void)
 {
+    
     int i = num_button_pins;
     while (i--) {
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
@@ -234,6 +235,8 @@ void sleepNow(void)
 #endif
     }
 
+    radio.sleep();
+    
     ACSR |= _BV(ACD);                         //disable the analog comparator
     ADCSRA &= ~_BV(ADEN);                     //disable ADC
     set_sleep_mode(SLEEP_MODE_PWR_DOWN);

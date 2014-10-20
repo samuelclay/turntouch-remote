@@ -1,7 +1,7 @@
 // RH_RF22.cpp
 //
 // Copyright (C) 2011 Mike McCauley
-// $Id: RH_RF22.cpp,v 1.19 2014/07/23 09:40:42 mikem Exp mikem $
+// $Id: RH_RF22.cpp,v 1.22 2014/09/17 22:41:47 mikem Exp $
 
 #include <RH_RF22.h>
 
@@ -63,6 +63,11 @@ RH_RF22::RH_RF22(uint8_t slaveSelectPin, uint8_t interruptPin, RHGenericSPI& spi
     _interruptPin = interruptPin;
     _idleMode = RH_RF22_XTON; // Default idle state is READY mode
     _polynomial = CRC_16_IBM; // Historical
+}
+
+void RH_RF22::setIdleMode(uint8_t idleMode)
+{
+    _idleMode = idleMode;
 }
 
 bool RH_RF22::init()
@@ -199,7 +204,7 @@ void RH_RF22::handleInterrupt()
     if (_lastInterruptFlags[0] & RH_RF22_ITXFFAEM)
     {
 	// See if more data has to be loaded into the Tx FIFO 
-	sendNextFragment();
+  	sendNextFragment();
 //	Serial.println("ITXFFAEM");  
     }
     if (_lastInterruptFlags[0] & RH_RF22_IRXFFAFULL)
@@ -427,6 +432,16 @@ void RH_RF22::setModeIdle()
 	setOpMode(_idleMode);
 	_mode = RHModeIdle;
     }
+}
+
+bool RH_RF22::sleep()
+{
+    if (_mode != RHModeSleep)
+    {
+	setOpMode(0);
+	_mode = RHModeSleep;
+    }
+    return true;
 }
 
 void RH_RF22::setModeRx()

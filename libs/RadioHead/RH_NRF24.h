@@ -1,7 +1,7 @@
 // RH_NRF24.h
 // Author: Mike McCauley
 // Copyright (C) 2012 Mike McCauley
-// $Id: RH_NRF24.h,v 1.11 2014/07/23 07:49:42 mikem Exp $
+// $Id: RH_NRF24.h,v 1.12 2014/09/17 22:41:47 mikem Exp $
 //
 
 #ifndef RH_NRF24_h
@@ -114,6 +114,7 @@
 #define RH_NRF24_PWR_m12dBm                                0x02
 #define RH_NRF24_PWR_m6dBm                                 0x04
 #define RH_NRF24_PWR_0dBm                                  0x06
+#define RH_NRF24_LNA_HCURR                                 0x01
 
 // #define RH_NRF24_REG_07_STATUS                             0x07
 #define RH_NRF24_RX_DR                                     0x40
@@ -137,7 +138,7 @@
 #define RH_NRF24_RX_EMPTY                                  0x01
 
 // #define RH_NRF24_REG_1C_DYNPD                              0x1c
-#define RH_NRF24_DPL_ALL                                   0x2f
+#define RH_NRF24_DPL_ALL                                   0x3f
 #define RH_NRF24_DPL_P5                                    0x20
 #define RH_NRF24_DPL_P4                                    0x10
 #define RH_NRF24_DPL_P3                                    0x08
@@ -214,7 +215,7 @@
 /// The examples below assume the Sparkfun WRL-00691 module
 ///
 /// Connect the nRF24L01 to most Arduino's like this (Caution, Arduino Mega has different pins for SPI, 
-/// see below). Use these same connections for Teensy 3.1.
+/// see below). Use these same connections for Teensy 3.1 (use 3.3V not 5V Vcc).
 /// \code
 ///                 Arduino      Sparkfun WRL-00691
 ///                 5V-----------VCC   (3.3V to 7V in)
@@ -255,7 +256,7 @@
 ///                              IRQ   (Interrupt output, not connected)
 ///                 GND----------GND   (ground in)
 /// \endcode
-/// and you can then use the default constructor RH_NRF24(). 
+/// and you can then use the constructor RH_NRF24(8, 53). 
 ///
 /// For an Itead Studio IBoard Pro http://imall.iteadstudio.com/iboard-pro.html, connected by hardware SPI to the 
 /// ITDB02 Parallel LCD Module Interface pins:
@@ -505,8 +506,7 @@ public:
     /// Sends data to the address set by setTransmitAddress()
     /// Sets the radio to TX mode
     /// \param [in] data Data bytes to send.
-    /// \param [in] len Number of data bytes to set in teh TX buffer. The actual size of the 
-    /// transmitted data payload is set by setPayloadSize
+    /// \param [in] len Number of data bytes to send
     /// \return true on success (which does not necessarily mean the receiver got the message, only that the message was
     /// successfully transmitted).
     bool send(const uint8_t* data, uint8_t len);
@@ -546,6 +546,13 @@ public:
     /// The maximum message length supported by this driver
     /// \return The maximum message length supported by this driver
     uint8_t maxMessageLength();
+
+    /// Sets the radio into Power Down mode.
+    /// If successful, the radio will stay in Power Down mode until woken by 
+    /// changing mode it idle, transmit or receive (eg by calling send(), recv(), available() etc)
+    /// Caution: there is a time penalty as the radio takes a finite time to wake from sleep mode.
+    /// \return true if sleep mode was successfully entered.
+    virtual bool    sleep();
 
 protected:
     /// Flush the TX FIFOs

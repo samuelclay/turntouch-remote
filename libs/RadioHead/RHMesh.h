@@ -2,7 +2,7 @@
 //
 // Author: Mike McCauley (mikem@airspayce.com)
 // Copyright (C) 2011 Mike McCauley
-// $Id: RHMesh.h,v 1.9 2014/07/23 09:40:42 mikem Exp mikem $
+// $Id: RHMesh.h,v 1.11 2014/08/27 22:00:36 mikem Exp $
 
 #ifndef RHMesh_h
 #define RHMesh_h
@@ -175,7 +175,7 @@ public:
     /// \param[in] id If present and not NULL, the referenced uint8_t will be set to the ID
     /// \param[in] flags If present and not NULL, the referenced uint8_t will be set to the FLAGS
     /// (not just those addressed to this node).
-    /// \return true if a valid message was recvived for this node and copied to buf
+    /// \return true if a valid message was received for this node and copied to buf
     bool recvfromAck(uint8_t* buf, uint8_t* len, uint8_t* source = NULL, uint8_t* dest = NULL, uint8_t* id = NULL, uint8_t* flags = NULL);
 
     /// Starts the receiver if it is not running already.
@@ -211,24 +211,24 @@ protected:
     /// Try to resolve a route for the given address. Blocks while discovering the route
     /// which may take up to 4000 msec.
     /// Virtual so subclasses can override.
-    /// \param [in] address The physical addres to resolve
+    /// \param [in] address The physical address to resolve
     /// \return true if the address was resolved and added to the local routing table
     virtual bool doArp(uint8_t address);
 
     /// Tests if the given address of length addresslen is indentical to the
-    /// physical addres of this node.
+    /// physical address of this node.
     /// RHMesh always ikmplements p[hysical addresses as the 1 octet address of the node
     /// given by _thisAddress
     /// Called by recvfromAck() to test whether a RH_MESH_MESSAGE_TYPE_ROUTE_DISCOVERY_REQUEST
     /// is for this node.
-    /// Subclasses may want to override to implemnt mode complicated or longer physical addresses
+    /// Subclasses may want to override to implement more complicated or longer physical addresses
     /// \param [in] address Address of the pyysical addres being tested
     /// \param [in] addresslen Lengthof the address in bytes
     /// \return true if the physical address of this node is identical to address
     virtual bool isPhysicalAddress(uint8_t* address, uint8_t addresslen);
 
 private:
-    /// Temporary mesage buffer
+    /// Temporary message buffer
     static uint8_t _tmpMessage[RH_ROUTER_MAX_MESSAGE_LEN];
 
 };
