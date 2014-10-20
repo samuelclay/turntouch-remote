@@ -5,22 +5,27 @@
 #include <new.h>
 #include <pinchange.h>
 #include <RH_RF22.h>
+#include <RHReliableDatagram.h>
 
 void sleepNow(void);
 void wakeup();
 bool run_remote();
 void blink(int loops, int loop_time, bool half);
+bool detectButtonChange(bool *button_on);
 
 // #define BODS 7      // BOD Sleep bit in MCUCR
 // #define BODSE 2     // BOD Sleep enable bit in MCUCR
 uint8_t mcucr1, mcucr2;
+
+#define CLIENT_ADDRESS 1
+#define SERVER_ADDRESS 2
 
 #define SERIAL_PRINT  1
 #define PRESS_ACTIVE  1
 #define PRESS_TOGGLE  2
 #define PRESS_MODE    3
 #define MODE_CHANGE_DURATION 750 // ms
-#define BUTTON_DEBOUNCE_DURATION 50 // ms
+#define BUTTON_DEBOUNCE_DURATION 30 // ms
 
 #if defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny85__)
 const int ce_pin           = 2;
@@ -39,9 +44,10 @@ unsigned long button_debounces[num_button_pins];
 uint8_t button_states[num_button_pins];
 uint8_t button_presses[num_button_pins];
 unsigned long button_timestamps[num_button_pins];
-volatile int awakems = 0;
+volatile unsigned long awakeTime = 0;
 const uint64_t pipe = 1;
-RH_RF22 radio;
+RH_RF22 radioDriver;
+RHReliableDatagram radio(radioDriver, CLIENT_ADDRESS);
 
 void setup() {
     Serial.begin(115200);
@@ -53,22 +59,10 @@ void setup() {
     blink(2, 100, true);
     
     if (!radio.init())
-        Serial.println("init failed");
-  // Defaults after init are 2.402 GHz (channel 2), 2Mbps, 0dBm
-    // if (!radio.setChannel(92))
-    //     Serial.println("setChannel failed");
-    // if (!radio.setRF(RH_NRF24::DataRate250kbps, RH_NRF24::TransmitPowerm18dBm))
-    //     Serial.println("setRF failed");
-    // uint8_t address[] = {0xE7, 0xE7, 0xE7};
-    // if (!radio.setNetworkAddress(address, sizeof(address)))
-    //     Serial.println("setNetworkAddress failed");
-        
-    // uint8_t retryDelay = 0x02;
-    // uint8_t retryCount = 0x0F;
-    // radio.spiWriteRegister(RH_NRF24_REG_04_SETUP_RETR, ((retryDelay << 4) & RH_NRF24_ARD) | (retryCount & RH_NRF24_ARC));
-    //
-    // radio.spiWriteRegister(RH_NRF24_REG_1D_FEATURE, RH_NRF24_EN_DPL | RH_NRF24_EN_DYN_ACK | RH_NRF24_EN_ACK_PAY);
-    // radio.spiWriteRegister(RH_NRF24_REG_01_EN_AA, 0x01);
+        Serial.println(" ---> Radio client init failed!\n");
+
+    radio.setTimeout(80);
+    radioDriver.setModemConfig(RH_RF22::FSK_Rb125Fd125);
     
     int i = num_button_pins;
     while (i--) {
@@ -82,35 +76,82 @@ void setup() {
 }
 
 void loop() {
-    bool button_on = false;
-    if (awakems > 1) {
-        button_on = run_remote();
-    }
+    bool button_on = run_remote();
+
     if (!button_on) {
-        if (awakems > 1000) {
-            awakems = 0;
+        if ((millis() - awakeTime) > 10) {
+            awakeTime = millis();
             sleepNow();
-        } else {
-            awakems += 1;
         }
     }
 }
 
 bool run_remote() {
+    bool button_on = false;
+    bool different = detectButtonChange(&button_on);
+
+    // Send the state of the buttons to the LED board
+    if (different) {
+        digitalWrite(led_pin, HIGH);
+        
+        awakeTime = millis();
+#ifdef SERIAL_PRINT
+        for (uint8_t i=0; i < sizeof(button_presses); i++) {
+            Serial.print(button_presses[i], HEX);
+        }
+#endif
+        uint8_t data = 0;
+        for (uint8_t i=0; i < sizeof(button_presses); i++) {
+            data |= (button_presses[i] << 2*i);
+        }
+        uint8_t len = sizeof(data);
+        bool sent = radio.sendtoWait(&data, len, SERVER_ADDRESS);
+        radio.waitPacketSent();
+        uint8_t buf[num_button_pins];
+        uint8_t from;
+        
+        if (!sent) { 
+#ifdef SERIAL_PRINT
+            Serial.println(" ... send failed!");
+#endif
+        } else if (radio.recvfromAckTimeout(buf, &len, 100, &from)) {
+#ifdef SERIAL_PRINT
+            Serial.print("\n --> Received from 0x");
+            Serial.print(from, HEX);
+            Serial.print(": ");
+            for (uint8_t i=0; i < sizeof(buf); i++) {
+                Serial.print(buf[i], HEX);
+            }
+            Serial.println();
+#endif
+        } else {
+#ifdef SERIAL_PRINT
+            Serial.print(" ... no reply!");
+            Serial.println();
+#endif
+        }
+        different = false;
+        digitalWrite(led_pin, LOW);
+    }
+
+    return button_on;
+}
+
+bool detectButtonChange(bool *button_on) {
     // Read the current state of buttons, and test if the current state
     // is different from the last state we sent
     int i = num_button_pins;
-    bool button_on = false;
     unsigned long button_offset = 0;
     bool different = false;
+    
     while (i--) {
         bool button_different = false;
         uint8_t state = !digitalRead(button_pins[i]);
 
-        if (state) button_on = true;
+        if (state) *button_on = true;
         
         if (state && !button_debounces[i]) {
-            awakems = 0;
+            awakeTime = millis();
             button_debounces[i] = millis();
         }
         if (state != button_states[i]) {
@@ -130,9 +171,9 @@ bool run_remote() {
             button_timestamps[i] = millis();
             button_presses[i] = PRESS_ACTIVE;
 #ifdef SERIAL_PRINT
-            Serial.print(" --> Starting active: ");
+            Serial.print(" --> Button #");
             Serial.print((int)i+1);
-            Serial.print(" -- ");
+            Serial.print(" pressed: ");
 #endif
         } else if (state && !button_different && button_timestamps[i]) {
             // Check if has hit new mode
@@ -140,9 +181,9 @@ bool run_remote() {
 
             if (button_offset >= MODE_CHANGE_DURATION) {
 #ifdef SERIAL_PRINT
-                Serial.print("\n --> Mode by default: ");
+                Serial.print(" --> Mode #");
                 Serial.print((int)i+1);
-                Serial.print(" -- ");
+                Serial.print(" by default in ");
                 Serial.print((unsigned long)button_offset);
                 Serial.print("ms -- ");
 #endif
@@ -153,74 +194,20 @@ bool run_remote() {
         } else if (!state && button_different) {
             // Button was pressed, now released
 #ifdef SERIAL_PRINT
-            Serial.print(" --> Ending active: ");
+            Serial.print(" --> Button #");
             Serial.print((int)i+1);
-            Serial.print(" -- ");
+            Serial.print(" released: ");
             Serial.print((unsigned long)button_offset);
             Serial.print(" -- ");
 #endif
-
-            // Debounce pressed button, seeing if toggle or new mode
-            // if (button_offset > 10) {
-                button_presses[i] = PRESS_TOGGLE;
-                button_timestamps[i] = 0;
-//             } else {
-// #ifdef SERIAL_PRINT
-//                 Serial.print("\nDebounced, ignored: ");
-//                 Serial.print((int)i+1);
-//                 Serial.print(" -- ");
-//                 Serial.print((unsigned long)button_offset);
-// #endif
-//             }
+            button_presses[i] = PRESS_TOGGLE;
+            button_timestamps[i] = 0;
         } else if (button_presses[i]) {
             button_presses[i] = 0;
         }
-
     }
-
-    // Send the state of the buttons to the LED board
-    if (different) {
-        digitalWrite(led_pin, HIGH);
-        
-        awakems = 0;
-        int tries_left = 1;
-        while (tries_left--) {
-            for (uint8_t i=0; i < sizeof(button_presses); i++) {
-                Serial.print(button_presses[i], HEX);
-            }
-            uint8_t data = 0;
-            for (uint8_t i=0; i < sizeof(button_presses); i++) {
-                data |= (button_presses[i] << 2*i);
-            }
-            uint8_t len = sizeof(data);
-            bool sent = radio.send(&data, len);
-            Serial.print(" sent:");
-            Serial.print(data, BIN);
-            radio.waitPacketSent();
-            uint8_t buf[num_button_pins];
-            
-            if (!sent) { 
-                Serial.println(" ... send failed!");
-            } else if (radio.recv(buf, &len)) {
-                Serial.print(" --> Received: ");
-                for (uint8_t i=0; i < sizeof(buf); i++) {
-                    Serial.print(buf[i], HEX);
-                }
-                Serial.println();
-                break;
-            } else {
-                Serial.print("\n ... no reply ... ");
-                if (!tries_left) {
-                    Serial.println("\n ... gave up!");
-                }
-            }
-        }
-        different = false;
-        digitalWrite(led_pin, LOW);
-        radio.setModeIdle();
-    }
-
-    return button_on;
+    
+    return different;
 }
 
 void sleepNow(void)
@@ -235,7 +222,7 @@ void sleepNow(void)
 #endif
     }
 
-    radio.sleep();
+    radioDriver.sleep();
     
     ACSR |= _BV(ACD);                         //disable the analog comparator
     ADCSRA &= ~_BV(ADEN);                     //disable ADC
@@ -268,7 +255,7 @@ void sleepNow(void)
 }
 
 void wakeup() {
-    awakems = 0;
+    awakeTime = millis();
 }
 
 void blink(int loops, int loop_time, bool half) {
