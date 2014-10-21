@@ -79,7 +79,7 @@ void loop() {
     bool button_on = run_remote();
 
     if (!button_on) {
-        if ((millis() - awakeTime) > 10) {
+        if ((millis() - awakeTime) > 250) {
             awakeTime = millis();
             sleepNow();
         }
@@ -221,8 +221,10 @@ void sleepNow(void)
         PCattachInterrupt(button_pins[i], wakeup, CHANGE);
 #endif
     }
-
+    Serial.println(" ---> Sleeping...");
     radioDriver.sleep();
+    delay(20);
+    
     
     ACSR |= _BV(ACD);                         //disable the analog comparator
     ADCSRA &= ~_BV(ADEN);                     //disable ADC
