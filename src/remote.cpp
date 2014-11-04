@@ -33,9 +33,8 @@ const int csn_pin          = 3;
 const int led_pin          = 0;
 const uint8_t button_pins[] = { 9,10,7,8 };
 #else
-const int ce_pin           = 9;
-const int csn_pin          = 10;
 const int led_pin          = 4;
+const int shutdown_pin     = 3; // PD3
 const uint8_t button_pins[] = { 5,6,7,8 };
 #endif
 
@@ -55,12 +54,17 @@ void setup() {
 
     pinMode(led_pin, OUTPUT);
     digitalWrite(led_pin, LOW);
+    pinMode(shutdown_pin, OUTPUT);
+    digitalWrite(shutdown_pin, LOW);
 
     blink(2, 100, true);
     
     if (!radio.init())
         Serial.println(" ---> Radio client init failed!\n");
-
+    
+    // Serial.print(" ---> Temperature: ");
+    // Serial.println(radio.temperatureRead(RH_RF22_TSRANGE_M64_64C, 0) * 0.5 - 64);
+    
     radio.setTimeout(80);
     radioDriver.setModemConfig(RH_RF22::FSK_Rb125Fd125);
     
