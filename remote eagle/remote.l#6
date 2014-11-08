@@ -129,7 +129,7 @@
 <smd name="GND" x="-2.38" y="0.07" dx="3" dy="1.09" layer="1" rot="R270"/>
 <text x="-2.67" y="3.235" size="0.6096" layer="25">&gt;Name</text>
 <text x="0.63" y="3.23" size="0.6096" layer="27">&gt;Value</text>
-<polygon width="0.1524" layer="1">
+<polygon width="0.1524" layer="29">
 <vertex x="-1.8" y="2.9"/>
 <vertex x="2" y="2.9"/>
 <vertex x="3" y="1.8"/>
@@ -149,6 +149,10 @@
 </polygon>
 <smd name="BTN" x="0" y="0" dx="2.45" dy="2.45" layer="1" roundness="100"/>
 <pad name="BTNVIA" x="-0.5" y="0.5" drill="0.3302" stop="no" thermals="no"/>
+<wire x1="-6.35" y1="6.35" x2="6.35" y2="6.35" width="0.127" layer="21"/>
+<wire x1="6.35" y1="6.35" x2="6.35" y2="-6.35" width="0.127" layer="21"/>
+<wire x1="6.35" y1="-6.35" x2="-6.35" y2="-6.35" width="0.127" layer="21"/>
+<wire x1="-6.35" y1="-6.35" x2="-6.35" y2="6.35" width="0.127" layer="21"/>
 </package>
 <package name="ANTENNA-CHIP_1204">
 <smd name="FEED" x="-6.032" y="0" dx="1.6764" dy="4.2" layer="1"/>

@@ -977,6 +977,10 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 </polygon>
 <smd name="BTN" x="0" y="0" dx="2.45" dy="2.45" layer="1" roundness="100"/>
 <pad name="BTNVIA" x="-0.5" y="0.5" drill="0.3302" stop="no" thermals="no"/>
+<wire x1="-6.35" y1="6.35" x2="6.35" y2="6.35" width="0.127" layer="21"/>
+<wire x1="6.35" y1="6.35" x2="6.35" y2="-6.35" width="0.127" layer="21"/>
+<wire x1="6.35" y1="-6.35" x2="-6.35" y2="-6.35" width="0.127" layer="21"/>
+<wire x1="-6.35" y1="-6.35" x2="-6.35" y2="6.35" width="0.127" layer="21"/>
 </package>
 </packages>
 <symbols>
@@ -6420,7 +6424,7 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <part name="U$7" library="remote" deviceset="SWITCH-SPDT-SMD" device="SMD2" value="Button 1"/>
 <part name="U$8" library="remote" deviceset="SWITCH-SPDT-SMD" device="SMD2" value="Button 2"/>
 <part name="U$9" library="remote" deviceset="SWITCH-SPDT-SMD" device="SMD2" value="Button 3"/>
-<part name="U$10" library="remote" deviceset="SWITCH-SPDT-SMD" device="SMD2"/>
+<part name="U$10" library="remote" deviceset="SWITCH-SPDT-SMD" device="SMD2" value="Button 4"/>
 <part name="GND1" library="SparkFun" deviceset="GND" device=""/>
 </parts>
 <sheets>

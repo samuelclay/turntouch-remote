@@ -153,7 +153,7 @@
 <wire x1="6.35" y1="6.35" x2="6.35" y2="-6.35" width="0.127" layer="21"/>
 <wire x1="6.35" y1="-6.35" x2="-6.35" y2="-6.35" width="0.127" layer="21"/>
 <wire x1="-6.35" y1="-6.35" x2="-6.35" y2="6.35" width="0.127" layer="21"/>
-<polygon width="0.1524" layer="29">
+<polygon width="0.1524" layer="31">
 <vertex x="-1.8" y="2.9"/>
 <vertex x="2" y="2.9"/>
 <vertex x="3" y="1.8"/>
