@@ -2039,8 +2039,12 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="16.35" y1="15.4" x2="15.494" y2="16.256" width="0.1524" layer="16"/>
 <wire x1="15.494" y1="16.256" x2="8.89" y2="16.256" width="0.1524" layer="16"/>
 <wire x1="8.89" y1="16.256" x2="8.636" y2="16.51" width="0.1524" layer="16"/>
-<wire x1="34.798" y1="20.32" x2="33.876" y2="14.04" width="0" layer="19" extent="16-16"/>
-<wire x1="24.75" y1="9.764" x2="18.8" y2="9.716" width="0" layer="19" extent="1-1"/>
+<wire x1="33.876" y1="14.04" x2="33.876" y2="15.4" width="0.1524" layer="16"/>
+<wire x1="33.876" y1="15.4" x2="30.988" y2="18.288" width="0.1524" layer="16"/>
+<via x="30.988" y="18.288" extent="1-16" drill="0.3302"/>
+<wire x1="30.988" y1="18.288" x2="34.544" y2="18.288" width="0.1524" layer="1"/>
+<wire x1="34.544" y1="18.288" x2="36.576" y2="20.32" width="0.1524" layer="1"/>
+<wire x1="18.8" y1="9.716" x2="24.75" y2="9.764" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MISO">
 <contactref element="J1" pad="1"/>

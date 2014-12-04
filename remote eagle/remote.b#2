@@ -1968,7 +1968,6 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="27.29" y1="1.524" x2="27.29" y2="0.904" width="0.1524" layer="1"/>
 <wire x1="27.29" y1="0.904" x2="27.686" y2="0.635" width="0.1524" layer="1"/>
 <wire x1="27.686" y1="0.635" x2="31.638" y2="0.635" width="0.1524" layer="1"/>
-<wire x1="31.638" y1="0.635" x2="32.4" y2="1.524" width="0.1524" layer="1"/>
 <wire x1="24.272" y1="1.524" x2="24.272" y2="1.412" width="0.1524" layer="1"/>
 <wire x1="24.272" y1="1.412" x2="23.622" y2="0.762" width="0.1524" layer="1"/>
 <wire x1="23.622" y1="0.762" x2="17.526" y2="0.762" width="0.1524" layer="1"/>
@@ -2047,7 +2046,16 @@ Please make sure your boards conform to these design rules.</description>
 <via x="10.16" y="14.986" extent="1-16" drill="0.3302"/>
 <wire x1="10.16" y1="14.986" x2="7.112" y2="14.986" width="0.1524" layer="1"/>
 <wire x1="7.112" y1="14.986" x2="2.032" y2="9.906" width="0.1524" layer="1"/>
-<wire x1="16.35" y1="14.04" x2="18.8" y2="9.716" width="0" layer="19" extent="1-16"/>
+<wire x1="32.4" y1="1.524" x2="33.02" y2="1.524" width="0.1524" layer="1"/>
+<wire x1="33.02" y1="1.524" x2="34.29" y2="2.794" width="0.1524" layer="1"/>
+<wire x1="34.29" y1="2.794" x2="34.29" y2="4.318" width="0.1524" layer="1"/>
+<wire x1="34.29" y1="4.318" x2="35.814" y2="5.842" width="0.1524" layer="1"/>
+<wire x1="35.814" y1="5.842" x2="37.846" y2="5.842" width="0.1524" layer="1"/>
+<wire x1="37.846" y1="5.842" x2="38.862" y2="6.858" width="0.1524" layer="1"/>
+<wire x1="38.862" y1="6.858" x2="38.862" y2="7.89" width="0.1524" layer="1"/>
+<wire x1="38.862" y1="7.89" x2="38.75" y2="8.002" width="0.1524" layer="1"/>
+<wire x1="32.4" y1="1.524" x2="32.4" y2="1.397" width="0.1524" layer="1"/>
+<wire x1="32.4" y1="1.397" x2="31.638" y2="0.635" width="0.1524" layer="1"/>
 </signal>
 <signal name="MISO">
 <contactref element="J1" pad="1"/>

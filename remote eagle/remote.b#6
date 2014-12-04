@@ -2044,7 +2044,13 @@ Please make sure your boards conform to these design rules.</description>
 <via x="30.988" y="18.288" extent="1-16" drill="0.3302"/>
 <wire x1="30.988" y1="18.288" x2="34.544" y2="18.288" width="0.1524" layer="1"/>
 <wire x1="34.544" y1="18.288" x2="36.576" y2="20.32" width="0.1524" layer="1"/>
-<wire x1="18.8" y1="9.716" x2="24.75" y2="9.764" width="0" layer="19" extent="1-1"/>
+<wire x1="24.75" y1="9.764" x2="24.78" y2="9.764" width="0.1524" layer="1"/>
+<wire x1="24.78" y1="9.764" x2="24.892" y2="9.652" width="0.1524" layer="1"/>
+<via x="24.892" y="9.652" extent="1-16" drill="0.3302"/>
+<wire x1="24.892" y1="9.652" x2="24.892" y2="12.192" width="0.1524" layer="16"/>
+<wire x1="24.892" y1="12.192" x2="25.146" y2="12.446" width="0.1524" layer="16"/>
+<via x="25.146" y="12.446" extent="1-16" drill="0.3302"/>
+<wire x1="25.146" y1="12.446" x2="30.988" y2="18.288" width="0.1524" layer="1"/>
 </signal>
 <signal name="MISO">
 <contactref element="J1" pad="1"/>
@@ -2464,7 +2470,10 @@ Please make sure your boards conform to these design rules.</description>
 <signal name="TOUCH4">
 <contactref element="IC1" pad="26"/>
 <contactref element="U$10" pad="TCH"/>
-<wire x1="30.046" y1="12.58" x2="21.47" y2="12.58" width="0.1524" layer="16"/>
+<wire x1="30.046" y1="12.58" x2="29.464" y2="13.208" width="0.1524" layer="16"/>
+<wire x1="29.464" y1="13.208" x2="24.638" y2="13.208" width="0.1524" layer="16"/>
+<wire x1="24.638" y1="13.208" x2="24.01" y2="12.58" width="0.1524" layer="16"/>
+<wire x1="24.01" y1="12.58" x2="21.47" y2="12.58" width="0.1524" layer="16"/>
 <wire x1="21.47" y1="12.58" x2="17.272" y2="8.382" width="0.1524" layer="16"/>
 <wire x1="17.272" y1="8.382" x2="15.494" y2="8.509" width="0.1524" layer="16"/>
 <via x="15.494" y="8.509" extent="1-16" drill="0.3302"/>

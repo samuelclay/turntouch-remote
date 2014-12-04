@@ -149,8 +149,8 @@
 Rev. 13</text>
 <text x="1.524" y="20.574" size="1.27" layer="26" font="vector" rot="SMR270" align="top-center">TURN TOUCH</text>
 <text x="7.62" y="36.83" size="0.508" layer="25">GND Serial</text>
-<hole x="3.302" y="35.306" drill="2.59999375"/>
-<hole x="35.306" y="3.302" drill="2.59999375"/>
+<hole x="3.556" y="36.576" drill="2.59999375"/>
+<hole x="36.322" y="4.572" drill="2.59999375"/>
 </plain>
 <libraries>
 <library name="SparkFun-Passives">

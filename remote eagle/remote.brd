@@ -2415,9 +2415,9 @@ Please make sure your boards conform to these design rules.</description>
 <signal name="N$2">
 <contactref element="Y2" pad="FEED"/>
 <contactref element="U$5" pad="1"/>
-<wire x1="38.75" y1="24.002" x2="38.354" y2="24.398" width="0.1524" layer="1"/>
-<wire x1="38.354" y1="24.398" x2="38.354" y2="26.416" width="0.1524" layer="1"/>
-<wire x1="38.354" y1="26.416" x2="38.29" y2="26.48" width="0.1524" layer="1"/>
+<wire x1="38.75" y1="24.002" x2="38.862" y2="24.398" width="0.1524" layer="1"/>
+<wire x1="38.862" y1="24.398" x2="38.862" y2="26.416" width="1.27" layer="1"/>
+<wire x1="38.862" y1="26.416" x2="38.29" y2="26.48" width="0.1524" layer="1"/>
 <wire x1="38.29" y1="26.48" x2="37.338" y2="26.48" width="0.1524" layer="1"/>
 </signal>
 <signal name="SHUTDOWN">

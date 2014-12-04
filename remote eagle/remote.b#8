@@ -2035,8 +2035,11 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="8.636" y1="16.51" x2="8.636" y2="31.242" width="0.1524" layer="16"/>
 <wire x1="8.636" y1="31.242" x2="10.922" y2="33.528" width="0.1524" layer="16"/>
 <wire x1="10.922" y1="33.528" x2="16.35" y2="33.528" width="0.1524" layer="16"/>
+<wire x1="16.35" y1="14.04" x2="16.35" y2="15.4" width="0.1524" layer="16"/>
+<wire x1="16.35" y1="15.4" x2="15.494" y2="16.256" width="0.1524" layer="16"/>
+<wire x1="15.494" y1="16.256" x2="8.89" y2="16.256" width="0.1524" layer="16"/>
+<wire x1="8.89" y1="16.256" x2="8.636" y2="16.51" width="0.1524" layer="16"/>
 <wire x1="34.798" y1="20.32" x2="33.876" y2="14.04" width="0" layer="19" extent="16-16"/>
-<wire x1="16.35" y1="14.04" x2="18.8" y2="9.716" width="0" layer="19" extent="1-16"/>
 <wire x1="24.75" y1="9.764" x2="18.8" y2="9.716" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MISO">
