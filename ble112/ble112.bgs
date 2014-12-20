@@ -9,6 +9,8 @@
 #
 # ================================================================
 
+const PIN_SELECT_MASK = $0F         # 0b11111111 = Px_0-Px_7 are outputs
+
 dim connected       # BLE connection status
 dim advertising     # advertising status (0=off, 1=on)
 dim io_status(3)    # port status characteristic local uint8array container
@@ -31,14 +33,24 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     # put module into discoverable/connectable mode
     call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
     
-    # enable interrupt on P0_0 and P0_1 rising edge
-    # (parameters are port=0, bitmask=0b00000011, edge=rising)
-    call hardware_io_port_config_irq(0, 3, 0)
+    # # enable interrupt on P0_X rising edge
+    # # (parameters are port=0, bitmask=0b00000011, edge=rising)
+    # call hardware_io_port_config_irq(0, PIN_SELECT_MASK, 0)    
+    # # enable interrupt on P1_6 rising edge
+    # # (parameters are port=1, bitmask=0b01000000, edge=rising)
+    # call hardware_io_port_config_irq(1, 64, 0)
     
-    # enable interrupt on P1_6 rising edge
-    # (parameters are port=1, bitmask=0b01000000, edge=rising)
-    call hardware_io_port_config_irq(1, 64, 0)
+    # enable falling-edge interrupts on Port0 pins
+    call hardware_io_port_config_pull(0, $00, 0)
+    call hardware_io_port_irq_enable(0, PIN_SELECT_MASK)
+    call hardware_io_port_irq_direction(0, 1)
 
+    # enable rising-edge interrupts on Port1 pins
+    # (dual-pin connections allows CHANGE-style interrupts)
+    call hardware_io_port_config_pull(1, $00, 0)
+    call hardware_io_port_irq_enable(1, PIN_SELECT_MASK)
+    call hardware_io_port_irq_direction(1, 0)
+    
     # DEVKIT UART OUTPUT: welcome message
     call system_endpoint_tx(system_endpoint_uart1, 28, "\r\n========================\r\n")
     call system_endpoint_tx(system_endpoint_uart1, 26, "Bluegiga GPIO Demo Ready\r\n")

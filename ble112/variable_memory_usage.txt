@@ -81,6 +81,7 @@
 0:0	system_endpoint_uart0
 0:0	system_endpoint_uart1
 0:0	system_endpoint_usb
+0:0	PIN_SELECT_MASK
 0:4	connected
 4:4	advertising
 8:3	io_status
