@@ -3,9 +3,18 @@
     <!-- enable sleep oscillator setting for low-power mode, using "30" (appropriate for dev kit) -->
     <sleeposc enable="true" ppm="30" />
     
+    <wakeup_pin enable="true" port="0" pin="0" />
+    <wakeup_pin enable="true" port="0" pin="1" />
+    <wakeup_pin enable="true" port="0" pin="2" />
+    <wakeup_pin enable="true" port="0" pin="3" />
+    <wakeup_pin enable="true" port="1" pin="0" />
+    <wakeup_pin enable="true" port="1" pin="1" />
+    <wakeup_pin enable="true" port="1" pin="2" />
+    <wakeup_pin enable="true" port="1" pin="3" />
+    
     <!-- disable USB interface to save power, since we don't need it -->
     <!-- DO NOT FLASH THIS ONTO A BLED112 WITH USB DISABLED. YOU WILL BRICK IT. -->
-    <usb enable="false" />
+    <usb enable="false" endpoint="none" />
 
     <!-- use default maximum power (+3dBm) and power amplifier bias (always 5) -->
     <txpower power="15" bias="5" />
@@ -14,7 +23,7 @@
     <script enable="true" />
 
     <!-- do not enable slow_clock if you need reliable UART output at fast speeds. It will result in baud rate data errors. -->
-    <slow_clock enable="false" />
+    <slow_clock enable="true" />
 
     <!-- enable DC/DC convertor control on P1_7 for current consumption optimization -->
     <pmux regulator_pin="7" />
@@ -31,7 +40,7 @@
     <usart channel="1" alternate="1" baud="115200" endpoint="none" flow="false" />
 
     <!-- P0_0, P0_1, and P1_6 will be used for interrupts. Port 2 interrupts are not supported. -->
-    <port index="0" pull="down" />
-    <port index="1" pull="down" />
-    <port index="2" pull="down" />
+    <port index="0" tristatemask="0" pull="down" />
+    <port index="1" tristatemask="0" pull="down" />
+    <port index="2" tristatemask="0" pull="down" />
 </hardware>

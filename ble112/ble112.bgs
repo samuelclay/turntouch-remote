@@ -20,6 +20,8 @@ dim ipr_data        # container for io_port_read() call's returned "port" value 
 dim port0_delta(4)  # debounce comparison variable
 dim port1_delta(4)  # debounce comparison variable
 dim irq_pos         # convert irq from bitvector to single number
+dim holding_irq     # currently holding a button for a mode change
+dim last_sent_state(2) # snapshot of last sent state, to avoid repeats
 
 event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     # initialize connection status as DISCONNECTED
@@ -31,7 +33,9 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     # initialize simple GPIO debouncing test var to 0 (first press will be accepted)
     port0_delta(0:4) = 0
     port1_delta(0:4) = 0
+    last_sent_state(0:2) = 0
     irq_pos = 0
+    holding_irq = $ff
     
     # set advertisement interval to 200-300ms, and use all advertisement channels
     # (note min/max parameters are in units of 625 uSec)
@@ -42,10 +46,10 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     
     # # enable interrupt on P0_X rising edge
     # # (parameters are port=0, bitmask=0b00000011, edge=rising)
-    # call hardware_io_port_config_irq(0, PIN_SELECT_MASK, 0)    
-    # # enable interrupt on P1_6 rising edge
-    # # (parameters are port=1, bitmask=0b01000000, edge=rising)
-    # call hardware_io_port_config_irq(1, 64, 0)
+    call hardware_io_port_config_irq(0, PIN_SELECT_MASK, 0)
+    # # enable interrupt on P1_X falling edge
+    # # (parameters are port=1, bitmask=0b01000000, edge=falling)
+    call hardware_io_port_config_irq(1, PIN_SELECT_MASK, 1)
     
     # enable falling-edge interrupts on Port0 pins
     call hardware_io_port_config_pull(0, $00, 0)
@@ -100,90 +104,82 @@ end
 event hardware_io_port_status(delta, port, irq, state)
     # reject this press if it's less then 100ms after the last one (32768 = 1 sec)
     if (irq & 1) = 1 then
-        irq_pos = 0
+        irq_pos = $00
     end if
     if (irq & 2) = 2 then
-        irq_pos = 1
+        irq_pos = $01
     end if
     if (irq & 4) = 4 then
-        irq_pos = 2
+        irq_pos = $02
     end if
     if (irq & 8) = 8 then
-        irq_pos = 3
+        irq_pos = $03
     end if
     if port = 0 then
-        if delta - port0_delta(irq:1) < 3277 then
+        if delta - port0_delta(irq_pos:1) < 3277 then
             return
         end if
     end if
     if port = 1 then
-        if delta - port1_delta(irq:1) < 3277 then
+        if delta - port1_delta(irq_pos:1) < 3277 then
             return
         end if
     end if
     
+    # start mode change timer
+    call hardware_set_soft_timer(0, 0, 1)
+    if port = 1 then
+        call hardware_set_soft_timer(32768, 0, 1)
+    end if
     if port = 0 then
-        port0_delta(irq:1) = delta
+        port0_delta(irq_pos:1) = delta
     end if
     if port = 1 then
-        port1_delta(irq:1) = delta
+        port1_delta(irq_pos:1) = delta
     end if
     
-    if port = 0 then
-        if (irq & 1) = 1 then
-            # P0_0 is HIGH and the source of this interrupt
-            # DEVKIT UART OUTPUT: P0_0 pressed
-            call system_endpoint_tx(system_endpoint_uart1, 14, "P0_0 pressed\r\n")
-        end if
-        if (irq & 2) = 2 then
-            # P0_1 is HIGH and the source of this interrupt
-            # DEVKIT UART OUTPUT: P0_1 pressed
-            call system_endpoint_tx(system_endpoint_uart1, 14, "P0_1 pressed\r\n")
-        end if
-        
+    if port = 0 then       
         # store state of Port 0 now, since we already have it
         io_status(0:1) = state & $0f
         
         # read state of Port 1
         call hardware_io_port_read(1, $ff)(ipr_result, ipr_port, ipr_data)
         io_status(1:1) = ipr_data & $0f
-
-        # state of Port 2 read later, since we have to do it in either interrupt case
     end if
     if port = 1 then
-        if (irq & 64) = 64 then
-            # P1_6 is HIGH and the source of this interrupt
-            # DEVKIT UART OUTPUT: P1_6 pressed
-            call system_endpoint_tx(system_endpoint_uart1, 14, "P1_6 pressed\r\n")
-            
-            # toggle advertising mode for run
-            if advertising = 0 then
-                # was off, so turn it on
-                call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
-                advertising = 1
-            else
-                # was on, so turn it off
-                call gap_set_mode(gap_non_discoverable, gap_non_connectable)
-                advertising = 0
-            end if
-        end if
-
         # read state of Port 0
         call hardware_io_port_read(0, $ff)(ipr_result, ipr_port, ipr_data)
         io_status(0:1) = ipr_data & $0f
 
         # store state of Port 1 now, since we already have it
         io_status(1:1) = state & $0f
-
-        # state of Port 2 read later, since we have to do it in either interrupt case
     end if
     
-    # read state of Port 2
-    # call hardware_io_port_read(2, $ff)(ipr_result, ipr_port, ipr_data)
-    # io_status(2:1) = ipr_data
+    # Add port and irq to message for debugging
     io_status(2:1) = port
     io_status(3:1) = irq_pos
     
     # update characteristic value (will push data if client has subscribed to notifications/indications)
-    call attributes_write(c_gpio_status, 0, 4, io_status(0:4))
+    if last_sent_state(0:2) != io_status(0:2) then
+        last_sent_state(0:2) = io_status(0:2)
+        call attributes_write(c_gpio_status, 0, 4, io_status(0:4))
+    end if
+    
+    # Nothing left to do but sleep
+    call gap_set_mode(0, 0)
+end
+
+# Mode change timer
+event hardware_soft_timer(handle)
+    # read state of Port 0
+    call hardware_io_port_read(0, $ff)(ipr_result, ipr_port, ipr_data)
+    io_status(0:1) = ipr_data & $0f
+    # read state of Port 1
+    call hardware_io_port_read(1, $ff)(ipr_result, ipr_port, ipr_data)
+    io_status(1:1) = ipr_data & $0f
+    
+    io_status(2:2) = $ff
+    if last_sent_state(0:2) = io_status(0:2) && io_status(0:2) != 0 then
+        call attributes_write(c_gpio_status, 0, 4, io_status(0:4))
+    end if
 end

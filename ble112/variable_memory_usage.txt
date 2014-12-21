@@ -1,4 +1,4 @@
-36
+42
 0:0	GAP_AD_FLAG_BREDR_NOT_SUPPORTED
 0:0	GAP_AD_FLAG_GENERAL_DISCOVERABLE
 0:0	GAP_AD_FLAG_LIMITED_DISCOVERABLE
@@ -91,3 +91,5 @@
 24:4	port0_delta
 28:4	port1_delta
 32:4	irq_pos
+36:4	holding_irq
+40:2	last_sent_state
