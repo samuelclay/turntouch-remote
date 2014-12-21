@@ -13,7 +13,7 @@ const PIN_SELECT_MASK = $0F         # 0b11111111 = Px_0-Px_7 are outputs
 
 dim connected       # BLE connection status
 dim advertising     # advertising status (0=off, 1=on)
-dim io_status(3)    # port status characteristic local uint8array container
+dim io_status(2)    # port status characteristic local uint8array container
 dim ipr_result      # container for io_port_read() call's returned "result" value (uint16)
 dim ipr_port        # container for io_port_read() call's returned "port" value (uint8)
 dim ipr_data        # container for io_port_read() call's returned "port" value (uint8)
@@ -141,9 +141,9 @@ event hardware_io_port_status(delta, port, irq, state)
     end if
     
     # read state of Port 2
-    call hardware_io_port_read(2, $ff)(ipr_result, ipr_port, ipr_data)
-    io_status(2:1) = ipr_data
+    # call hardware_io_port_read(2, $ff)(ipr_result, ipr_port, ipr_data)
+    # io_status(2:1) = ipr_data
     
     # update characteristic value (will push data if client has subscribed to notifications/indications)
-    call attributes_write(c_gpio_status, 0, 3, io_status(0:3))
+    call attributes_write(c_gpio_status, 0, 2, io_status(0:2))
 end

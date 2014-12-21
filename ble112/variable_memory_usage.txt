@@ -1,4 +1,4 @@
-23
+22
 0:0	GAP_AD_FLAG_BREDR_NOT_SUPPORTED
 0:0	GAP_AD_FLAG_GENERAL_DISCOVERABLE
 0:0	GAP_AD_FLAG_LIMITED_DISCOVERABLE
@@ -84,7 +84,7 @@
 0:0	PIN_SELECT_MASK
 0:4	connected
 4:4	advertising
-8:3	io_status
-11:4	ipr_result
-15:4	ipr_port
-19:4	ipr_data
+8:2	io_status
+10:4	ipr_result
+14:4	ipr_port
+18:4	ipr_data
