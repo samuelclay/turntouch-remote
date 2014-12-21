@@ -116,12 +116,12 @@ event hardware_io_port_status(delta, port, irq, state)
         irq_pos = $03
     end if
     if port = 0 then
-        if delta - port0_delta(irq_pos:1) < 3277 then
+        if delta - port0_delta(irq_pos:1) < 6554 then
             return
         end if
     end if
     if port = 1 then
-        if delta - port1_delta(irq_pos:1) < 3277 then
+        if delta - port1_delta(irq_pos:1) < 6554 then
             return
         end if
     end if
@@ -144,7 +144,7 @@ event hardware_io_port_status(delta, port, irq, state)
         
         # read state of Port 1
         call hardware_io_port_read(1, $ff)(ipr_result, ipr_port, ipr_data)
-        io_status(1:1) = ipr_data & $0f
+        io_status(3:1) = ipr_data & $0f
     end if
     if port = 1 then
         # read state of Port 0
@@ -152,17 +152,19 @@ event hardware_io_port_status(delta, port, irq, state)
         io_status(0:1) = ipr_data & $0f
 
         # store state of Port 1 now, since we already have it
-        io_status(1:1) = state & $0f
+        io_status(3:1) = state & $0f
     end if
     
     # Add port and irq to message for debugging
-    io_status(2:1) = port
-    io_status(3:1) = irq_pos
+    io_status(0:1) = io_status(0:1) & io_status(3:1)
+    io_status(3:1) = io_status(0:1)
+    io_status(1:1) = port
+    io_status(2:1) = irq
     
     # update characteristic value (will push data if client has subscribed to notifications/indications)
-    if last_sent_state(0:2) != io_status(0:2) then
-        last_sent_state(0:2) = io_status(0:2)
-        call attributes_write(c_gpio_status, 0, 4, io_status(0:4))
+    if last_sent_state(0:1) != io_status(0:1) then
+        last_sent_state(0:1) = io_status(0:1)
+        call attributes_write(c_gpio_status, 0, 3, io_status(0:3))
     end if
     
     # Nothing left to do but sleep
@@ -174,12 +176,9 @@ event hardware_soft_timer(handle)
     # read state of Port 0
     call hardware_io_port_read(0, $ff)(ipr_result, ipr_port, ipr_data)
     io_status(0:1) = ipr_data & $0f
-    # read state of Port 1
-    call hardware_io_port_read(1, $ff)(ipr_result, ipr_port, ipr_data)
-    io_status(1:1) = ipr_data & $0f
     
-    io_status(2:2) = $ff
-    if last_sent_state(0:2) = io_status(0:2) && io_status(0:2) != 0 then
-        call attributes_write(c_gpio_status, 0, 4, io_status(0:4))
+    io_status(1:2) = $ffff
+    if last_sent_state(0:1) = io_status(0:1) && io_status(0:1) != 0 then
+        call attributes_write(c_gpio_status, 0, 3, io_status(0:3))
     end if
 end
