@@ -1,4 +1,4 @@
-22
+30
 0:0	GAP_AD_FLAG_BREDR_NOT_SUPPORTED
 0:0	GAP_AD_FLAG_GENERAL_DISCOVERABLE
 0:0	GAP_AD_FLAG_LIMITED_DISCOVERABLE
@@ -88,3 +88,5 @@
 10:4	ipr_result
 14:4	ipr_port
 18:4	ipr_data
+22:4	port0_delta
+26:4	port1_delta

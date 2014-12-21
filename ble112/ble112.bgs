@@ -17,6 +17,8 @@ dim io_status(2)    # port status characteristic local uint8array container
 dim ipr_result      # container for io_port_read() call's returned "result" value (uint16)
 dim ipr_port        # container for io_port_read() call's returned "port" value (uint8)
 dim ipr_data        # container for io_port_read() call's returned "port" value (uint8)
+dim port0_delta     # debounce comparison variable
+dim port1_delta     # debounce comparison variable
 
 
 event system_boot(major, minor, patch, build, ll_version, protocol, hw)
@@ -25,6 +27,10 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     
     # initialize advertising status as ON (since we're about to turn it on)
     advertising = 1
+
+    # initialize simple GPIO debouncing test var to 0 (first press will be accepted)
+    port0_delta = 0
+    port1_delta = 0
     
     # set advertisement interval to 200-300ms, and use all advertisement channels
     # (note min/max parameters are in units of 625 uSec)
@@ -91,6 +97,25 @@ end
 
 # catch button press for P0_0, P0_1, P1_6 (active HIGH configuration, hardware.xml pulls it low)
 event hardware_io_port_status(delta, port, irq, state)
+    # reject this press if it's less then 100ms after the last one (32768 = 1 sec)
+    if port = 0 then
+        if delta - port0_delta < 3277 then
+            return
+        end if
+    end if
+    if port = 1 then
+        if delta - port1_delta < 3277 then
+            return
+        end if
+    end if
+    
+    if port = 0 then
+        port0_delta = delta
+    end if
+    if port = 1 then
+        port1_delta = delta
+    end if
+    
     if port = 0 then
         if (irq & 1) = 1 then
             # P0_0 is HIGH and the source of this interrupt
