@@ -13,13 +13,13 @@ const PIN_SELECT_MASK = $0F         # 0b11111111 = Px_0-Px_7 are outputs
 
 dim connected       # BLE connection status
 dim advertising     # advertising status (0=off, 1=on)
-dim io_status(2)    # port status characteristic local uint8array container
+dim io_status(4)    # port status characteristic local uint8array container
 dim ipr_result      # container for io_port_read() call's returned "result" value (uint16)
 dim ipr_port        # container for io_port_read() call's returned "port" value (uint8)
 dim ipr_data        # container for io_port_read() call's returned "port" value (uint8)
-dim port0_delta     # debounce comparison variable
-dim port1_delta     # debounce comparison variable
-
+dim port0_delta(4)  # debounce comparison variable
+dim port1_delta(4)  # debounce comparison variable
+dim irq_pos         # convert irq from bitvector to single number
 
 event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     # initialize connection status as DISCONNECTED
@@ -29,8 +29,9 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     advertising = 1
 
     # initialize simple GPIO debouncing test var to 0 (first press will be accepted)
-    port0_delta = 0
-    port1_delta = 0
+    port0_delta(0:4) = 0
+    port1_delta(0:4) = 0
+    irq_pos = 0
     
     # set advertisement interval to 200-300ms, and use all advertisement channels
     # (note min/max parameters are in units of 625 uSec)
@@ -98,22 +99,34 @@ end
 # catch button press for P0_0, P0_1, P1_6 (active HIGH configuration, hardware.xml pulls it low)
 event hardware_io_port_status(delta, port, irq, state)
     # reject this press if it's less then 100ms after the last one (32768 = 1 sec)
+    if (irq & 1) = 1 then
+        irq_pos = 0
+    end if
+    if (irq & 2) = 2 then
+        irq_pos = 1
+    end if
+    if (irq & 4) = 4 then
+        irq_pos = 2
+    end if
+    if (irq & 8) = 8 then
+        irq_pos = 3
+    end if
     if port = 0 then
-        if delta - port0_delta < 3277 then
+        if delta - port0_delta(irq:1) < 3277 then
             return
         end if
     end if
     if port = 1 then
-        if delta - port1_delta < 3277 then
+        if delta - port1_delta(irq:1) < 3277 then
             return
         end if
     end if
     
     if port = 0 then
-        port0_delta = delta
+        port0_delta(irq:1) = delta
     end if
     if port = 1 then
-        port1_delta = delta
+        port1_delta(irq:1) = delta
     end if
     
     if port = 0 then
@@ -129,11 +142,11 @@ event hardware_io_port_status(delta, port, irq, state)
         end if
         
         # store state of Port 0 now, since we already have it
-        io_status(0:1) = state
+        io_status(0:1) = state & $0f
         
         # read state of Port 1
         call hardware_io_port_read(1, $ff)(ipr_result, ipr_port, ipr_data)
-        io_status(1:1) = ipr_data
+        io_status(1:1) = ipr_data & $0f
 
         # state of Port 2 read later, since we have to do it in either interrupt case
     end if
@@ -157,10 +170,10 @@ event hardware_io_port_status(delta, port, irq, state)
 
         # read state of Port 0
         call hardware_io_port_read(0, $ff)(ipr_result, ipr_port, ipr_data)
-        io_status(0:1) = ipr_data
+        io_status(0:1) = ipr_data & $0f
 
         # store state of Port 1 now, since we already have it
-        io_status(1:1) = state
+        io_status(1:1) = state & $0f
 
         # state of Port 2 read later, since we have to do it in either interrupt case
     end if
@@ -168,7 +181,9 @@ event hardware_io_port_status(delta, port, irq, state)
     # read state of Port 2
     # call hardware_io_port_read(2, $ff)(ipr_result, ipr_port, ipr_data)
     # io_status(2:1) = ipr_data
+    io_status(2:1) = port
+    io_status(3:1) = irq_pos
     
     # update characteristic value (will push data if client has subscribed to notifications/indications)
-    call attributes_write(c_gpio_status, 0, 2, io_status(0:2))
+    call attributes_write(c_gpio_status, 0, 4, io_status(0:4))
 end

@@ -49,7 +49,7 @@
         <characteristic uuid="f1c7c102-27bc-4074-aee6-35c58a3b31f6" id="c_gpio_status">
             <description>Button Status</description>
             <properties read="true" indicate="true" notify="true" />
-            <value length="2" type="hex" />
+            <value length="4" type="hex" />
             <!--
                 This will contain a 3-byte value that contains the logic status of Port 0,
                 Port 1, and Port 2 (in that order). The included BGScript application will
