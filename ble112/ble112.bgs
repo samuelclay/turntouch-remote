@@ -64,7 +64,7 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     
     # DEVKIT UART OUTPUT: welcome message
     call system_endpoint_tx(system_endpoint_uart1, 28, "\r\n========================\r\n")
-    call system_endpoint_tx(system_endpoint_uart1, 26, "Bluegiga GPIO Demo Ready\r\n")
+    call system_endpoint_tx(system_endpoint_uart1, 28, "Turn Touch Mac Remote Bootup\r\n")
 end
 
 event connection_status(connection, flags, address, address_type, conn_interval, timeout, latency, bonding)
@@ -167,8 +167,14 @@ event hardware_io_port_status(delta, port, irq, state)
         call attributes_write(c_gpio_status, 0, 3, io_status(0:3))
     end if
     
+    call system_endpoint_tx(system_endpoint_uart1, 19, " ---> Sleeping...\r\n")
+    
     # Nothing left to do but sleep
-    call gap_set_mode(0, 0)
+    if connected then
+        call gap_set_mode(0, 0)
+    else
+        call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
+    end if
 end
 
 # Mode change timer
