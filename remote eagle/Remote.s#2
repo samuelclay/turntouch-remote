@@ -977,11 +977,11 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 </polygon>
 <smd name="BTN" x="0" y="0" dx="2.45" dy="2.45" layer="1" roundness="100"/>
 <pad name="BTNVIA" x="-0.5" y="0.5" drill="0.3302" stop="no" thermals="no"/>
-<wire x1="-6.35" y1="6.35" x2="6.35" y2="6.35" width="0.127" layer="21"/>
-<wire x1="6.35" y1="6.35" x2="6.35" y2="-6.35" width="0.127" layer="21"/>
-<wire x1="6.35" y1="-6.35" x2="-6.35" y2="-6.35" width="0.127" layer="21"/>
-<wire x1="-6.35" y1="-6.35" x2="-6.35" y2="6.35" width="0.127" layer="21"/>
-<polygon width="0.1524" layer="29">
+<wire x1="-7.62" y1="7.62" x2="7.62" y2="7.62" width="0.127" layer="21"/>
+<wire x1="7.62" y1="7.62" x2="7.62" y2="-7.62" width="0.127" layer="21"/>
+<wire x1="7.62" y1="-7.62" x2="-7.62" y2="-7.62" width="0.127" layer="21"/>
+<wire x1="-7.62" y1="-7.62" x2="-7.62" y2="7.62" width="0.127" layer="21"/>
+<polygon width="0.1524" layer="31">
 <vertex x="-1.8" y="2.9"/>
 <vertex x="2" y="2.9"/>
 <vertex x="3" y="1.8"/>
@@ -999,7 +999,7 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <vertex x="-2.9" y="-1.8"/>
 <vertex x="-2.9" y="1.8"/>
 </polygon>
-<polygon width="0.1524" layer="31">
+<polygon width="0.1524" layer="29">
 <vertex x="-1.8" y="2.9"/>
 <vertex x="2" y="2.9"/>
 <vertex x="3" y="1.8"/>
