@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.0.0">
+<eagle version="7.2.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -593,10 +593,10 @@
 <smd name="P$3" x="0" y="0" dx="7.112" dy="10.922" layer="1"/>
 </package>
 <package name="DOME-M-SERIES">
-<smd name="P.C$1@2" x="0" y="0" dx="3.81" dy="3.81" layer="1" roundness="100"/>
-<smd name="P.O$1" x="0" y="-4.445" dx="0.635" dy="0.635" layer="1" roundness="100" stop="no"/>
+<smd name="P$1" x="0" y="0" dx="3.81" dy="3.81" layer="1" roundness="100" stop="no"/>
+<smd name="P$3" x="0" y="-4.445" dx="0.635" dy="0.635" layer="1" roundness="100" stop="no"/>
 <polygon width="0.1524" layer="1">
-<vertex x="0" y="5.08" curve="90"/>
+<vertex x="-0.635" y="5.08" curve="90"/>
 <vertex x="-5.08" y="0" curve="90"/>
 <vertex x="0" y="-5.08" curve="90"/>
 <vertex x="5.08" y="0" curve="87.062397"/>
@@ -606,9 +606,28 @@
 <vertex x="3.81" y="0" curve="-90"/>
 <vertex x="0" y="-3.81" curve="-90"/>
 <vertex x="-3.81" y="0" curve="-90"/>
-<vertex x="0" y="3.81"/>
+<vertex x="-0.635" y="3.81"/>
 </polygon>
-<pad name="P.C$1@1" x="0" y="1.27" drill="0.3302" diameter="0.508"/>
+<pad name="P$2" x="0" y="2.54" drill="0.3302" diameter="0.508" stop="no" first="yes"/>
+<wire x1="-7.62" y1="-7.62" x2="-7.62" y2="-6.35" width="0.127" layer="21"/>
+<wire x1="-7.62" y1="-6.35" x2="-7.62" y2="4.55395" width="0.127" layer="21"/>
+<wire x1="-7.62" y1="4.55395" x2="-4.55395" y2="7.62" width="0.127" layer="21" curve="-90"/>
+<wire x1="-4.55395" y1="7.62" x2="6.35" y2="7.62" width="0.127" layer="21"/>
+<wire x1="6.35" y1="7.62" x2="7.62" y2="7.62" width="0.127" layer="21"/>
+<wire x1="7.62" y1="7.62" x2="7.62" y2="-7.62" width="0.127" layer="21"/>
+<wire x1="7.62" y1="-7.62" x2="-7.62" y2="-7.62" width="0.127" layer="21"/>
+<circle x="-12.7" y="-5.715" radius="1.419903125" width="0.127" layer="21"/>
+<circle x="5.715" y="12.7" radius="1.419903125" width="0.127" layer="21"/>
+<wire x1="-7.62" y1="-7.62" x2="-11.43" y2="-7.62" width="0.127" layer="21"/>
+<wire x1="-11.43" y1="-7.62" x2="-12.7" y2="-6.35" width="0.127" layer="21"/>
+<wire x1="-12.7" y1="-6.35" x2="-11.43" y2="-5.08" width="0.127" layer="21"/>
+<wire x1="-11.43" y1="-5.08" x2="-10.16" y2="-6.35" width="0.127" layer="21"/>
+<wire x1="-10.16" y1="-6.35" x2="-7.62" y2="-6.35" width="0.127" layer="21"/>
+<wire x1="7.62" y1="7.62" x2="7.62" y2="11.43" width="0.127" layer="21"/>
+<wire x1="7.62" y1="11.43" x2="6.35" y2="12.7" width="0.127" layer="21"/>
+<wire x1="6.35" y1="12.7" x2="5.08" y2="11.43" width="0.127" layer="21"/>
+<wire x1="5.08" y1="11.43" x2="6.35" y2="10.16" width="0.127" layer="21"/>
+<wire x1="6.35" y1="10.16" x2="6.35" y2="7.62" width="0.127" layer="21"/>
 </package>
 </packages>
 <symbols>
@@ -1875,10 +1894,10 @@
 </symbol>
 <symbol name="DOME">
 <description>Single switch for snaptron dome</description>
-<pin name="P.V$1" x="-2.54" y="0" visible="off" length="short" direction="pwr"/>
+<pin name="V" x="-2.54" y="0" visible="off" length="short"/>
 <circle x="0" y="0" radius="0.3592" width="0.2032" layer="94"/>
 <circle x="2.54" y="0" radius="0.3592" width="0.2032" layer="94"/>
-<pin name="IC.B$1" x="5.08" y="0" visible="off" length="short" direction="pas" rot="R180"/>
+<pin name="B" x="5.08" y="0" visible="off" length="short" rot="R180"/>
 <wire x1="0" y1="0" x2="1.778" y2="1.778" width="0.254" layer="94"/>
 <text x="-2.54" y="2.54" size="1.27" layer="94">&gt;VALUE</text>
 <text x="-2.54" y="-2.54" size="1.27" layer="94">&gt;NAME</text>
@@ -2158,8 +2177,8 @@ Used for things that can directly connect to a USB port, say USB key</descriptio
 <devices>
 <device name="" package="DOME-M-SERIES">
 <connects>
-<connect gate="G$1" pin="IC.B$1" pad="P.O$1"/>
-<connect gate="G$1" pin="P.V$1" pad="P.C$1@1 P.C$1@2"/>
+<connect gate="G$1" pin="B" pad="P$3"/>
+<connect gate="G$1" pin="V" pad="P$1 P$2"/>
 </connects>
 <technologies>
 <technology name=""/>
