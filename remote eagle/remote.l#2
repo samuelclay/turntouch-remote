@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.2.0">
+<eagle version="7.0.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.001" altunitdist="inch" altunit="inch"/>
+<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.005" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -590,7 +590,10 @@
 <wire x1="8" y1="6" x2="3" y2="11" width="0.127" layer="21" curve="90"/>
 <wire x1="3" y1="11" x2="-3" y2="11" width="0.127" layer="21"/>
 <circle x="0" y="0" radius="10" width="0.127" layer="21"/>
-<smd name="P$3" x="0" y="0" dx="7.112" dy="10.922" layer="1"/>
+<text x="-3.81" y="13.97" size="1.27" layer="21">+</text>
+<text x="-3.81" y="-15.24" size="1.27" layer="21">-</text>
+<circle x="-3.429" y="14.605" radius="0.898025" width="0.127" layer="21"/>
+<circle x="-3.429" y="-14.605" radius="0.898025" width="0.127" layer="21"/>
 </package>
 <package name="DOME-M-SERIES">
 <smd name="P$1" x="0" y="0" dx="3.81" dy="3.81" layer="1" roundness="100"/>
@@ -641,7 +644,20 @@
 <vertex x="-3.81" y="0" curve="-90"/>
 <vertex x="-0.1778" y="3.81"/>
 </polygon>
-<polygon width="0.1524" layer="29">
+<polygon width="0.508" layer="29">
+<vertex x="-0.1778" y="5.08" curve="90"/>
+<vertex x="-5.08" y="0" curve="90"/>
+<vertex x="0" y="-5.08" curve="90"/>
+<vertex x="5.08" y="0" curve="87.062397"/>
+<vertex x="0" y="5.08"/>
+<vertex x="0" y="3.81" curve="-90"/>
+<vertex x="3.81" y="0.254"/>
+<vertex x="3.81" y="0" curve="-90"/>
+<vertex x="0" y="-3.81" curve="-90"/>
+<vertex x="-3.81" y="0" curve="-90"/>
+<vertex x="-0.1778" y="3.81"/>
+</polygon>
+<polygon width="0.508" layer="31">
 <vertex x="-0.1778" y="5.08" curve="90"/>
 <vertex x="-5.08" y="0" curve="90"/>
 <vertex x="0" y="-5.08" curve="90"/>

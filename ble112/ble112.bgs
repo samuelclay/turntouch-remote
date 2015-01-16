@@ -129,7 +129,7 @@ event hardware_io_port_status(delta, port, irq, state)
     # start mode change timer
     call hardware_set_soft_timer(0, 0, 1)
     if port = 1 then
-        call hardware_set_soft_timer(32768, 0, 1)
+        call hardware_set_soft_timer(19660, 0, 1)
     end if
     if port = 0 then
         port0_delta(irq_pos:1) = delta

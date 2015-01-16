@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.2.0">
+<eagle version="7.0.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="yes"/>
@@ -645,7 +645,10 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <wire x1="8" y1="6" x2="3" y2="11" width="0.127" layer="21" curve="90"/>
 <wire x1="3" y1="11" x2="-3" y2="11" width="0.127" layer="21"/>
 <circle x="0" y="0" radius="10" width="0.127" layer="21"/>
-<smd name="P$3" x="0" y="0" dx="7.112" dy="10.922" layer="1"/>
+<text x="-3.81" y="13.97" size="1.27" layer="21">+</text>
+<text x="-3.81" y="-15.24" size="1.27" layer="21">-</text>
+<circle x="-3.048" y="14.605" radius="0.898025" width="0.127" layer="21"/>
+<circle x="-3.048" y="-14.605" radius="0.898025" width="0.127" layer="21"/>
 </package>
 <package name="DOME-M-SERIES">
 <smd name="P$1" x="0" y="0" dx="3.81" dy="3.81" layer="1" roundness="100"/>
