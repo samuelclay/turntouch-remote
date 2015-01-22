@@ -3,15 +3,6 @@
     <!-- enable sleep oscillator setting for low-power mode, using "30" (appropriate for dev kit) -->
     <sleeposc enable="true" ppm="30" />
     
-    <wakeup_pin enable="true" port="0" pin="0" />
-    <wakeup_pin enable="true" port="0" pin="1" />
-    <wakeup_pin enable="true" port="0" pin="2" />
-    <wakeup_pin enable="true" port="0" pin="3" />
-    <wakeup_pin enable="true" port="1" pin="0" />
-    <wakeup_pin enable="true" port="1" pin="1" />
-    <wakeup_pin enable="true" port="1" pin="2" />
-    <wakeup_pin enable="true" port="1" pin="3" />
-    
     <!-- disable USB interface to save power, since we don't need it -->
     <!-- DO NOT FLASH THIS ONTO A BLED112 WITH USB DISABLED. YOU WILL BRICK IT. -->
     <usb enable="false" endpoint="none" />

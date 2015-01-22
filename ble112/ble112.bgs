@@ -9,7 +9,7 @@
 #
 # ================================================================
 
-const PIN_SELECT_MASK = $0F         # 0b11111111 = Px_0-Px_7 are outputs
+const PIN_SELECT_MASK = $0F         # 0b00001111 = Px_0-Px_3 are inputs
 
 dim connected       # BLE connection status
 dim advertising     # advertising status (0=off, 1=on)
@@ -123,19 +123,19 @@ event hardware_io_port_status(delta, port, irq, state)
     end if
     if port = 0 then
         if delta - port0_delta(irq_pos:1) < 6554 then
-            return # debounce
+            return # 100ms debounce
         end if
     end if
     if port = 1 then
         if delta - port1_delta(irq_pos:1) < 6554 then
-            return # debounce
+            return # 100ms debounce
         end if
     end if
     
     # start mode change timer
     call hardware_set_soft_timer(0, 0, 1)
     if port = 1 then
-        call hardware_set_soft_timer(19660, 0, 1)
+        call hardware_set_soft_timer(19660, 0, 1) # 500ms
     end if
     if port = 0 then
         port0_delta(irq_pos:1) = delta
@@ -164,7 +164,7 @@ event hardware_io_port_status(delta, port, irq, state)
     # Add port and irq to message for debugging
     io_status(0:1) = io_status(0:1) & io_status(3:1)
     io_status(3:1) = io_status(0:1)
-    io_status(1:1) = port
+    io_status(1:1) = port # unreliable, as rising/falling edge may be called
     io_status(2:1) = irq
     
     # update characteristic value (will push data if client has subscribed to notifications/indications)
@@ -181,6 +181,7 @@ event hardware_io_port_status(delta, port, irq, state)
         call gap_set_mode(0, 0)
     else
         call hardware_adc_read($f,1,0)
+        
         call system_endpoint_tx(system_endpoint_uart1, 13, "Scanning...\r\n")
         call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
     end if
