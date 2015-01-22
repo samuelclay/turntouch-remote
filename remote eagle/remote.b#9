@@ -720,7 +720,9 @@ Please make sure your boards conform to these design rules.</description>
 <element name="LOGO" library="remote" package="LOGO" value="" x="18.034" y="8.89"/>
 <element name="U$6" library="remote" package="20MMCOINCELL" value="COINCELLHOLDER" x="9.906" y="18.542" rot="R180"/>
 <element name="JP2" library="SparkFun-Connectors" package="1X02" value="Serial" x="32.512" y="7.112" smashed="yes"/>
-<element name="PROG" library="pel_misc" package="FTSH-105-DV" value="CONN_5-2-FTSH-V" x="27.432" y="5.08"/>
+<element name="PROG" library="pel_misc" package="FTSH-105-DV" value="CONN_5-2-FTSH-V" x="27.432" y="5.08" smashed="yes">
+<attribute name="NAME" x="24.511" y="0.762" size="0.635" layer="25" font="vector" ratio="16"/>
+</element>
 <element name="U1" library="sf-bluegiga" package="BLE112-A" value="BLE112-A" x="26.416" y="26.924"/>
 <element name="C4" library="SparkFun" package="0603-CAP" value="1uF" x="16.764" y="31.75" rot="R180"/>
 <element name="C5" library="SparkFun" package="0603-CAP" value="1uF" x="16.764" y="33.782" rot="R180"/>

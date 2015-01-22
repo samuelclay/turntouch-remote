@@ -761,8 +761,7 @@ Please make sure your boards conform to these design rules.</description>
 <vertex x="-1.778" y="-1.524"/>
 </polygon>
 <wire x1="9.906" y1="33.147" x2="10.287" y2="33.147" width="0.254" layer="1"/>
-<wire x1="10.287" y1="33.147" x2="12.192" y2="35.052" width="0" layer="19" extent="1-16"/>
-<wire x1="12.192" y1="35.052" x2="20.852" y2="35.052" width="0.254" layer="1"/>
+<wire x1="11.811" y1="35.052" x2="20.852" y2="35.052" width="0.254" layer="1"/>
 <wire x1="20.852" y1="35.052" x2="20.366" y2="35.074" width="0.254" layer="1"/>
 <wire x1="24.892" y1="3.05" x2="24.382" y2="3.05" width="0.254" layer="1"/>
 <wire x1="24.382" y1="3.05" x2="23.876" y2="3.556" width="0.254" layer="1"/>
@@ -806,6 +805,15 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="25.146" y1="34.29" x2="25.146" y2="34.036" width="0.254" layer="1"/>
 <wire x1="25.146" y1="34.798" x2="24.765" y2="35.179" width="0.254" layer="1"/>
 <wire x1="25.146" y1="34.798" x2="25.146" y2="34.036" width="0.254" layer="1"/>
+<wire x1="9.906" y1="33.147" x2="9.525" y2="33.147" width="0.254" layer="1"/>
+<wire x1="9.525" y1="33.147" x2="5.08" y2="28.702" width="0.254" layer="1"/>
+<wire x1="5.08" y1="28.702" x2="5.08" y2="21.082" width="0.254" layer="1"/>
+<wire x1="5.08" y1="21.082" x2="6.858" y2="19.304" width="0.254" layer="1"/>
+<via x="6.858" y="19.304" extent="1-16" drill="0.3302"/>
+<wire x1="6.858" y1="19.304" x2="11.938" y2="19.304" width="0.254" layer="16"/>
+<via x="11.938" y="19.304" extent="1-16" drill="0.3302"/>
+<wire x1="11.938" y1="19.304" x2="12.192" y2="19.304" width="0.254" layer="1"/>
+<wire x1="11.811" y1="35.052" x2="9.906" y2="33.147" width="0.254" layer="1"/>
 </signal>
 <signal name="N$1">
 </signal>
@@ -923,11 +931,8 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="30.988" y1="14.224" x2="27.432" y2="10.668" width="0.254" layer="1"/>
 <wire x1="9.398" y1="26.162" x2="10.668" y2="26.162" width="0.254" layer="16"/>
 <wire x1="26.162" y1="10.668" x2="27.432" y2="10.668" width="0.254" layer="16"/>
-<wire x1="9.398" y1="26.162" x2="6.858" y2="26.162" width="0.254" layer="1"/>
-<wire x1="6.858" y1="26.162" x2="3.81" y2="23.114" width="0.254" layer="1"/>
-<wire x1="3.81" y1="23.114" x2="3.81" y2="13.462" width="0.254" layer="1"/>
-<wire x1="3.81" y1="13.462" x2="7.874" y2="9.398" width="0.254" layer="1"/>
-<wire x1="7.874" y1="9.398" x2="10.668" y2="9.398" width="0.254" layer="1"/>
+<wire x1="9.398" y1="26.162" x2="9.398" y2="10.668" width="0.254" layer="1"/>
+<wire x1="9.398" y1="10.668" x2="10.668" y2="9.398" width="0.254" layer="1"/>
 <wire x1="12.954" y1="26.162" x2="9.398" y2="26.162" width="0.254" layer="1"/>
 </signal>
 <signal name="P1_5">

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.2.0">
+<eagle version="7.0.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="yes"/>
@@ -696,7 +696,20 @@ Standard 0603 ceramic capacitor, and 0.1" leaded capacitor.</description>
 <vertex x="-3.81" y="0" curve="-90"/>
 <vertex x="-0.1778" y="3.81"/>
 </polygon>
-<polygon width="0.1524" layer="29">
+<polygon width="0.508" layer="29">
+<vertex x="-0.1778" y="5.08" curve="90"/>
+<vertex x="-5.08" y="0" curve="90"/>
+<vertex x="0" y="-5.08" curve="90"/>
+<vertex x="5.08" y="0" curve="87.062397"/>
+<vertex x="0" y="5.08"/>
+<vertex x="0" y="3.81" curve="-90"/>
+<vertex x="3.81" y="0.254"/>
+<vertex x="3.81" y="0" curve="-90"/>
+<vertex x="0" y="-3.81" curve="-90"/>
+<vertex x="-3.81" y="0" curve="-90"/>
+<vertex x="-0.1778" y="3.81"/>
+</polygon>
+<polygon width="0.508" layer="31">
 <vertex x="-0.1778" y="5.08" curve="90"/>
 <vertex x="-5.08" y="0" curve="90"/>
 <vertex x="0" y="-5.08" curve="90"/>

@@ -41,6 +41,19 @@
         
     </service>
     
+    <!-- 180F: org.bluetooth.service.battery_service -->
+    <service uuid="180F" id="battery_service">
+        <description>Battery Service</description>
+    
+        <!-- E101: org.bluetooth.characteristic.battery_level -->
+        <characteristic uuid="2a19" id="c_battery_level">
+            <description>Battery Level</description>
+            <properties read="true" indicate="true" notify="true" />
+            <value length="1" />
+        </characteristic>
+        
+    </service>
+    
     <!-- custom gpio status service -->
     <service uuid="ddea706a-9d53-4bbb-ac0b-74ba819e7d9c" advertise="true">
         <description>Button Status Service</description>

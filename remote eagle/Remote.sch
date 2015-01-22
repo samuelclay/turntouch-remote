@@ -3048,9 +3048,9 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <label x="109.22" y="35.56" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="U1" gate="G$1" pin="P1_4"/>
-<wire x1="33.02" y1="45.72" x2="33.02" y2="58.42" width="0.1524" layer="91"/>
-<label x="33.02" y="50.8" size="1.778" layer="95" rot="R90"/>
+<wire x1="81.28" y1="81.28" x2="60.96" y2="81.28" width="0.1524" layer="91"/>
+<label x="68.58" y="81.28" size="1.778" layer="95"/>
+<pinref part="U1" gate="G$1" pin="P0_4"/>
 </segment>
 </net>
 <net name="P2_1" class="0">
@@ -3202,13 +3202,6 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <pinref part="U1" gate="G$1" pin="P2_0"/>
 </segment>
 </net>
-<net name="P0_4" class="0">
-<segment>
-<wire x1="81.28" y1="81.28" x2="60.96" y2="81.28" width="0.1524" layer="91"/>
-<label x="68.58" y="81.28" size="1.778" layer="95"/>
-<pinref part="U1" gate="G$1" pin="P0_4"/>
-</segment>
-</net>
 <net name="P0_5" class="0">
 <segment>
 <wire x1="81.28" y1="78.74" x2="60.96" y2="78.74" width="0.1524" layer="91"/>
@@ -3296,6 +3289,13 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <pinref part="U1" gate="G$1" pin="P1_0"/>
 <wire x1="43.18" y1="45.72" x2="43.18" y2="58.42" width="0.1524" layer="91"/>
 <label x="43.18" y="50.8" size="1.778" layer="95" rot="R90"/>
+</segment>
+</net>
+<net name="P1_4" class="0">
+<segment>
+<pinref part="U1" gate="G$1" pin="P1_4"/>
+<wire x1="33.02" y1="45.72" x2="33.02" y2="58.42" width="0.1524" layer="91"/>
+<label x="33.02" y="50.8" size="1.778" layer="95" rot="R90"/>
 </segment>
 </net>
 </nets>

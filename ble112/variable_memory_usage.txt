@@ -1,4 +1,4 @@
-42
+54
 0:0	GAP_AD_FLAG_BREDR_NOT_SUPPORTED
 0:0	GAP_AD_FLAG_GENERAL_DISCOVERABLE
 0:0	GAP_AD_FLAG_LIMITED_DISCOVERABLE
@@ -24,6 +24,7 @@
 0:0	attributes_attribute_status_flag_indicate
 0:0	attributes_attribute_status_flag_notify
 0:0	c_appearance
+0:0	c_battery_level
 0:0	c_device_name
 0:0	c_gpio_status
 0:0	c_manufacturer_name
@@ -93,3 +94,6 @@
 32:4	irq_pos
 36:4	holding_irq
 40:2	last_sent_state
+42:4	bat_pct
+46:4	batconn_handle
+50:4	last_bat_pct

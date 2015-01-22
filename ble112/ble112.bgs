@@ -22,6 +22,9 @@ dim port1_delta(4)  # debounce comparison variable
 dim irq_pos         # convert irq from bitvector to single number
 dim holding_irq     # currently holding a button for a mode change
 dim last_sent_state(2) # snapshot of last sent state, to avoid repeats
+dim bat_pct         # battery percentage
+dim batconn_handle  # battery connection
+dim last_bat_pct    # cache of last battery % seen
 
 event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     # initialize connection status as DISCONNECTED
@@ -37,9 +40,12 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     irq_pos = 0
     holding_irq = $ff
     
+    # initialize battery level
+    last_bat_pct = 0
+    
     # set advertisement interval to 200-300ms, and use all advertisement channels
     # (note min/max parameters are in units of 625 uSec)
-    call gap_set_adv_parameters(320, 480, 7)
+    call gap_set_adv_parameters(640, 960, 1)
 
     # put module into discoverable/connectable mode
     call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
@@ -93,7 +99,7 @@ event connection_disconnected(handle, result)
 
     # set advertisement interval back to 200-300ms, use all advertisement channels
     # (note min/max parameters are in units of 625 uSec)
-    call gap_set_adv_parameters(320, 480, 7)
+    call gap_set_adv_parameters(640, 960, 1)
 
     # put module back into discoverable/connectable mode
     # (also resumes advertising based on parameters)
@@ -117,12 +123,12 @@ event hardware_io_port_status(delta, port, irq, state)
     end if
     if port = 0 then
         if delta - port0_delta(irq_pos:1) < 6554 then
-            return
+            return # debounce
         end if
     end if
     if port = 1 then
         if delta - port1_delta(irq_pos:1) < 6554 then
-            return
+            return # debounce
         end if
     end if
     
@@ -169,8 +175,13 @@ event hardware_io_port_status(delta, port, irq, state)
     
     # Nothing left to do but sleep
     if connected then
+        call hardware_adc_read($f,1,0)
+    
+        call system_endpoint_tx(system_endpoint_uart1, 13, "Sleeping...\r\n")
         call gap_set_mode(0, 0)
     else
+        call hardware_adc_read($f,1,0)
+        call system_endpoint_tx(system_endpoint_uart1, 13, "Scanning...\r\n")
         call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
     end if
 end
@@ -183,6 +194,50 @@ event hardware_soft_timer(handle)
     
     io_status(1:2) = $ffff
     if last_sent_state(0:1) = io_status(0:1) && io_status(0:1) != 0 then
+        call system_endpoint_tx(system_endpoint_uart1, 13, "Mode change!\r\n")
         call attributes_write(c_gpio_status, 0, 3, io_status(0:3))
     end if
+end
+
+# This event listener listens for incoming ATT protocol read requests, and when the battery
+# attribute is read, executes an ADC read and sends back the computer result when complete.
+event attributes_user_read_request(connection, handle, offset, maxsize)
+    # Store current connection handle for later
+    batconn_handle = connection
+    # Request ADC read operation
+    #   15 = AVDD/3 channel (will be between 0.66v - 1.2v by definition)
+    #   3 = 12 effective bits, range = [-2048, +2047] when right-aligned
+    #   0 = internal 1.24V reference
+    call hardware_adc_read($f, 1, 0)
+end
+
+# This event listener catches the ADC result
+event hardware_adc_result(input, value)
+    # ADC behavior:
+    # - Range is [-2048, +2047] when 12 ENOB is selected
+    # - Value will be left-aligned in a 16-bit container, meaning the direct
+    #       result will be in the range [-32768, +32767] and must be shifted
+    # - Actual battery readings will only ever be positive, so we only care
+    #       about the positive part of the range [0, +32767] or 0x0000-0x7FFF
+    # - VDD voltage = (value >> 4) * 3 * 1.24 / 2048
+    # *** IMPORTANT***
+    # A new CR2032 battery reads at ~2.52v based on some tests, but different
+    # batteries may exhibit different levels here depending on chemistry.
+    # You should test the range with your own battery to make sure).
+    # - A "full" battery will read ~2.5v:
+    #   --> (3.0v/3) * (32767/1.24v) = 26425
+    # - An "empty" battery will read ~2.0v (min module voltage):
+    #   --> (2.0v/3) * (32767/1.24v) = 17616
+    # This means we must scale [+17616, +23342] to [0, +100]
+    bat_pct = (value - 17616) * 100 / (26425 - 17616)
+    
+    # Only update battery level if it has dropped
+    # >= only for testing, change to >
+    if last_bat_pct = 0 || last_bat_pct >= bat_pct || last_bat_pct < bat_pct
+        last_bat_pct = bat_pct
+        call attributes_write(c_battery_level, 0, 1, bat_pct)
+    end if
+        
+    # respond with calculated percent (connection=stored value, result=0, length=1, data=bat_pct)
+    call attributes_user_read_response(batconn_handle, 0, 1, bat_pct)
 end
