@@ -3,6 +3,8 @@
     <!-- enable sleep oscillator setting for low-power mode, using "30" (appropriate for dev kit) -->
     <sleeposc enable="true" ppm="30" />
     
+    <sleep enable="true" max_mode="2" />
+    
     <!-- disable USB interface to save power, since we don't need it -->
     <!-- DO NOT FLASH THIS ONTO A BLED112 WITH USB DISABLED. YOU WILL BRICK IT. -->
     <usb enable="false" endpoint="none" />
@@ -31,7 +33,7 @@
     <usart channel="1" alternate="1" baud="115200" endpoint="none" flow="false" />
 
     <!-- P0_0, P0_1, and P1_6 will be used for interrupts. Port 2 interrupts are not supported. -->
-    <port index="0" tristatemask="0" pull="down" />
-    <port index="1" tristatemask="0" pull="down" />
+    <port index="0" tristatemask="0" pull="up" />
+    <port index="1" tristatemask="0" pull="up" />
     <port index="2" tristatemask="0" pull="down" />
 </hardware>

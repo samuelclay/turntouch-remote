@@ -9,7 +9,8 @@
 #
 # ================================================================
 
-const PIN_SELECT_MASK = $0F         # 0b00001111 = Px_0-Px_3 are inputs
+const PORT0_PIN_SELECT_MASK = $C3         # 0b11000011 = P0_0-P0_1 & P0_6-P0_7 are inputs
+const PORT1_PIN_SELECT_MASK = $78         # 0b01110000 = Px_3-Px_6 are inputs
 
 dim connected       # BLE connection status
 dim advertising     # advertising status (0=off, 1=on)
@@ -25,6 +26,7 @@ dim last_sent_state(2) # snapshot of last sent state, to avoid repeats
 dim bat_pct         # battery percentage
 dim batconn_handle  # battery connection
 dim last_bat_pct    # cache of last battery % seen
+dim t(12)
 
 event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     # initialize connection status as DISCONNECTED
@@ -36,7 +38,7 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     # initialize simple GPIO debouncing test var to 0 (first press will be accepted)
     port0_delta(0:4) = 0
     port1_delta(0:4) = 0
-    last_sent_state(0:2) = 0
+    last_sent_state(0:2) = $0f
     irq_pos = 0
     holding_irq = $ff
     
@@ -45,28 +47,22 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     
     # set advertisement interval to 200-300ms, and use all advertisement channels
     # (note min/max parameters are in units of 625 uSec)
-    call gap_set_adv_parameters(640, 960, 1)
+#    call gap_set_adv_parameters(640, 960, 1)
+    call gap_set_adv_parameters(64, 96, 1)
 
     # put module into discoverable/connectable mode
     call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
     
-    # # enable interrupt on P0_X rising edge
-    # # (parameters are port=0, bitmask=0b00000011, edge=rising)
-    call hardware_io_port_config_irq(0, PIN_SELECT_MASK, 0)
-    # # enable interrupt on P1_X falling edge
-    # # (parameters are port=1, bitmask=0b01000000, edge=falling)
-    call hardware_io_port_config_irq(1, PIN_SELECT_MASK, 1)
-    
     # enable falling-edge interrupts on Port0 pins
-    call hardware_io_port_config_pull(0, $00, 0)
-    call hardware_io_port_irq_enable(0, PIN_SELECT_MASK)
-    call hardware_io_port_irq_direction(0, 1)
+    call hardware_io_port_config_pull(0, $00, 1)
+    call hardware_io_port_irq_enable(0, PORT0_PIN_SELECT_MASK)
+    call hardware_io_port_irq_direction(0, 0)
 
     # enable rising-edge interrupts on Port1 pins
     # (dual-pin connections allows CHANGE-style interrupts)
-    call hardware_io_port_config_pull(1, $00, 0)
-    call hardware_io_port_irq_enable(1, PIN_SELECT_MASK)
-    call hardware_io_port_irq_direction(1, 0)
+    call hardware_io_port_config_pull(1, $00, 1)
+    call hardware_io_port_irq_enable(1, PORT1_PIN_SELECT_MASK)
+    call hardware_io_port_irq_direction(1, 1)
     
     # DEVKIT UART OUTPUT: welcome message
     call system_endpoint_tx(system_endpoint_uart1, 28, "\r\n========================\r\n")
@@ -99,28 +95,49 @@ event connection_disconnected(handle, result)
 
     # set advertisement interval back to 200-300ms, use all advertisement channels
     # (note min/max parameters are in units of 625 uSec)
-    call gap_set_adv_parameters(640, 960, 1)
+#    call gap_set_adv_parameters(640, 960, 1)
+    call gap_set_adv_parameters(64, 96, 1)
 
     # put module back into discoverable/connectable mode
     # (also resumes advertising based on parameters)
     call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
 end
 
-# catch button press for P0_0, P0_1, P1_6 (active HIGH configuration, hardware.xml pulls it low)
+# catch button presses (active LOW, hardware.xml pulls it high)
 event hardware_io_port_status(delta, port, irq, state)
+    # normalize irq
+    call system_endpoint_tx(system_endpoint_uart1, 13, "Interrupt -- ")
+    t(0:1) = (irq / 100) + 48
+    t(1:1) = (irq / 10) + (irq / -100 * 10) + 48
+    t(2:1) = irq + (irq / 10 * -10) + 48
+    call system_endpoint_tx(system_endpoint_uart1, 3, t(0:3))
+    call system_endpoint_tx(system_endpoint_uart1, 4, " -- ")
+    if (port = 0 && (irq & $01)) || (port = 1 && (irq & $08)) then
+        call system_endpoint_tx(system_endpoint_uart1, 3, "1\r\n")
+        irq_pos = 1
+    end if
+    if (port = 0 && (irq & $02)) then
+        call system_endpoint_tx(system_endpoint_uart1, 4, "20\r\n")
+        irq_pos = 2
+    end if
+    if (port = 1 && (irq & $10)) then
+        call system_endpoint_tx(system_endpoint_uart1, 4, "21\r\n")
+        irq_pos = 2
+    end if
+    if (port = 0 && (irq & $40)) || (port = 1 && (irq & $20)) then
+        call system_endpoint_tx(system_endpoint_uart1, 3, "3\r\n")
+        irq_pos = 3
+    end if
+    if (port = 0 && (irq & $80)) then
+        call system_endpoint_tx(system_endpoint_uart1, 4, "40\r\n")
+        irq_pos = 4
+    end if
+    if (port = 1 && (irq & $40)) then
+        call system_endpoint_tx(system_endpoint_uart1, 4, "41\r\n")
+        irq_pos = 4
+    end if
+    
     # reject this press if it's less then 100ms after the last one (32768 = 1 sec)
-    if (irq & 1) = 1 then
-        irq_pos = $00
-    end if
-    if (irq & 2) = 2 then
-        irq_pos = $01
-    end if
-    if (irq & 4) = 4 then
-        irq_pos = $02
-    end if
-    if (irq & 8) = 8 then
-        irq_pos = $03
-    end if
     if port = 0 then
         if delta - port0_delta(irq_pos:1) < 6554 then
             return # 100ms debounce
@@ -134,8 +151,9 @@ event hardware_io_port_status(delta, port, irq, state)
     
     # start mode change timer
     call hardware_set_soft_timer(0, 0, 1)
+    # use falling edge port to detect button pressed
     if port = 1 then
-        call hardware_set_soft_timer(19660, 0, 1) # 500ms
+        call hardware_set_soft_timer(23592, 0, 1) # 600ms
     end if
     if port = 0 then
         port0_delta(irq_pos:1) = delta
@@ -146,43 +164,37 @@ event hardware_io_port_status(delta, port, irq, state)
     
     if port = 0 then       
         # store state of Port 0 now, since we already have it
-        io_status(0:1) = state & $0f
+        io_status(0:1) = state & PORT0_PIN_SELECT_MASK
         
         # read state of Port 1
         call hardware_io_port_read(1, $ff)(ipr_result, ipr_port, ipr_data)
-        io_status(3:1) = ipr_data & $0f
+        io_status(3:1) = ipr_data & PORT1_PIN_SELECT_MASK
     end if
     if port = 1 then
         # read state of Port 0
         call hardware_io_port_read(0, $ff)(ipr_result, ipr_port, ipr_data)
-        io_status(0:1) = ipr_data & $0f
+        io_status(0:1) = ipr_data & PORT0_PIN_SELECT_MASK
 
         # store state of Port 1 now, since we already have it
-        io_status(3:1) = state & $0f
+        io_status(3:1) = state & PORT1_PIN_SELECT_MASK
     end if
     
     # Add port and irq to message for debugging
-    io_status(0:1) = io_status(0:1) & io_status(3:1)
-    io_status(3:1) = io_status(0:1)
-    io_status(1:1) = port # unreliable, as rising/falling edge may be called
-    io_status(2:1) = irq
-    
+    io_status(0:1) = (io_status(0:1) >> 4) | (io_status(0:1) & $0F)
+    io_status(1:1) = $00
     # update characteristic value (will push data if client has subscribed to notifications/indications)
     if last_sent_state(0:1) != io_status(0:1) then
         last_sent_state(0:1) = io_status(0:1)
-        call attributes_write(c_gpio_status, 0, 3, io_status(0:3))
+        call attributes_write(c_gpio_status, 0, 2, io_status(0:2))
+        call hardware_adc_read($0f,1,0)
     end if
     
     # Nothing left to do but sleep
-    if connected then
-        call hardware_adc_read($f,1,0)
-    
-        call system_endpoint_tx(system_endpoint_uart1, 13, "Sleeping...\r\n")
+    if connected then    
+#        call system_endpoint_tx(system_endpoint_uart1, 13, "Sleeping...\r\n")
         call gap_set_mode(0, 0)
-    else
-        call hardware_adc_read($f,1,0)
-        
-        call system_endpoint_tx(system_endpoint_uart1, 13, "Scanning...\r\n")
+    else    
+#        call system_endpoint_tx(system_endpoint_uart1, 13, "Scanning...\r\n")
         call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
     end if
 end
@@ -190,13 +202,16 @@ end
 # Mode change timer
 event hardware_soft_timer(handle)
     # read state of Port 0
-    call hardware_io_port_read(0, $ff)(ipr_result, ipr_port, ipr_data)
-    io_status(0:1) = ipr_data & $0f
+    call system_endpoint_tx(system_endpoint_uart1, 16, "Wake for timer\r\n")
     
-    io_status(1:2) = $ffff
-    if last_sent_state(0:1) = io_status(0:1) && io_status(0:1) != 0 then
+    call hardware_io_port_read(0, $ff)(ipr_result, ipr_port, ipr_data)
+    io_status(0:1) = ipr_data & PORT0_PIN_SELECT_MASK
+    io_status(0:1) = (io_status(0:1) >> 4) | (io_status(0:1) & $0F)
+    io_status(1:1) = $ff
+    
+    if last_sent_state(0:1) = io_status(0:1) && io_status(0:1) != $0f then
         call system_endpoint_tx(system_endpoint_uart1, 13, "Mode change!\r\n")
-        call attributes_write(c_gpio_status, 0, 3, io_status(0:3))
+        call attributes_write(c_gpio_status, 0, 2, io_status(0:2))
     end if
 end
 
