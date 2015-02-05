@@ -2928,7 +2928,9 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <instance part="LOGO" gate="G$1" x="-12.7" y="139.7"/>
 <instance part="U$6" gate="G$1" x="121.92" y="68.58"/>
 <instance part="JP2" gate="G$1" x="106.68" y="137.16"/>
-<instance part="PROG" gate="G$1" x="124.46" y="109.22"/>
+<instance part="PROG" gate="G$1" x="124.46" y="109.22" smashed="yes">
+<attribute name="NAME" x="129.54" y="119.38" size="2.032" layer="95" rot="R180"/>
+</instance>
 <instance part="P+4" gate="G$1" x="144.78" y="127"/>
 <instance part="GND2" gate="1" x="104.14" y="99.06"/>
 <instance part="U1" gate="G$1" x="40.64" y="86.36"/>
