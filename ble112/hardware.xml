@@ -19,7 +19,7 @@
     <slow_clock enable="true" />
 
     <!-- enable DC/DC convertor control on P1_7 for current consumption optimization -->
-    <pmux regulator_pin="7" />
+    <!-- pmux regulator_pin="7"  -->
 
     <!-- USART 1 used for debug serial output in this demo -->
     <!-- (make sure the RS232 switch is on and you're powering over USB if you want to leave this enabled) -->
