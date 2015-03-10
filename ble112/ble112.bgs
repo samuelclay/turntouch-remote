@@ -104,8 +104,8 @@ event connection_disconnected(handle, result)
 
     # set advertisement interval back to 200-300ms, use all advertisement channels
     # (note min/max parameters are in units of 625 uSec)
-    call gap_set_adv_parameters(1600, 3200, 7)
-    # call gap_set_adv_parameters(64, 96, 1)
+    # call gap_set_adv_parameters(1600, 3200, 7)
+    call gap_set_adv_parameters(64, 96, 1)
 
     # put module back into discoverable/connectable mode
     # (also resumes advertising based on parameters)
