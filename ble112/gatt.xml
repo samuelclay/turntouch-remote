@@ -16,7 +16,7 @@
         <characteristic uuid="2A01" id="c_appearance">
             <description>Appearance</description>
             <properties read="true" const="true" />
-            <value type="hex">0100</value>
+            <value type="hex">0180</value>
         </characteristic>
         
     </service>
@@ -31,25 +31,38 @@
             <properties read="true" const="true" />
             <value>Turn Touch</value>
         </characteristic>
-
-        <!-- 2A24: org.bluetooth.characteristic.model_number_string -->
-        <characteristic uuid="2A24" id="c_model_number">
-            <description>Model Number</description>
+        
+        <!-- 2A25: org.bluetooth.characteristic.serial_number_string -->
+        <characteristic uuid="2A25" id="c_serial_number">
+            <description>Serial Number</description>
             <properties read="true" const="true" />
-            <value>TT-REMOTE-01</value>
+            <value>123456789</value>
         </characteristic>
         
+        <!-- 2A24: org.bluetooth.characteristic.model_number_string -->
+        <characteristic uuid="2A24" id="c_model_number">
+            <description>Firmware Model Number</description>
+            <properties read="true" const="true" />
+            <value>0.3.0</value>
+        </characteristic>
+        
+        <!-- 2A27: org.bluetooth.characteristic.hardware_revision_string -->
+        <characteristic uuid="2a27">
+            <description>Hardware Revision String</description>
+            <properties read="true" const="true" />
+            <value>Rev. 17</value>
+        </characteristic>
     </service>
     
     <!-- 180F: org.bluetooth.service.battery_service -->
     <service uuid="180F" id="battery_service">
         <description>Battery Service</description>
     
-        <!-- E101: org.bluetooth.characteristic.battery_level -->
+        <!-- 2A19: org.bluetooth.characteristic.battery_level -->
         <characteristic uuid="2a19" id="c_battery_level">
             <description>Battery Level</description>
             <properties read="true" indicate="true" notify="true" />
-            <value length="1" />
+            <value length="1" type="hex" />
         </characteristic>
         
     </service>

@@ -3,5 +3,6 @@
     <gatt in="gatt.xml" />
     <hardware in="hardware.xml" />    
     <script in="ble112.bgs" />
+    <!-- <script in="mincurrent.bgs" /> -->
     <image out="out.hex" />    
 </project>

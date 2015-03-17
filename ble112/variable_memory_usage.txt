@@ -1,4 +1,4 @@
-66
+90
 0:0	GAP_AD_FLAG_BREDR_NOT_SUPPORTED
 0:0	GAP_AD_FLAG_GENERAL_DISCOVERABLE
 0:0	GAP_AD_FLAG_LIMITED_DISCOVERABLE
@@ -29,6 +29,7 @@
 0:0	c_gpio_status
 0:0	c_manufacturer_name
 0:0	c_model_number
+0:0	c_serial_number
 0:0	connection_completed
 0:0	connection_connected
 0:0	connection_encrypted
@@ -99,3 +100,9 @@
 46:4	batconn_handle
 50:4	last_bat_pct
 54:12	t
+66:4	interval_min
+70:4	interval_max
+74:4	conn_latency
+78:4	conn_timeout
+82:4	updated_conn
+86:4	updated_result

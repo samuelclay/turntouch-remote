@@ -28,6 +28,13 @@ dim batconn_handle  # battery connection
 dim last_bat_pct    # cache of last battery % seen
 dim t(12)
 
+dim interval_min
+dim interval_max
+dim conn_latency
+dim conn_timeout
+dim updated_conn
+dim updated_result
+
 event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     # initialize connection status as DISCONNECTED
     connected = 0
@@ -56,8 +63,8 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     
     # set advertisement interval to 200-300ms, and use all advertisement channels
     # (note min/max parameters are in units of 625 uSec)
-    call gap_set_adv_parameters(1600, 3200, 7)
-    # call gap_set_adv_parameters(64, 96, 1)
+    # call gap_set_adv_parameters(1600, 3200, 7)
+    call gap_set_adv_parameters(64, 96, 1)
 
     # put module into discoverable/connectable mode
     call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
@@ -74,18 +81,35 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     call hardware_io_port_irq_direction(1, 1)
     
     # DEVKIT UART OUTPUT: welcome message
-    call system_endpoint_tx(system_endpoint_uart1, 28, "\r\n========================\r\n")
-    call system_endpoint_tx(system_endpoint_uart1, 28, "Turn Touch Mac Remote Bootup\r\n")
+    call system_endpoint_tx(system_endpoint_uart1, 32, "\r\n============================\r\n")
+    call system_endpoint_tx(system_endpoint_uart1, 30, "Turn Touch Mac Remote Bootup\r\n")
+    call system_endpoint_tx(system_endpoint_uart1, 32, "============================\r\n\r\n")
 end
 
 event connection_status(connection, flags, address, address_type, conn_interval, timeout, latency, bonding)
     # check for "new connection established" event
-    if (flags & $05) = $05 then
-        # set connection status to CONNECTED
-        connected = 1
+    call system_endpoint_tx(system_endpoint_uart1, 26, " ---> CONNECTED, interval: ")
+    t(0:1) = (conn_interval / 100) + 48
+    t(1:1) = (conn_interval / 10) + (conn_interval / -100 * 10) + 48
+    t(2:1) = conn_interval + (conn_interval / 10 * -10) + 48
+    call system_endpoint_tx(system_endpoint_uart1, 3, t(0:3))
+    call system_endpoint_tx(system_endpoint_uart1, 2, "\r\n")
 
-        # DEVKIT UART OUTPUT: connected
-        call system_endpoint_tx(system_endpoint_uart1, 11, "CONNECTED\r\n")
+    if (flags & $05) = $05 then
+        connected = 1
+        
+        ## From Section 3.6 in Apple Bluetooth Design Guidelines
+        ## https://developer.apple.com/hardwaredrivers/BluetoothDesignGuidelines.pdf
+        # Interval Max * (Slave Latency + 1) ≤ 2 seconds 
+        # Interval Min ≥ 20 ms
+        # Interval Min + 20 ms ≤ Interval Max Slave Latency ≤ 4 
+        # connSupervisionTimeout ≤ 6 seconds
+        # Interval Max * (Slave Latency + 1) * 3 < connSupervisionTimeout
+        interval_min = 102
+        interval_max = 148
+        conn_latency = 14
+        conn_timeout = 500
+        call connection_update(connection, interval_min, interval_max, conn_latency, conn_timeout)
     end if
     
     # check for "encrypted" status (e.g. connected + bonded, not used by this IRQ demo)
@@ -120,29 +144,29 @@ event hardware_io_port_status(delta, port, irq, state)
     t(1:1) = (irq / 10) + (irq / -100 * 10) + 48
     t(2:1) = irq + (irq / 10 * -10) + 48
     call system_endpoint_tx(system_endpoint_uart1, 3, t(0:3))
-    call system_endpoint_tx(system_endpoint_uart1, 4, " -- ")
+    # call system_endpoint_tx(system_endpoint_uart1, 4, " -- ")
     if (port = 0 && (irq & $01)) || (port = 1 && (irq & $08)) then
-        call system_endpoint_tx(system_endpoint_uart1, 3, "1\r\n")
+        # call system_endpoint_tx(system_endpoint_uart1, 3, "1\r\n")
         irq_pos = 1
     end if
     if (port = 0 && (irq & $02)) then
-        call system_endpoint_tx(system_endpoint_uart1, 4, "20\r\n")
+        # call system_endpoint_tx(system_endpoint_uart1, 4, "20\r\n")
         irq_pos = 2
     end if
     if (port = 1 && (irq & $10)) then
-        call system_endpoint_tx(system_endpoint_uart1, 4, "21\r\n")
+        # call system_endpoint_tx(system_endpoint_uart1, 4, "21\r\n")
         irq_pos = 2
     end if
     if (port = 0 && (irq & $40)) || (port = 1 && (irq & $20)) then
-        call system_endpoint_tx(system_endpoint_uart1, 3, "3\r\n")
+        # call system_endpoint_tx(system_endpoint_uart1, 3, "3\r\n")
         irq_pos = 3
     end if
     if (port = 0 && (irq & $80)) then
-        call system_endpoint_tx(system_endpoint_uart1, 4, "40\r\n")
+        # call system_endpoint_tx(system_endpoint_uart1, 4, "40\r\n")
         irq_pos = 4
     end if
     if (port = 1 && (irq & $40)) then
-        call system_endpoint_tx(system_endpoint_uart1, 4, "41\r\n")
+        # call system_endpoint_tx(system_endpoint_uart1, 4, "41\r\n")
         irq_pos = 4
     end if
     
@@ -200,10 +224,10 @@ event hardware_io_port_status(delta, port, irq, state)
     
     # Nothing left to do but sleep
     if connected then    
-#        call system_endpoint_tx(system_endpoint_uart1, 13, "Sleeping...\r\n")
+       call system_endpoint_tx(system_endpoint_uart1, 13, "Sleeping...\r\n")
         call gap_set_mode(0, 0)
     else    
-#        call system_endpoint_tx(system_endpoint_uart1, 13, "Scanning...\r\n")
+       call system_endpoint_tx(system_endpoint_uart1, 13, "Scanning...\r\n")
         call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
     end if
 end
