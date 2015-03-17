@@ -5953,8 +5953,8 @@ Source: AVX .. aphvc.pdf</description>
 <instance part="GND4" gate="1" x="162.56" y="27.94"/>
 <instance part="P+5" gate="G$1" x="86.36" y="99.06"/>
 <instance part="P+6" gate="G$1" x="182.88" y="99.06"/>
-<instance part="C4" gate="G$1" x="101.6" y="17.78"/>
-<instance part="C5" gate="G$1" x="86.36" y="17.78"/>
+<instance part="C4" gate="G$1" x="101.6" y="22.86"/>
+<instance part="C5" gate="G$1" x="86.36" y="22.86"/>
 <instance part="C6" gate="G$1" x="5.08" y="35.56"/>
 <instance part="GND11" gate="1" x="86.36" y="10.16"/>
 <instance part="GND12" gate="1" x="101.6" y="10.16"/>
@@ -6008,10 +6008,12 @@ Source: AVX .. aphvc.pdf</description>
 <segment>
 <pinref part="C5" gate="G$1" pin="2"/>
 <pinref part="GND11" gate="1" pin="GND"/>
+<wire x1="86.36" y1="17.78" x2="86.36" y2="12.7" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="C4" gate="G$1" pin="2"/>
 <pinref part="GND12" gate="1" pin="GND"/>
+<wire x1="101.6" y1="17.78" x2="101.6" y2="12.7" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="GND1" gate="1" pin="GND"/>
@@ -6203,7 +6205,7 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="109.22" y1="81.28" x2="119.38" y2="81.28" width="0.1524" layer="91"/>
 <junction x="109.22" y="81.28"/>
 <pinref part="C4" gate="G$1" pin="1"/>
-<wire x1="101.6" y1="20.32" x2="101.6" y2="33.02" width="0.1524" layer="91"/>
+<wire x1="101.6" y1="25.4" x2="101.6" y2="33.02" width="0.1524" layer="91"/>
 <wire x1="101.6" y1="33.02" x2="109.22" y2="33.02" width="0.1524" layer="91"/>
 <wire x1="109.22" y1="33.02" x2="109.22" y2="78.74" width="0.1524" layer="91"/>
 <junction x="109.22" y="78.74"/>
@@ -6221,7 +6223,7 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="86.36" y1="99.06" x2="86.36" y2="63.5" width="0.1524" layer="91"/>
 <wire x1="86.36" y1="63.5" x2="119.38" y2="63.5" width="0.1524" layer="91"/>
 <pinref part="C5" gate="G$1" pin="1"/>
-<wire x1="86.36" y1="20.32" x2="86.36" y2="63.5" width="0.1524" layer="91"/>
+<wire x1="86.36" y1="25.4" x2="86.36" y2="63.5" width="0.1524" layer="91"/>
 <junction x="86.36" y="63.5"/>
 </segment>
 <segment>

@@ -2927,7 +2927,7 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <instances>
 <instance part="LOGO" gate="G$1" x="-12.7" y="139.7"/>
 <instance part="U$6" gate="G$1" x="121.92" y="68.58"/>
-<instance part="JP2" gate="G$1" x="121.92" y="137.16"/>
+<instance part="JP2" gate="G$1" x="124.46" y="137.16"/>
 <instance part="PROG" gate="G$1" x="124.46" y="109.22"/>
 <instance part="P+4" gate="G$1" x="144.78" y="127"/>
 <instance part="GND2" gate="1" x="104.14" y="99.06"/>
@@ -2956,7 +2956,7 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <net name="GND" class="0">
 <segment>
 <pinref part="JP2" gate="G$1" pin="1"/>
-<wire x1="129.54" y1="137.16" x2="144.78" y2="137.16" width="0.1524" layer="91"/>
+<wire x1="132.08" y1="137.16" x2="144.78" y2="137.16" width="0.1524" layer="91"/>
 <label x="144.78" y="137.16" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
@@ -3011,7 +3011,7 @@ will be further integrated into the Sparkfun Library for other footprints.  It c
 <net name="SERIAL" class="0">
 <segment>
 <pinref part="JP2" gate="G$1" pin="2"/>
-<wire x1="129.54" y1="139.7" x2="144.78" y2="139.7" width="0.1524" layer="91"/>
+<wire x1="132.08" y1="139.7" x2="144.78" y2="139.7" width="0.1524" layer="91"/>
 <label x="144.78" y="139.7" size="1.016" layer="95" xref="yes"/>
 </segment>
 <segment>
