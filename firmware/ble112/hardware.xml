@@ -32,7 +32,8 @@
     -->
     <usart channel="1" alternate="1" baud="115200" endpoint="none" flow="false" />
 
-    <!-- P0_0, P0_1, and P1_6 will be used for interrupts. Port 2 interrupts are not supported. -->
+    <!-- PORT0_PIN_SELECT_MASK and PORT1_PIN_SELECT_MASK will be used for interrupts. -->
+    <!-- Port 2 interrupts are not supported. -->
     <port index="0" tristatemask="0" pull="up" />
     <port index="1" tristatemask="0" pull="up" />
     <port index="2" tristatemask="0" pull="down" />

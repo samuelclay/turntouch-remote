@@ -1,11 +1,11 @@
 # ================================================================
-# BGScript demo application: GPIO interrupts
-# Jeff Rowberg <jeff.rowberg@bluegiga.com>
+# Turn Touch Remote Firmware
+# Samuel Clay <samuel@turntouch.com>
 # ----------------------------------------------------------------
 #
 # CHANGELOG:
-#   2013-04-16 - Fix missing P1 data storage
-#   2013-01-10 - Initial release
+#   2015-04-02 - Firmware values modifiable over GATT
+#   2014-12-24 - Initial release
 #
 # ================================================================
 
@@ -26,15 +26,12 @@ dim last_sent_state(2) # snapshot of last sent state, to avoid repeats
 dim bat_pct         # battery percentage
 dim batconn_handle  # battery connection
 dim last_bat_pct    # cache of last battery % seen
-dim t(12)
-
-dim interval_min
-dim interval_max
-dim conn_latency
-dim conn_timeout
-dim updated_conn
-dim updated_result
-
+dim interval_min    # connection interval, higher value consumes less battery
+dim interval_max    # connection interval, lower value has less latency
+dim conn_latency    # number of events to skip if nothing changes (for battery)
+dim conn_timeout    # max timeout on acknowledging master
+dim t(12)           # debug value used to convert int to string
+dim xgatt_PS_value
 event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     # initialize connection status as DISCONNECTED
     connected = 0
@@ -84,7 +81,20 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     call system_endpoint_tx(system_endpoint_uart1, 32, "\r\n============================\r\n")
     call system_endpoint_tx(system_endpoint_uart1, 30, "Turn Touch Mac Remote Bootup\r\n")
     call system_endpoint_tx(system_endpoint_uart1, 32, "============================\r\n\r\n")
+    
+    #Initialize a GATT value from a PS key, which is 2 bytes long
+    call flash_ps_load($8000)(result, len1, data1(0:2))
+    call system_endpoint_tx(system_endpoint_uart1, len1, data1)
+    
+    xgatt_PS_value = 300
+    # Write the PS value to handle with ID "xgatt_PS_value"
+    call attributes_write(xgatt_PS_value, 0, )
+    
 end
+
+# ==============
+# = Connection =
+# ==============
 
 event connection_status(connection, flags, address, address_type, conn_interval, timeout, latency, bonding)
     # check for "new connection established" event
@@ -135,6 +145,10 @@ event connection_disconnected(handle, result)
     # (also resumes advertising based on parameters)
     call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
 end
+
+# ========
+# = GPIO =
+# ========
 
 # catch button presses (active LOW, hardware.xml pulls it high)
 event hardware_io_port_status(delta, port, irq, state)
@@ -232,6 +246,10 @@ event hardware_io_port_status(delta, port, irq, state)
     end if
 end
 
+# =========
+# = Timer =
+# =========
+
 # Mode change timer
 event hardware_soft_timer(handle)
     # read state of Port 0
@@ -248,6 +266,10 @@ event hardware_soft_timer(handle)
     end if
 end
 
+# =================
+# = Battery Level =
+# =================
+
 # This event listener listens for incoming ATT protocol read requests, and when the battery
 # attribute is read, executes an ADC read and sends back the computer result when complete.
 event attributes_user_read_request(connection, handle, offset, maxsize)
@@ -257,8 +279,12 @@ event attributes_user_read_request(connection, handle, offset, maxsize)
     #   15 = AVDD/3 channel (will be between 0.66v - 1.2v by definition)
     #   3 = 12 effective bits, range = [-2048, +2047] when right-aligned
     #   0 = internal 1.24V reference
-    call hardware_adc_read($f, 1, 0)
+    call hardware_adc_read($f, 1, 0) # returns hardware_adc_result
 end
+
+# =======
+# = ADC =
+# =======
 
 # This event listener catches the ADC result
 event hardware_adc_result(input, value)
