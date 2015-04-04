@@ -17,7 +17,7 @@
 
     <!-- do not enable slow_clock if you need reliable UART output at fast speeds. It will result in baud rate data errors. -->
     <slow_clock enable="true" />
-
+    
     <!-- enable DC/DC convertor control on P1_7 for current consumption optimization -->
     <!-- pmux regulator_pin="7"  -->
 

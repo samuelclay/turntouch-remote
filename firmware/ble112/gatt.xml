@@ -1,9 +1,3 @@
-<!-----------------------------------------------------
-    Turn Touch Remote GATT
-
-    Generate UUIDs: 
-        python -c "import uuid; print uuid.uuid4()"
-  ----------------------------------------------------->
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
 
@@ -67,7 +61,7 @@
         <!-- 2A19: org.bluetooth.characteristic.battery_level -->
         <characteristic uuid="2a19" id="c_battery_level">
             <description>Battery Level</description>
-            <properties read="true" indicate="true" notify="true" />
+            <properties read="true" notify="true" />
             <value length="1" type="hex" />
         </characteristic>
         
@@ -76,7 +70,10 @@
     <!-- custom gpio status service -->
     <service uuid="88c3907a-dc4f-41b1-bb04-4e4deb81fadd" advertise="true">
         <description>Button Service</description>
-        
+
+        <!-- Generate UUIDs:                             -->
+        <!-- python -c "import uuid; print uuid.uuid4()" -->
+
         <!-- button status characteristic -->
         <characteristic uuid="47099164-4d08-4338-bedf-7fc043dbec5c" id="c_gpio_status">
             <description>Button Status</description>
@@ -91,8 +88,8 @@
         <!-- interval_min characteristic -->
         <characteristic uuid="0a02cefb-f546-4a56-ad2b-4aeadca0da6e" id="c_interval_min">
             <description>interval_min</description>
-            <properties read="true" write="true" indicate="true" />
-            <value length="2" type="hex" />
+            <properties read="true" write="true" />
+            <value length="2" />
             <!--
                 This will contain a 1-byte value: the interval_min connection setting.
             -->
@@ -101,8 +98,8 @@
         <!-- interval_max characteristic -->
         <characteristic uuid="50a71e79-f950-4973-9cbd-1ce5439603be" id="c_interval_max">
             <description>interval_max</description>
-            <properties read="true" write="true" indicate="true" />
-            <value length="2" type="hex" />
+            <properties read="true" write="true" />
+            <value length="2" />
             <!--
                 This will contain a 1-byte value: the interval_max connection setting.
             -->
@@ -111,8 +108,8 @@
         <!-- conn_latency characteristic -->
         <characteristic uuid="3b6ef6e7-d9dc-4010-960a-a48bbe114935" id="c_conn_latency">
             <description>conn_latency</description>
-            <properties read="true" write="true" indicate="true" />
-            <value length="2" type="hex" />
+            <properties read="true" write="true" />
+            <value length="2" />
             <!--
                 This will contain a 1-byte value: the conn_latency connection setting.
             -->
@@ -121,8 +118,8 @@
         <!-- conn_timeout characteristic -->
         <characteristic uuid="c6d87b9e-70c3-47ff-a534-e1ceb2bdf435" id="c_conn_timeout">
             <description>conn_timeout</description>
-            <properties read="true" write="true" indicate="true" />
-            <value length="2" type="hex" />
+            <properties read="true" write="true" />
+            <value length="2" />
             <!--
                 This will contain a 1-byte value: the conn_timeout connection setting.
             -->

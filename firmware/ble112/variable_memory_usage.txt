@@ -1,4 +1,4 @@
-90
+114
 0:0	GAP_AD_FLAG_BREDR_NOT_SUPPORTED
 0:0	GAP_AD_FLAG_GENERAL_DISCOVERABLE
 0:0	GAP_AD_FLAG_LIMITED_DISCOVERABLE
@@ -25,8 +25,12 @@
 0:0	attributes_attribute_status_flag_notify
 0:0	c_appearance
 0:0	c_battery_level
+0:0	c_conn_latency
+0:0	c_conn_timeout
 0:0	c_device_name
 0:0	c_gpio_status
+0:0	c_interval_max
+0:0	c_interval_min
 0:0	c_manufacturer_name
 0:0	c_model_number
 0:0	c_serial_number
@@ -85,6 +89,10 @@
 0:0	system_endpoint_usb
 0:0	PORT0_PIN_SELECT_MASK
 0:0	PORT1_PIN_SELECT_MASK
+0:0	DEFAULT_INTERVAL_MIN
+0:0	DEFAULT_INTERVAL_MAX
+0:0	DEFAULT_CONN_LATENCY
+0:0	DEFAULT_CONN_TIMEOUT
 0:4	connected
 4:4	advertising
 8:4	io_status
@@ -99,10 +107,15 @@
 42:4	bat_pct
 46:4	batconn_handle
 50:4	last_bat_pct
-54:12	t
-66:4	interval_min
-70:4	interval_max
-74:4	conn_latency
-78:4	conn_timeout
-82:4	updated_conn
-86:4	updated_result
+54:4	ps_interval_min
+58:4	ps_interval_max
+62:4	ps_conn_latency
+66:4	ps_conn_timeout
+70:12	t
+82:4	ps_interval_min_uuid
+86:4	ps_interval_max_uuid
+90:4	ps_conn_latency_uuid
+94:4	ps_conn_timeout_uuid
+98:4	ps_error
+102:4	ps_len
+106:8	ps_data

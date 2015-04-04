@@ -12,6 +12,18 @@
 const PORT0_PIN_SELECT_MASK = $C3         # 0b11000011 = P0_0-P0_1 & P0_6-P0_7 are inputs
 const PORT1_PIN_SELECT_MASK = $78         # 0b01110000 = Px_3-Px_6 are inputs
 
+## From Section 3.6 in Apple Bluetooth Design Guidelines
+## https://developer.apple.com/hardwaredrivers/BluetoothDesignGuidelines.pdf
+# Interval Max * (Slave Latency + 1) ≤ 2 seconds 
+# Interval Min ≥ 20 ms
+# Interval Min + 20 ms ≤ Interval Max Slave Latency ≤ 4 
+# connSupervisionTimeout ≤ 6 seconds
+# Interval Max * (Slave Latency + 1) * 3 < connSupervisionTimeout
+const DEFAULT_INTERVAL_MIN = 102 # units of 1.25ms
+const DEFAULT_INTERVAL_MAX = 148 # units of 1.25ms
+const DEFAULT_CONN_LATENCY = 3
+const DEFAULT_CONN_TIMEOUT = 500 # units of 10ms
+
 dim connected       # BLE connection status
 dim advertising     # advertising status (0=off, 1=on)
 dim io_status(4)    # port status characteristic local uint8array container
@@ -26,12 +38,19 @@ dim last_sent_state(2) # snapshot of last sent state, to avoid repeats
 dim bat_pct         # battery percentage
 dim batconn_handle  # battery connection
 dim last_bat_pct    # cache of last battery % seen
-dim interval_min    # connection interval, higher value consumes less battery
-dim interval_max    # connection interval, lower value has less latency
-dim conn_latency    # number of events to skip if nothing changes (for battery)
-dim conn_timeout    # max timeout on acknowledging master
+dim ps_interval_min    # connection interval, higher value consumes less battery
+dim ps_interval_max    # connection interval, lower value has less latency
+dim ps_conn_latency    # number of events to skip if nothing changes (for battery)
+dim ps_conn_timeout    # max timeout on acknowledging master
 dim t(12)           # debug value used to convert int to string
-dim xgatt_PS_value
+dim ps_interval_min_uuid
+dim ps_interval_max_uuid
+dim ps_conn_latency_uuid
+dim ps_conn_timeout_uuid
+dim ps_error
+dim ps_len
+dim ps_data(8)
+
 event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     # initialize connection status as DISCONNECTED
     connected = 0
@@ -82,13 +101,59 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     call system_endpoint_tx(system_endpoint_uart1, 30, "Turn Touch Mac Remote Bootup\r\n")
     call system_endpoint_tx(system_endpoint_uart1, 32, "============================\r\n\r\n")
     
-    #Initialize a GATT value from a PS key, which is 2 bytes long
-    call flash_ps_load($8000)(result, len1, data1(0:2))
-    call system_endpoint_tx(system_endpoint_uart1, len1, data1)
+    # Read firmware settings from flash, setting defaults if values not set
+    ps_interval_min_uuid = $8000
+    ps_interval_max_uuid = $8001
+    ps_conn_latency_uuid = $8002
+    ps_conn_timeout_uuid = $8003
+    call flash_ps_load(ps_interval_min_uuid)(ps_error, ps_len, ps_data(0:2))
+    if ps_error != 0 then
+        # No values set, so set defaults
+        call system_endpoint_tx(system_endpoint_uart1, 29, "\n\r ---> No flash values set...")
+        call flash_ps_save(ps_interval_min_uuid, 2, DEFAULT_INTERVAL_MIN)
+        call flash_ps_save(ps_interval_max_uuid, 2, DEFAULT_INTERVAL_MAX)
+        call flash_ps_save(ps_conn_latency_uuid, 2, DEFAULT_CONN_LATENCY)
+        call flash_ps_save(ps_conn_timeout_uuid, 2, DEFAULT_CONN_TIMEOUT)
+        call flash_ps_load(ps_interval_min_uuid)(ps_error, ps_len, ps_data(0:2))
+    end if
+    call flash_ps_load(ps_interval_max_uuid)(ps_error, ps_len, ps_data(2:2))
+    call flash_ps_load(ps_conn_latency_uuid)(ps_error, ps_len, ps_data(4:2))
+    call flash_ps_load(ps_conn_timeout_uuid)(ps_error, ps_len, ps_data(6:2))
+    ps_interval_min = ps_data(0:2)
+    ps_interval_max = ps_data(2:2)
+    ps_conn_latency = ps_data(4:2)
+    ps_conn_timeout = ps_data(6:2)
+
+    call system_endpoint_tx(system_endpoint_uart1, 9, "\n\r$8000: ")
+    t(0:1) = (ps_data(0:2)/1000) + (ps_data(0:2) / 10000*-10) + 48
+    t(1:1) = (ps_data(0:2)/100) + (ps_data(0:2) / 1000*-10) + 48
+    t(2:1) = (ps_data(0:2)/10) + (ps_data(0:2) / 100*-10) + 48
+    t(3:1) = (ps_data(0:2)) + (ps_data(0:2) / 10*-10) + 48
+    call system_endpoint_tx(system_endpoint_uart1, 4, t(0:4))
+    call system_endpoint_tx(system_endpoint_uart1, 9, "\n\r$8001: ")
+    t(0:1) = (ps_data(2:2)/1000) + (ps_data(2:2) / 10000*-10) + 48
+    t(1:1) = (ps_data(2:2)/100) + (ps_data(2:2) / 1000*-10) + 48
+    t(2:1) = (ps_data(2:2)/10) + (ps_data(2:2) / 100*-10) + 48
+    t(3:1) = (ps_data(2:2)) + (ps_data(2:2) / 10*-10) + 48
+    call system_endpoint_tx(system_endpoint_uart1, 4, t(0:4))
+    call system_endpoint_tx(system_endpoint_uart1, 9, "\n\r$8002: ")
+    t(0:1) = (ps_data(4:2)/1000) + (ps_data(4:2) / 10000*-10) + 48
+    t(1:1) = (ps_data(4:2)/100) + (ps_data(4:2) / 1000*-10) + 48
+    t(2:1) = (ps_data(4:2)/10) + (ps_data(4:2) / 100*-10) + 48
+    t(3:1) = (ps_data(4:2)) + (ps_data(4:2) / 10*-10) + 48
+    call system_endpoint_tx(system_endpoint_uart1, 4, t(0:4))
+    call system_endpoint_tx(system_endpoint_uart1, 9, "\n\r$8003: ")
+    t(0:1) = (ps_data(6:2)/1000) + (ps_data(6:2) / 10000*-10) + 48
+    t(1:1) = (ps_data(6:2)/100) + (ps_data(6:2) / 1000*-10) + 48
+    t(2:1) = (ps_data(6:2)/10) + (ps_data(6:2) / 100*-10) + 48
+    t(3:1) = (ps_data(6:2)) + (ps_data(6:2) / 10*-10) + 48
+    call system_endpoint_tx(system_endpoint_uart1, 4, t(0:4))
+    call system_endpoint_tx(system_endpoint_uart1, 2, "\n\r.")
     
-    xgatt_PS_value = 300
-    # Write the PS value to handle with ID "xgatt_PS_value"
-    call attributes_write(xgatt_PS_value, 0, )
+    call attributes_write(c_interval_min, 0, 2, ps_interval_min)
+    call attributes_write(c_interval_max, 0, 2, ps_interval_max)
+    call attributes_write(c_conn_latency, 0, 2, ps_conn_latency)
+    call attributes_write(c_conn_timeout, 0, 2, ps_conn_timeout)
     
 end
 
@@ -96,30 +161,19 @@ end
 # = Connection =
 # ==============
 
-event connection_status(connection, flags, address, address_type, conn_interval, timeout, latency, bonding)
+event connection_status(connection, flags, address, address_type, interval, timeout, latency, bonding)
     # check for "new connection established" event
     call system_endpoint_tx(system_endpoint_uart1, 27, " ---> CONNECTED, interval: ")
-    t(0:1) = (conn_interval / 100) + 48
-    t(1:1) = (conn_interval / 10) + (conn_interval / -100 * 10) + 48
-    t(2:1) = conn_interval + (conn_interval / 10 * -10) + 48
+    t(0:1) = (interval / 100) + 48
+    t(1:1) = (interval / 10) + (interval / -100 * 10) + 48
+    t(2:1) = interval + (interval / 10 * -10) + 48
     call system_endpoint_tx(system_endpoint_uart1, 3, t(0:3))
     call system_endpoint_tx(system_endpoint_uart1, 2, "\r\n")
 
     if (flags & $05) = $05 then
         connected = 1
         
-        ## From Section 3.6 in Apple Bluetooth Design Guidelines
-        ## https://developer.apple.com/hardwaredrivers/BluetoothDesignGuidelines.pdf
-        # Interval Max * (Slave Latency + 1) ≤ 2 seconds 
-        # Interval Min ≥ 20 ms
-        # Interval Min + 20 ms ≤ Interval Max Slave Latency ≤ 4 
-        # connSupervisionTimeout ≤ 6 seconds
-        # Interval Max * (Slave Latency + 1) * 3 < connSupervisionTimeout
-        interval_min = 102 # units of 1.25ms
-        interval_max = 148 # units of 1.25ms
-        conn_latency = 4
-        conn_timeout = 500 # units of 10ms
-        call connection_update(connection, interval_min, interval_max, conn_latency, conn_timeout)
+        call connection_update(connection, ps_interval_min, ps_interval_max, ps_conn_latency, ps_conn_timeout)
     end if
     
     # check for "encrypted" status (e.g. connected + bonded, not used by this IRQ demo)
@@ -144,6 +198,11 @@ event connection_disconnected(handle, result)
     # put module back into discoverable/connectable mode
     # (also resumes advertising based on parameters)
     call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
+end
+
+event attributes_value(connection, reason, handle, offset, value_len, value_data)
+    call system_endpoint_tx(system_endpoint_uart1, 14, "Writing value\r\n")
+    call attributes_user_write_response(connection, $00)
 end
 
 # ========
@@ -238,10 +297,10 @@ event hardware_io_port_status(delta, port, irq, state)
     
     # Nothing left to do but sleep
     if connected then    
-       call system_endpoint_tx(system_endpoint_uart1, 13, "Sleeping...\r\n")
+        call system_endpoint_tx(system_endpoint_uart1, 13, "Sleeping...\r\n")
         call gap_set_mode(0, 0)
     else    
-       call system_endpoint_tx(system_endpoint_uart1, 13, "Scanning...\r\n")
+        call system_endpoint_tx(system_endpoint_uart1, 13, "Scanning...\r\n")
         call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
     end if
 end
@@ -266,25 +325,9 @@ event hardware_soft_timer(handle)
     end if
 end
 
-# =================
-# = Battery Level =
-# =================
-
-# This event listener listens for incoming ATT protocol read requests, and when the battery
-# attribute is read, executes an ADC read and sends back the computer result when complete.
-event attributes_user_read_request(connection, handle, offset, maxsize)
-    # Store current connection handle for later
-    batconn_handle = connection
-    # Request ADC read operation
-    #   15 = AVDD/3 channel (will be between 0.66v - 1.2v by definition)
-    #   3 = 12 effective bits, range = [-2048, +2047] when right-aligned
-    #   0 = internal 1.24V reference
-    call hardware_adc_read($f, 1, 0) # returns hardware_adc_result
-end
-
-# =======
-# = ADC =
-# =======
+# =======================
+# = ADC - Battery Level =
+# =======================
 
 # This event listener catches the ADC result
 event hardware_adc_result(input, value)
