@@ -41,7 +41,6 @@ dim irq_pos         # convert irq from bitvector to single number
 dim holding_irq     # currently holding a button for a mode change
 dim last_sent_state(2) # snapshot of last sent state, to avoid repeats
 dim bat_pct         # battery percentage
-dim batconn_handle  # battery connection
 dim last_bat_pct    # cache of last battery % seen
 dim ps_interval_min    # connection interval, higher value consumes less battery
 dim ps_interval_max    # connection interval, lower value has less latency
@@ -342,7 +341,6 @@ event hardware_io_port_status(delta, port, irq, state)
     if last_sent_state(0:1) != io_status(0:1) then
         last_sent_state(0:1) = io_status(0:1)
         call attributes_write(c_gpio_status, 0, 2, io_status(0:2))
-        call hardware_adc_read($0f,1,0)
     end if
     
     # Nothing left to do but sleep
@@ -379,6 +377,13 @@ end
 # = ADC - Battery Level =
 # =======================
 
+event attributes_user_read_request(connection, handle, offset, maxsize)
+    if handle = c_battery_level
+        call system_endpoint_tx(system_endpoint_uart1, 10, "Battery?\r\n")
+        call hardware_adc_read($0f, 1, 0)
+    end if
+end
+
 # This event listener catches the ADC result
 event hardware_adc_result(input, value)
     # ADC behavior:
@@ -403,9 +408,8 @@ event hardware_adc_result(input, value)
     # >= only for testing, change to >
     if last_bat_pct = 0 || last_bat_pct >= bat_pct || last_bat_pct < bat_pct
         last_bat_pct = bat_pct
-        call attributes_write(c_battery_level, 0, 1, bat_pct)
+        # respond with calculated percent (connection=stored value, result=0, length=1, data=bat_pct)
+        call system_endpoint_tx(system_endpoint_uart1, 10, "Battery!\r\n")
+        call attributes_user_read_response(0, 0, 1, bat_pct)
     end if
-        
-    # respond with calculated percent (connection=stored value, result=0, length=1, data=bat_pct)
-    call attributes_user_read_response(batconn_handle, 0, 1, bat_pct)
 end

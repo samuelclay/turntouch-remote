@@ -61,8 +61,8 @@
         <!-- 2A19: org.bluetooth.characteristic.battery_level -->
         <characteristic uuid="2a19" id="c_battery_level">
             <description>Battery Level</description>
-            <properties read="true" notify="true" />
-            <value length="1" type="hex" />
+            <properties read="true" />
+            <value type="user" />
         </characteristic>
         
     </service>
