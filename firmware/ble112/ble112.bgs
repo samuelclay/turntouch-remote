@@ -24,6 +24,11 @@ const DEFAULT_INTERVAL_MAX = 148 # units of 1.25ms
 const DEFAULT_CONN_LATENCY = 3
 const DEFAULT_CONN_TIMEOUT = 500 # units of 10ms
 
+const ps_interval_min_uuid = $8000
+const ps_interval_max_uuid = $8001
+const ps_conn_latency_uuid = $8002
+const ps_conn_timeout_uuid = $8003
+
 dim connected       # BLE connection status
 dim advertising     # advertising status (0=off, 1=on)
 dim io_status(4)    # port status characteristic local uint8array container
@@ -43,13 +48,37 @@ dim ps_interval_max    # connection interval, lower value has less latency
 dim ps_conn_latency    # number of events to skip if nothing changes (for battery)
 dim ps_conn_timeout    # max timeout on acknowledging master
 dim t(12)           # debug value used to convert int to string
-dim ps_interval_min_uuid
-dim ps_interval_max_uuid
-dim ps_conn_latency_uuid
-dim ps_conn_timeout_uuid
 dim ps_error
 dim ps_len
 dim ps_data(8)
+
+# ========================
+# = PS Firmware Settings =
+# ======================== 
+
+procedure read_ps_settings()
+    call flash_ps_load(ps_interval_min_uuid)(ps_error, ps_len, ps_data(0:2))
+    if ps_error != 0 then
+        # No values set, so set defaults
+        call system_endpoint_tx(system_endpoint_uart1, 29, "\n\r ---> No flash values set...")
+        call flash_ps_save(ps_interval_min_uuid, 2, DEFAULT_INTERVAL_MIN)
+        call flash_ps_save(ps_interval_max_uuid, 2, DEFAULT_INTERVAL_MAX)
+        call flash_ps_save(ps_conn_latency_uuid, 2, DEFAULT_CONN_LATENCY)
+        call flash_ps_save(ps_conn_timeout_uuid, 2, DEFAULT_CONN_TIMEOUT)
+        call flash_ps_load(ps_interval_min_uuid)(ps_error, ps_len, ps_data(0:2))
+    end if
+    call flash_ps_load(ps_interval_max_uuid)(ps_error, ps_len, ps_data(2:2))
+    call flash_ps_load(ps_conn_latency_uuid)(ps_error, ps_len, ps_data(4:2))
+    call flash_ps_load(ps_conn_timeout_uuid)(ps_error, ps_len, ps_data(6:2))
+    ps_interval_min = ps_data(0:2)
+    ps_interval_max = ps_data(2:2)
+    ps_conn_latency = ps_data(4:2)
+    ps_conn_timeout = ps_data(6:2)
+end
+
+# ===============
+# = System Boot =
+# ===============
 
 event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     # initialize connection status as DISCONNECTED
@@ -102,27 +131,7 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     call system_endpoint_tx(system_endpoint_uart1, 32, "============================\r\n\r\n")
     
     # Read firmware settings from flash, setting defaults if values not set
-    ps_interval_min_uuid = $8000
-    ps_interval_max_uuid = $8001
-    ps_conn_latency_uuid = $8002
-    ps_conn_timeout_uuid = $8003
-    call flash_ps_load(ps_interval_min_uuid)(ps_error, ps_len, ps_data(0:2))
-    if ps_error != 0 then
-        # No values set, so set defaults
-        call system_endpoint_tx(system_endpoint_uart1, 29, "\n\r ---> No flash values set...")
-        call flash_ps_save(ps_interval_min_uuid, 2, DEFAULT_INTERVAL_MIN)
-        call flash_ps_save(ps_interval_max_uuid, 2, DEFAULT_INTERVAL_MAX)
-        call flash_ps_save(ps_conn_latency_uuid, 2, DEFAULT_CONN_LATENCY)
-        call flash_ps_save(ps_conn_timeout_uuid, 2, DEFAULT_CONN_TIMEOUT)
-        call flash_ps_load(ps_interval_min_uuid)(ps_error, ps_len, ps_data(0:2))
-    end if
-    call flash_ps_load(ps_interval_max_uuid)(ps_error, ps_len, ps_data(2:2))
-    call flash_ps_load(ps_conn_latency_uuid)(ps_error, ps_len, ps_data(4:2))
-    call flash_ps_load(ps_conn_timeout_uuid)(ps_error, ps_len, ps_data(6:2))
-    ps_interval_min = ps_data(0:2)
-    ps_interval_max = ps_data(2:2)
-    ps_conn_latency = ps_data(4:2)
-    ps_conn_timeout = ps_data(6:2)
+    call read_ps_settings()
 
     call system_endpoint_tx(system_endpoint_uart1, 9, "\n\r$8000: ")
     t(0:1) = (ps_data(0:2)/1000) + (ps_data(0:2) / 10000*-10) + 48
@@ -201,8 +210,49 @@ event connection_disconnected(handle, result)
 end
 
 event attributes_value(connection, reason, handle, offset, value_len, value_data)
-    call system_endpoint_tx(system_endpoint_uart1, 14, "Writing value\r\n")
-    call attributes_user_write_response(connection, $00)
+    if handle = c_interval_min then
+        call flash_ps_load(ps_interval_min_uuid)(ps_error, ps_len, ps_data(0:2))
+        if ps_error = 0 && ps_data(0:2) != value_data(0:2) then
+            call flash_ps_save(ps_interval_min_uuid, 2, value_data(0:2))
+        else
+            call system_endpoint_tx(system_endpoint_uart1, 21, "ps_data == value_data")
+        end if
+        t(0:1) = (ps_data(0:2) / 100) + 48
+        t(1:1) = (ps_data(0:2) / 10) + (ps_data(0:2) / -100 * 10) + 48
+        t(2:1) = ps_data(0:2) + (ps_data(0:2) / 10 * -10) + 48
+        call system_endpoint_tx(system_endpoint_uart1, 5, "Old: ")        
+        call system_endpoint_tx(system_endpoint_uart1, 3, t(0:3))
+        call system_endpoint_tx(system_endpoint_uart1, 2, "\r\n")        
+        t(0:1) = (value_data(0:2) / 100) + 48
+        t(1:1) = (value_data(0:2) / 10) + (value_data(0:2) / -100 * 10) + 48
+        t(2:1) = value_data(0:2) + (value_data(0:2) / 10 * -10) + 48
+        call system_endpoint_tx(system_endpoint_uart1, 5, "New: ")        
+        call system_endpoint_tx(system_endpoint_uart1, 3, t(0:3))
+        call system_endpoint_tx(system_endpoint_uart1, 2, "\r\n")   
+    end if
+    if handle = c_interval_max then
+        call flash_ps_load(ps_interval_max_uuid)(ps_error, ps_len, ps_data(0:2))
+        if ps_error = 0 && ps_data(0:2) != value_data(0:2) then
+            call flash_ps_save(ps_interval_max_uuid, 2, value_data(0:2))
+        else
+            call system_endpoint_tx(system_endpoint_uart1, 21, "ps_data == value_data")
+        end if
+        t(0:1) = (ps_data(0:2) / 100) + 48
+        t(1:1) = (ps_data(0:2) / 10) + (ps_data(0:2) / -100 * 10) + 48
+        t(2:1) = ps_data(0:2) + (ps_data(0:2) / 10 * -10) + 48
+        call system_endpoint_tx(system_endpoint_uart1, 5, "Old: ")        
+        call system_endpoint_tx(system_endpoint_uart1, 3, t(0:3))
+        call system_endpoint_tx(system_endpoint_uart1, 2, "\r\n")        
+        t(0:1) = (value_data(0:2) / 100) + 48
+        t(1:1) = (value_data(0:2) / 10) + (value_data(0:2) / -100 * 10) + 48
+        t(2:1) = value_data(0:2) + (value_data(0:2) / 10 * -10) + 48
+        call system_endpoint_tx(system_endpoint_uart1, 5, "New: ")        
+        call system_endpoint_tx(system_endpoint_uart1, 3, t(0:3))
+        call system_endpoint_tx(system_endpoint_uart1, 2, "\r\n")   
+    end if
+    
+    call read_ps_settings()  
+    call connection_update(connection, ps_interval_min, ps_interval_max, ps_conn_latency, ps_conn_timeout)
 end
 
 # ========
