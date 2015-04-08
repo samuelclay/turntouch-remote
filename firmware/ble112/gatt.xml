@@ -71,9 +71,6 @@
     <service uuid="88c3907a-dc4f-41b1-bb04-4e4deb81fadd" advertise="true">
         <description>Button Service</description>
 
-        <!-- Generate UUIDs:                             -->
-        <!-- python -c "import uuid; print uuid.uuid4()" -->
-
         <!-- button status characteristic -->
         <characteristic uuid="47099164-4d08-4338-bedf-7fc043dbec5c" id="c_gpio_status">
             <description>Button Status</description>
@@ -84,6 +81,14 @@
                 PORT0_PIN_SELECT_MASK | (PORT1_PIN_SELECT_MASK << 1)
             -->
         </characteristic>
+    </service>
+    
+    <!-- Firmware settings service -->
+    <service uuid="2f850855-71c4-4543-bcd3-9bc29d435390" advertise="true">
+        <description>Firmware Settings Service</description>
+        
+        <!-- Generate UUIDs:                             -->
+        <!-- python -c "import uuid; print uuid.uuid4()" -->
 
         <!-- interval_min characteristic -->
         <characteristic uuid="0a02cefb-f546-4a56-ad2b-4aeadca0da6e" id="c_interval_min">
@@ -91,7 +96,7 @@
             <properties read="true" write="true" />
             <value length="2" />
             <!--
-                This will contain a 1-byte value: the interval_min connection setting.
+                This will contain a 2-byte value: the interval_min connection setting.
             -->
         </characteristic>
 
@@ -101,7 +106,7 @@
             <properties read="true" write="true" />
             <value length="2" />
             <!--
-                This will contain a 1-byte value: the interval_max connection setting.
+                This will contain a 2-byte value: the interval_max connection setting.
             -->
         </characteristic>
 
@@ -111,7 +116,7 @@
             <properties read="true" write="true" />
             <value length="2" />
             <!--
-                This will contain a 1-byte value: the conn_latency connection setting.
+                This will contain a 2-byte value: the conn_latency connection setting.
             -->
         </characteristic>
 
@@ -121,7 +126,7 @@
             <properties read="true" write="true" />
             <value length="2" />
             <!--
-                This will contain a 1-byte value: the conn_timeout connection setting.
+                This will contain a 2-byte value: the conn_timeout connection setting.
             -->
         </characteristic>
 

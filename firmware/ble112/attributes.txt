@@ -5,7 +5,7 @@ c_serial_number 13
 c_model_number 16
 c_battery_level 23
 c_gpio_status 27
-c_interval_min 31
-c_interval_max 34
-c_conn_latency 37
-c_conn_timeout 40
+c_interval_min 32
+c_interval_max 35
+c_conn_latency 38
+c_conn_timeout 41
