@@ -9,6 +9,7 @@
 #
 # ================================================================
 
+# Button status pin masks
 const PORT0_PIN_SELECT_MASK = $C3         # 0b11000011 = P0_0-P0_1 & P0_6-P0_7 are inputs
 const PORT1_PIN_SELECT_MASK = $78         # 0b01110000 = Px_3-Px_6 are inputs
 
@@ -24,46 +25,54 @@ const DEFAULT_INTERVAL_MAX = 148 # units of 1.25ms
 const DEFAULT_CONN_LATENCY = 3
 const DEFAULT_CONN_TIMEOUT = 500 # units of 10ms
 
+# Flash storage offsets/addresses
 const ps_interval_min_uuid = $8000
 const ps_interval_max_uuid = $8001
 const ps_conn_latency_uuid = $8002
 const ps_conn_timeout_uuid = $8003
 
-dim connected       # BLE connection status
-dim advertising     # advertising status (0=off, 1=on)
-dim io_status(4)    # port status characteristic local uint8array container
-dim ipr_result      # container for io_port_read() call's returned "result" value (uint16)
-dim ipr_port        # container for io_port_read() call's returned "port" value (uint8)
-dim ipr_data        # container for io_port_read() call's returned "port" value (uint8)
-dim port0_delta(4)  # debounce comparison variable
-dim port1_delta(4)  # debounce comparison variable
-dim irq_pos         # convert irq from bitvector to single number
-dim holding_irq     # currently holding a button for a mode change
-dim last_sent_state(2) # snapshot of last sent state, to avoid repeats
-dim bat_pct         # battery percentage
-dim last_bat_pct    # cache of last battery % seen
-dim ps_interval_min    # connection interval, higher value consumes less battery
-dim ps_interval_max    # connection interval, lower value has less latency
-dim ps_conn_latency    # number of events to skip if nothing changes (for battery)
-dim ps_conn_timeout    # max timeout on acknowledging master
-dim t(12)           # debug value used to convert int to string
-dim ps_error
-dim ps_len
-dim ps_data(8)
+# Global variables
+dim connected           # BLE connection status
+dim advertising         # advertising status (0=off, 1=on)
+dim io_status(4)        # port status characteristic local uint8array container
+dim ipr_result          # container for io_port_read() call's returned "result" value (uint16)
+dim ipr_port            # container for io_port_read() call's returned "port" value (uint8)
+dim ipr_data            # container for io_port_read() call's returned "port" value (uint8)
+dim port0_delta(4)      # debounce comparison variable
+dim port1_delta(4)      # debounce comparison variable
+dim irq_pos             # convert irq from bitvector to single number
+dim holding_irq         # currently holding a button for a mode change
+dim last_sent_state(2)  # snapshot of last sent state, to avoid repeats
+dim bat_pct             # battery percentage
+dim last_bat_pct        # cache of last battery % seen
+dim ps_interval_min     # connection interval, higher value consumes less battery
+dim ps_interval_max     # connection interval, lower value has less latency
+dim ps_conn_latency     # number of events to skip if nothing changes (for battery)
+dim ps_conn_timeout     # max timeout on acknowledging master
+dim t(12)               # debug value used to convert int to string
+dim ps_error            # Flash storage error
+dim ps_len              # Flash storage variable length
+dim ps_data(8)          # uint8array for Flash storage data
 
 # ========================
 # = PS Firmware Settings =
 # ======================== 
 
+# Resets firmware settings
+procedure reset_ps_settings()
+    call flash_ps_save(ps_interval_min_uuid, 2, DEFAULT_INTERVAL_MIN)
+    call flash_ps_save(ps_interval_max_uuid, 2, DEFAULT_INTERVAL_MAX)
+    call flash_ps_save(ps_conn_latency_uuid, 2, DEFAULT_CONN_LATENCY)
+    call flash_ps_save(ps_conn_timeout_uuid, 2, DEFAULT_CONN_TIMEOUT)
+end
+
+# Set global variables with flash firmware settings, setting defaults if necessary
 procedure read_ps_settings()
     call flash_ps_load(ps_interval_min_uuid)(ps_error, ps_len, ps_data(0:2))
     if ps_error != 0 then
         # No values set, so set defaults
         call system_endpoint_tx(system_endpoint_uart1, 29, "\n\r ---> No flash values set...")
-        call flash_ps_save(ps_interval_min_uuid, 2, DEFAULT_INTERVAL_MIN)
-        call flash_ps_save(ps_interval_max_uuid, 2, DEFAULT_INTERVAL_MAX)
-        call flash_ps_save(ps_conn_latency_uuid, 2, DEFAULT_CONN_LATENCY)
-        call flash_ps_save(ps_conn_timeout_uuid, 2, DEFAULT_CONN_TIMEOUT)
+        call reset_ps_settings()
         call flash_ps_load(ps_interval_min_uuid)(ps_error, ps_len, ps_data(0:2))
     end if
     call flash_ps_load(ps_interval_max_uuid)(ps_error, ps_len, ps_data(2:2))
@@ -79,6 +88,7 @@ end
 # = System Boot =
 # ===============
 
+# Main routine
 event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     # initialize connection status as DISCONNECTED
     connected = 0
@@ -131,7 +141,8 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     
     # Read firmware settings from flash, setting defaults if values not set
     call read_ps_settings()
-
+    
+    # Log current firmware settings
     call system_endpoint_tx(system_endpoint_uart1, 9, "\n\r$8000: ")
     t(0:1) = (ps_data(0:2)/1000) + (ps_data(0:2) / 10000*-10) + 48
     t(1:1) = (ps_data(0:2)/100) + (ps_data(0:2) / 1000*-10) + 48
@@ -158,6 +169,7 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     call system_endpoint_tx(system_endpoint_uart1, 4, t(0:4))
     call system_endpoint_tx(system_endpoint_uart1, 2, "\n\r.")
     
+    # Firmware settings placed into GATT for server to read
     call attributes_write(c_interval_min, 0, 2, ps_interval_min)
     call attributes_write(c_interval_max, 0, 2, ps_interval_max)
     call attributes_write(c_conn_latency, 0, 2, ps_conn_latency)
@@ -169,6 +181,7 @@ end
 # = Connection =
 # ==============
 
+# Called when connection changes, including any connection settings
 event connection_status(connection, flags, address, address_type, interval, timeout, latency, bonding)
     # check for "new connection established" event
     call system_endpoint_tx(system_endpoint_uart1, 27, " ---> CONNECTED, interval: ")
@@ -191,6 +204,7 @@ event connection_status(connection, flags, address, address_type, interval, time
     end if
 end
 
+# Device disconnects from server
 event connection_disconnected(handle, result)
     # set connection status to DISCONNECTED
     connected = 0
@@ -208,7 +222,10 @@ event connection_disconnected(handle, result)
     call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
 end
 
+# GATT value changed
 event attributes_value(connection, reason, handle, offset, value_len, value_data)
+    # Check each firmware setting by handle, then compare to internal value.
+    # If GATT value and PS value are different, save to PS and update globals.
     if handle = c_interval_min then
         call flash_ps_load(ps_interval_min_uuid)(ps_error, ps_len, ps_data(0:2))
         if ps_error = 0 && ps_data(0:2) != value_data(0:2) then
@@ -216,18 +233,6 @@ event attributes_value(connection, reason, handle, offset, value_len, value_data
         else
             call system_endpoint_tx(system_endpoint_uart1, 21, "ps_data == value_data")
         end if
-        t(0:1) = (ps_data(0:2) / 100) + 48
-        t(1:1) = (ps_data(0:2) / 10) + (ps_data(0:2) / -100 * 10) + 48
-        t(2:1) = ps_data(0:2) + (ps_data(0:2) / 10 * -10) + 48
-        call system_endpoint_tx(system_endpoint_uart1, 5, "Old: ")        
-        call system_endpoint_tx(system_endpoint_uart1, 3, t(0:3))
-        call system_endpoint_tx(system_endpoint_uart1, 2, "\r\n")        
-        t(0:1) = (value_data(0:2) / 100) + 48
-        t(1:1) = (value_data(0:2) / 10) + (value_data(0:2) / -100 * 10) + 48
-        t(2:1) = value_data(0:2) + (value_data(0:2) / 10 * -10) + 48
-        call system_endpoint_tx(system_endpoint_uart1, 5, "New: ")        
-        call system_endpoint_tx(system_endpoint_uart1, 3, t(0:3))
-        call system_endpoint_tx(system_endpoint_uart1, 2, "\r\n")   
     end if
     if handle = c_interval_max then
         call flash_ps_load(ps_interval_max_uuid)(ps_error, ps_len, ps_data(0:2))
@@ -236,29 +241,51 @@ event attributes_value(connection, reason, handle, offset, value_len, value_data
         else
             call system_endpoint_tx(system_endpoint_uart1, 21, "ps_data == value_data")
         end if
-        t(0:1) = (ps_data(0:2) / 100) + 48
-        t(1:1) = (ps_data(0:2) / 10) + (ps_data(0:2) / -100 * 10) + 48
-        t(2:1) = ps_data(0:2) + (ps_data(0:2) / 10 * -10) + 48
-        call system_endpoint_tx(system_endpoint_uart1, 5, "Old: ")        
-        call system_endpoint_tx(system_endpoint_uart1, 3, t(0:3))
-        call system_endpoint_tx(system_endpoint_uart1, 2, "\r\n")        
-        t(0:1) = (value_data(0:2) / 100) + 48
-        t(1:1) = (value_data(0:2) / 10) + (value_data(0:2) / -100 * 10) + 48
-        t(2:1) = value_data(0:2) + (value_data(0:2) / 10 * -10) + 48
-        call system_endpoint_tx(system_endpoint_uart1, 5, "New: ")        
-        call system_endpoint_tx(system_endpoint_uart1, 3, t(0:3))
-        call system_endpoint_tx(system_endpoint_uart1, 2, "\r\n")   
+    end if
+    if handle = c_conn_latency then
+        call flash_ps_load(ps_interval_min_uuid)(ps_error, ps_len, ps_data(0:2))
+        if ps_error = 0 && ps_data(0:2) != value_data(0:2) then
+            call flash_ps_save(ps_conn_latency_uuid, 2, value_data(0:2))
+        else
+            call system_endpoint_tx(system_endpoint_uart1, 21, "ps_data == value_data")
+        end if
+    end if
+    if handle = c_conn_timeout then
+        call flash_ps_load(ps_interval_min_uuid)(ps_error, ps_len, ps_data(0:2))
+        if ps_error = 0 && ps_data(0:2) != value_data(0:2) then
+            call flash_ps_save(ps_conn_timeout_uuid, 2, value_data(0:2))
+        else
+            call system_endpoint_tx(system_endpoint_uart1, 21, "ps_data == value_data")
+        end if
     end if
     
-    call read_ps_settings()  
+    if value_data(0:4) = $0000
+        call system_endpoint_tx(system_endpoint_uart1, 21, "Resetting PS data...\r\n")
+        call reset_ps_settings()
+    end if
+    
+    # Update global firmware settings based on changes made above
+    call read_ps_settings()
+    
+    # Update connection with new firmware settings given by server
     call connection_update(connection, ps_interval_min, ps_interval_max, ps_conn_latency, ps_conn_timeout)
+end
+
+procedure sleep()
+    if connected then    
+        call system_endpoint_tx(system_endpoint_uart1, 13, "Sleeping...\r\n")
+        call gap_set_mode(0, 0)
+    else    
+        call system_endpoint_tx(system_endpoint_uart1, 13, "Scanning...\r\n")
+        call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
+    end if
 end
 
 # ========
 # = GPIO =
 # ========
 
-# catch button presses (active LOW, hardware.xml pulls it high)
+# Capture button presses (active LOW, hardware.xml pulls it high)
 event hardware_io_port_status(delta, port, irq, state)
     # normalize irq
     call system_endpoint_tx(system_endpoint_uart1, 13, "Interrupt -- ")
@@ -344,13 +371,7 @@ event hardware_io_port_status(delta, port, irq, state)
     end if
     
     # Nothing left to do but sleep
-    if connected then    
-        call system_endpoint_tx(system_endpoint_uart1, 13, "Sleeping...\r\n")
-        call gap_set_mode(0, 0)
-    else    
-        call system_endpoint_tx(system_endpoint_uart1, 13, "Scanning...\r\n")
-        call gap_set_mode(gap_general_discoverable, gap_undirected_connectable)
-    end if
+    call sleep()
 end
 
 # =========
@@ -371,12 +392,15 @@ event hardware_soft_timer(handle)
         call system_endpoint_tx(system_endpoint_uart1, 13, "Mode change!\r\n")
         call attributes_write(c_gpio_status, 0, 2, io_status(0:2))
     end if
+    
+    call sleep()
 end
 
 # =======================
 # = ADC - Battery Level =
 # =======================
 
+# Server has requested an attribute value
 event attributes_user_read_request(connection, handle, offset, maxsize)
     if handle = c_battery_level
         call system_endpoint_tx(system_endpoint_uart1, 10, "Battery?\r\n")
@@ -384,7 +408,7 @@ event attributes_user_read_request(connection, handle, offset, maxsize)
     end if
 end
 
-# This event listener catches the ADC result
+# This event listener catches the ADC read result
 event hardware_adc_result(input, value)
     # ADC behavior:
     # - Range is [-2048, +2047] when 12 ENOB is selected
@@ -412,4 +436,6 @@ event hardware_adc_result(input, value)
         call system_endpoint_tx(system_endpoint_uart1, 10, "Battery!\r\n")
         call attributes_user_read_response(0, 0, 1, bat_pct)
     end if
+
+    call sleep()
 end

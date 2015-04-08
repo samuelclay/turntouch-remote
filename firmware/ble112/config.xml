@@ -3,5 +3,7 @@
 
     <!-- Flash storage used for updating connection settings in software -->
     <user_data size="0x800" />
+    
+    <throughput optimize="power" />
 
 </config>
