@@ -84,6 +84,14 @@ procedure read_ps_settings()
     ps_conn_timeout = ps_data(6:2)
 end
 
+procedure print_int(value)
+    t(0:1) = (value/1000) + (value / 10000*-10) + 48
+    t(1:1) = (value/100) + (value / 1000*-10) + 48
+    t(2:1) = (value/10) + (value / 100*-10) + 48
+    t(3:1) = (value) + (value / 10*-10) + 48
+    call system_endpoint_tx(system_endpoint_uart1, 4, t(0:4))
+end
+
 # ===============
 # = System Boot =
 # ===============
@@ -144,30 +152,14 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     
     # Log current firmware settings
     call system_endpoint_tx(system_endpoint_uart1, 9, "\n\r$8000: ")
-    t(0:1) = (ps_data(0:2)/1000) + (ps_data(0:2) / 10000*-10) + 48
-    t(1:1) = (ps_data(0:2)/100) + (ps_data(0:2) / 1000*-10) + 48
-    t(2:1) = (ps_data(0:2)/10) + (ps_data(0:2) / 100*-10) + 48
-    t(3:1) = (ps_data(0:2)) + (ps_data(0:2) / 10*-10) + 48
-    call system_endpoint_tx(system_endpoint_uart1, 4, t(0:4))
+    call print_int(ps_data(0:2))
     call system_endpoint_tx(system_endpoint_uart1, 9, "\n\r$8001: ")
-    t(0:1) = (ps_data(2:2)/1000) + (ps_data(2:2) / 10000*-10) + 48
-    t(1:1) = (ps_data(2:2)/100) + (ps_data(2:2) / 1000*-10) + 48
-    t(2:1) = (ps_data(2:2)/10) + (ps_data(2:2) / 100*-10) + 48
-    t(3:1) = (ps_data(2:2)) + (ps_data(2:2) / 10*-10) + 48
-    call system_endpoint_tx(system_endpoint_uart1, 4, t(0:4))
+    call print_int(ps_data(2:2))
     call system_endpoint_tx(system_endpoint_uart1, 9, "\n\r$8002: ")
-    t(0:1) = (ps_data(4:2)/1000) + (ps_data(4:2) / 10000*-10) + 48
-    t(1:1) = (ps_data(4:2)/100) + (ps_data(4:2) / 1000*-10) + 48
-    t(2:1) = (ps_data(4:2)/10) + (ps_data(4:2) / 100*-10) + 48
-    t(3:1) = (ps_data(4:2)) + (ps_data(4:2) / 10*-10) + 48
-    call system_endpoint_tx(system_endpoint_uart1, 4, t(0:4))
+    call print_int(ps_data(4:2))
     call system_endpoint_tx(system_endpoint_uart1, 9, "\n\r$8003: ")
-    t(0:1) = (ps_data(6:2)/1000) + (ps_data(6:2) / 10000*-10) + 48
-    t(1:1) = (ps_data(6:2)/100) + (ps_data(6:2) / 1000*-10) + 48
-    t(2:1) = (ps_data(6:2)/10) + (ps_data(6:2) / 100*-10) + 48
-    t(3:1) = (ps_data(6:2)) + (ps_data(6:2) / 10*-10) + 48
-    call system_endpoint_tx(system_endpoint_uart1, 4, t(0:4))
-    call system_endpoint_tx(system_endpoint_uart1, 2, "\n\r.")
+    call print_int(ps_data(6:2))
+    call system_endpoint_tx(system_endpoint_uart1, 2, "\n\r")
     
     # Firmware settings placed into GATT for server to read
     call attributes_write(c_interval_min, 0, 2, ps_interval_min)
@@ -185,10 +177,7 @@ end
 event connection_status(connection, flags, address, address_type, interval, timeout, latency, bonding)
     # check for "new connection established" event
     call system_endpoint_tx(system_endpoint_uart1, 27, " ---> CONNECTED, interval: ")
-    t(0:1) = (interval / 100) + 48
-    t(1:1) = (interval / 10) + (interval / -100 * 10) + 48
-    t(2:1) = interval + (interval / 10 * -10) + 48
-    call system_endpoint_tx(system_endpoint_uart1, 3, t(0:3))
+    call print_int(interval)
     call system_endpoint_tx(system_endpoint_uart1, 2, "\r\n")
 
     if (flags & $05) = $05 then
@@ -289,33 +278,24 @@ end
 event hardware_io_port_status(delta, port, irq, state)
     # normalize irq
     call system_endpoint_tx(system_endpoint_uart1, 13, "Interrupt -- ")
-    t(0:1) = (irq / 100) + 48
-    t(1:1) = (irq / 10) + (irq / -100 * 10) + 48
-    t(2:1) = irq + (irq / 10 * -10) + 48
-    call system_endpoint_tx(system_endpoint_uart1, 3, t(0:3))
-    # call system_endpoint_tx(system_endpoint_uart1, 4, " -- ")
+    call print_int(irq)
+    
     if (port = 0 && (irq & $01)) || (port = 1 && (irq & $08)) then
-        # call system_endpoint_tx(system_endpoint_uart1, 3, "1\r\n")
         irq_pos = 1
     end if
     if (port = 0 && (irq & $02)) then
-        # call system_endpoint_tx(system_endpoint_uart1, 4, "20\r\n")
         irq_pos = 2
     end if
     if (port = 1 && (irq & $10)) then
-        # call system_endpoint_tx(system_endpoint_uart1, 4, "21\r\n")
         irq_pos = 2
     end if
     if (port = 0 && (irq & $40)) || (port = 1 && (irq & $20)) then
-        # call system_endpoint_tx(system_endpoint_uart1, 3, "3\r\n")
         irq_pos = 3
     end if
     if (port = 0 && (irq & $80)) then
-        # call system_endpoint_tx(system_endpoint_uart1, 4, "40\r\n")
         irq_pos = 4
     end if
     if (port = 1 && (irq & $40)) then
-        # call system_endpoint_tx(system_endpoint_uart1, 4, "41\r\n")
         irq_pos = 4
     end if
     
