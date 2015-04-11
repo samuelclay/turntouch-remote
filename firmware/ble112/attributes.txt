@@ -9,3 +9,4 @@ c_interval_min 32
 c_interval_max 35
 c_conn_latency 38
 c_conn_timeout 41
+c_mode_duration 44

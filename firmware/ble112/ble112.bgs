@@ -24,12 +24,14 @@ const DEFAULT_INTERVAL_MIN = 102 # units of 1.25ms
 const DEFAULT_INTERVAL_MAX = 148 # units of 1.25ms
 const DEFAULT_CONN_LATENCY = 3
 const DEFAULT_CONN_TIMEOUT = 500 # units of 10ms
+const DEFAULT_MODE_DURATION = 600 # ms
 
 # Flash storage offsets/addresses
 const ps_interval_min_uuid = $8000
 const ps_interval_max_uuid = $8001
 const ps_conn_latency_uuid = $8002
 const ps_conn_timeout_uuid = $8003
+const ps_mode_duration_uuid = $8004
 
 # Global variables
 dim connected           # BLE connection status
@@ -49,10 +51,11 @@ dim ps_interval_min     # connection interval, higher value consumes less batter
 dim ps_interval_max     # connection interval, lower value has less latency
 dim ps_conn_latency     # number of events to skip if nothing changes (for battery)
 dim ps_conn_timeout     # max timeout on acknowledging master
+dim ps_mode_duration    # time from button held down to mode change
 dim t(12)               # debug value used to convert int to string
 dim ps_error            # Flash storage error
 dim ps_len              # Flash storage variable length
-dim ps_data(8)          # uint8array for Flash storage data
+dim ps_data(10)         # uint8array for Flash storage data
 
 # ========================
 # = PS Firmware Settings =
@@ -64,6 +67,7 @@ procedure reset_ps_settings()
     call flash_ps_save(ps_interval_max_uuid, 2, DEFAULT_INTERVAL_MAX)
     call flash_ps_save(ps_conn_latency_uuid, 2, DEFAULT_CONN_LATENCY)
     call flash_ps_save(ps_conn_timeout_uuid, 2, DEFAULT_CONN_TIMEOUT)
+    call flash_ps_save(ps_mode_duration_uuid, 2, DEFAULT_MODE_DURATION)
 end
 
 # Set global variables with flash firmware settings, setting defaults if necessary
@@ -78,10 +82,12 @@ procedure read_ps_settings()
     call flash_ps_load(ps_interval_max_uuid)(ps_error, ps_len, ps_data(2:2))
     call flash_ps_load(ps_conn_latency_uuid)(ps_error, ps_len, ps_data(4:2))
     call flash_ps_load(ps_conn_timeout_uuid)(ps_error, ps_len, ps_data(6:2))
+    call flash_ps_load(ps_mode_duration_uuid)(ps_error, ps_len, ps_data(8:2))
     ps_interval_min = ps_data(0:2)
     ps_interval_max = ps_data(2:2)
     ps_conn_latency = ps_data(4:2)
     ps_conn_timeout = ps_data(6:2)
+    ps_mode_duration = ps_data(8:2)
 end
 
 procedure print_int(value)
@@ -159,6 +165,8 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     call print_int(ps_data(4:2))
     call system_endpoint_tx(system_endpoint_uart1, 9, "\n\r$8003: ")
     call print_int(ps_data(6:2))
+    call system_endpoint_tx(system_endpoint_uart1, 9, "\n\r$8004: ")
+    call print_int(ps_data(8:2))
     call system_endpoint_tx(system_endpoint_uart1, 2, "\n\r")
     
     # Firmware settings placed into GATT for server to read
@@ -166,6 +174,7 @@ event system_boot(major, minor, patch, build, ll_version, protocol, hw)
     call attributes_write(c_interval_max, 0, 2, ps_interval_max)
     call attributes_write(c_conn_latency, 0, 2, ps_conn_latency)
     call attributes_write(c_conn_timeout, 0, 2, ps_conn_timeout)
+    call attributes_write(c_mode_duration, 0, 2, ps_mode_duration)
     
 end
 
@@ -232,7 +241,7 @@ event attributes_value(connection, reason, handle, offset, value_len, value_data
         end if
     end if
     if handle = c_conn_latency then
-        call flash_ps_load(ps_interval_min_uuid)(ps_error, ps_len, ps_data(0:2))
+        call flash_ps_load(ps_conn_latency_uuid)(ps_error, ps_len, ps_data(0:2))
         if ps_error = 0 && ps_data(0:2) != value_data(0:2) then
             call flash_ps_save(ps_conn_latency_uuid, 2, value_data(0:2))
         else
@@ -240,9 +249,18 @@ event attributes_value(connection, reason, handle, offset, value_len, value_data
         end if
     end if
     if handle = c_conn_timeout then
-        call flash_ps_load(ps_interval_min_uuid)(ps_error, ps_len, ps_data(0:2))
+        call flash_ps_load(ps_conn_timeout_uuid)(ps_error, ps_len, ps_data(0:2))
         if ps_error = 0 && ps_data(0:2) != value_data(0:2) then
             call flash_ps_save(ps_conn_timeout_uuid, 2, value_data(0:2))
+        else
+            call system_endpoint_tx(system_endpoint_uart1, 21, "ps_data == value_data")
+        end if
+    end if
+    if handle = c_mode_duration then
+        call flash_ps_load(ps_mode_duration_uuid)(ps_error, ps_len, ps_data(0:2))
+        if ps_error = 0 && ps_data(0:2) != value_data(0:2) then
+            ps_mode_duration = value_data(0:2)
+            call flash_ps_save(ps_mode_duration_uuid, 2, value_data(0:2))
         else
             call system_endpoint_tx(system_endpoint_uart1, 21, "ps_data == value_data")
         end if
@@ -315,7 +333,7 @@ event hardware_io_port_status(delta, port, irq, state)
     call hardware_set_soft_timer(0, 0, 1)
     # use falling edge port to detect button pressed
     if port = 1 then
-        call hardware_set_soft_timer(23592, 0, 1) # 600ms
+        call hardware_set_soft_timer(39320*ps_mode_duration/1000, 0, 1)
     end if
     if port = 0 then
         port0_delta(irq_pos:1) = delta

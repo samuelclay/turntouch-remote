@@ -1,4 +1,4 @@
-94
+100
 0:0	GAP_AD_FLAG_BREDR_NOT_SUPPORTED
 0:0	GAP_AD_FLAG_GENERAL_DISCOVERABLE
 0:0	GAP_AD_FLAG_LIMITED_DISCOVERABLE
@@ -32,6 +32,7 @@
 0:0	c_interval_max
 0:0	c_interval_min
 0:0	c_manufacturer_name
+0:0	c_mode_duration
 0:0	c_model_number
 0:0	c_serial_number
 0:0	connection_completed
@@ -93,10 +94,12 @@
 0:0	DEFAULT_INTERVAL_MAX
 0:0	DEFAULT_CONN_LATENCY
 0:0	DEFAULT_CONN_TIMEOUT
+0:0	DEFAULT_MODE_DURATION
 0:0	ps_interval_min_uuid
 0:0	ps_interval_max_uuid
 0:0	ps_conn_latency_uuid
 0:0	ps_conn_timeout_uuid
+0:0	ps_mode_duration_uuid
 0:4	connected
 4:4	advertising
 8:4	io_status
@@ -114,7 +117,8 @@
 54:4	ps_interval_max
 58:4	ps_conn_latency
 62:4	ps_conn_timeout
-66:12	t
-78:4	ps_error
-82:4	ps_len
-86:8	ps_data
+66:4	ps_mode_duration
+70:12	t
+82:4	ps_error
+86:4	ps_len
+90:10	ps_data

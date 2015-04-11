@@ -130,6 +130,16 @@
             -->
         </characteristic>
 
+        <!-- mode_duration characteristic -->
+        <characteristic uuid="bc382b21-1617-48cc-9e93-f4104561f71d" id="c_mode_duration">
+            <description>mode_duration</description>
+            <properties read="true" write="true" />
+            <value length="2" />
+            <!--
+                This will contain a 2-byte value: the mode_duration setting.
+            -->
+        </characteristic>
+
     </service>
 
 </configuration>
