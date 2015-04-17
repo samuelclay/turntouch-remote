@@ -22,7 +22,7 @@ const PORT1_PIN_SELECT_MASK = $78         # 0b01110000 = Px_3-Px_6 are inputs
 # Interval Max * (Slave Latency + 1) * 3 < connSupervisionTimeout
 const DEFAULT_INTERVAL_MIN = 102 # units of 1.25ms
 const DEFAULT_INTERVAL_MAX = 148 # units of 1.25ms
-const DEFAULT_CONN_LATENCY = 3
+const DEFAULT_CONN_LATENCY = 4
 const DEFAULT_CONN_TIMEOUT = 500 # units of 10ms
 const DEFAULT_MODE_DURATION = 600 # ms
 
