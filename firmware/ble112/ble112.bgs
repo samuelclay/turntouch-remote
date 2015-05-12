@@ -286,6 +286,10 @@ event attributes_value(connection, reason, handle, offset, value_len, value_data
     end if
     if handle = c_nickname then
         call flash_ps_load(ps_nickname_uuid)(ps_error, ps_len, ps_nickname(0:ps_len))
+        call print_int(ps_error)
+        call system_endpoint_tx(system_endpoint_uart1, 1, "-")
+        call print_int(ps_len)
+        
         call system_endpoint_tx(system_endpoint_uart1, 20, "\r\nSetting nickname '")
         call system_endpoint_tx(system_endpoint_uart1, value_len, value_data(0:value_len))
         call system_endpoint_tx(system_endpoint_uart1, 7, "' was '")
@@ -296,7 +300,7 @@ event attributes_value(connection, reason, handle, offset, value_len, value_data
         call print_int(value_len)
         
         
-        if ps_error != 0 || memcmp(ps_nickname(offset), value_data(0), value_len) then
+        if memcmp(ps_nickname(offset), value_data(0), value_len) then
             call system_endpoint_tx(system_endpoint_uart1, 30, "...ps_nickname == value_data\r\n")
         else
             call system_endpoint_tx(system_endpoint_uart1, 1, ".")
