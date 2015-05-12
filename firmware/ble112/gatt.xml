@@ -140,6 +140,16 @@
             -->
         </characteristic>
 
+        <!-- nickname characteristic -->
+        <characteristic uuid="6b8d8785-0b9b-4b13-bfe5-d71dd3b6ccc2" id="c_nickname">
+            <description>nickname</description>
+            <properties read="true" write="true" />
+            <value length="32" />
+            <!--
+                This will contain a 32-byte value: the device's user-assigned nickname.
+            -->
+        </characteristic>
+
     </service>
 
 </configuration>

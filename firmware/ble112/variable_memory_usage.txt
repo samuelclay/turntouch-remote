@@ -1,4 +1,4 @@
-100
+132
 0:0	GAP_AD_FLAG_BREDR_NOT_SUPPORTED
 0:0	GAP_AD_FLAG_GENERAL_DISCOVERABLE
 0:0	GAP_AD_FLAG_LIMITED_DISCOVERABLE
@@ -34,6 +34,7 @@
 0:0	c_manufacturer_name
 0:0	c_mode_duration
 0:0	c_model_number
+0:0	c_nickname
 0:0	c_serial_number
 0:0	connection_completed
 0:0	connection_connected
@@ -100,6 +101,7 @@
 0:0	ps_conn_latency_uuid
 0:0	ps_conn_timeout_uuid
 0:0	ps_mode_duration_uuid
+0:0	ps_nickname_uuid
 0:4	connected
 4:4	advertising
 8:4	io_status
@@ -122,3 +124,4 @@
 82:4	ps_error
 86:4	ps_len
 90:10	ps_data
+100:32	ps_nickname
