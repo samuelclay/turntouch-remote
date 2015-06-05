@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.01" unitdist="inch" unit="inch" style="dots" multiple="1" display="yes" altdistance="0.005" altunitdist="inch" altunit="inch"/>
+<grid distance="0.01" unitdist="inch" unit="mm" style="dots" multiple="1" display="yes" altdistance="0.005" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -143,9 +143,9 @@
 </layers>
 <board>
 <plain>
-<text x="30.48" y="11.43" size="0.85" layer="26" font="vector" rot="SMR0" align="top-center">18 February 2015
-Rev. 17</text>
-<text x="30.988" y="14.986" size="1.27" layer="26" font="vector" rot="SMR0" align="top-center">TURN TOUCH</text>
+<text x="4.064" y="18.288" size="0.85" layer="26" font="vector" rot="SMR270" align="top-center">23 March 2015
+Rev. 18</text>
+<text x="1.27" y="18.288" size="1.27" layer="26" font="vector" rot="SMR270" align="top-center">TURN TOUCH</text>
 <text x="31.75" y="5.08" size="0.508" layer="25">GND Serial</text>
 <hole x="3.302" y="34.036" drill="2.032"/>
 <hole x="34.036" y="3.302" drill="2.032"/>
@@ -160,6 +160,18 @@ Rev. 17</text>
 <wire x1="32.766" y1="36.83" x2="5.08" y2="36.83" width="0.4064" layer="20"/>
 <wire x1="5.08" y1="36.83" x2="0" y2="31.75" width="0.4064" layer="20" curve="90"/>
 <hole x="7.112" y="1.778" drill="2.032"/>
+<wire x1="16.256" y1="34.29" x2="17.526" y2="34.29" width="0.254" layer="21"/>
+<wire x1="17.526" y1="34.29" x2="17.526" y2="33.274" width="0.254" layer="21"/>
+<wire x1="17.526" y1="33.274" x2="16.256" y2="33.274" width="0.254" layer="21"/>
+<wire x1="16.256" y1="33.274" x2="16.256" y2="34.29" width="0.254" layer="21"/>
+<wire x1="16.256" y1="32.258" x2="17.272" y2="32.258" width="0.254" layer="21"/>
+<wire x1="17.272" y1="32.258" x2="17.272" y2="31.242" width="0.254" layer="21"/>
+<wire x1="17.272" y1="31.242" x2="16.256" y2="31.242" width="0.254" layer="21"/>
+<wire x1="16.256" y1="31.242" x2="16.256" y2="32.258" width="0.254" layer="21"/>
+<wire x1="21.336" y1="6.096" x2="22.86" y2="6.096" width="0.254" layer="21"/>
+<wire x1="22.86" y1="6.096" x2="22.86" y2="4.318" width="0.254" layer="21"/>
+<wire x1="22.86" y1="4.318" x2="21.336" y2="4.318" width="0.254" layer="21"/>
+<wire x1="21.336" y1="4.318" x2="21.336" y2="6.096" width="0.254" layer="21"/>
 </plain>
 <libraries>
 <library name="remote">
@@ -1803,10 +1815,19 @@ Please make sure your boards conform to these design rules.</description>
 <element name="PROG" library="pel_misc" package="FTSH-105-DV" value="CONN_5-2-FTSH-V" x="27.432" y="5.08" smashed="yes">
 <attribute name="NAME" x="24.511" y="0.762" size="0.635" layer="25" font="vector" ratio="16"/>
 </element>
-<element name="U1" library="sf-bluegiga" package="BLE112-A" value="BLE112-A" x="26.924" y="26.924"/>
-<element name="C4" library="resistor" package="C0805K" value="1uF" x="16.764" y="31.75" rot="R180"/>
-<element name="C5" library="resistor" package="C0805K" value="1uF" x="16.764" y="33.782" rot="R180"/>
-<element name="C6" library="resistor" package="C1206K" value="100uF" x="22.098" y="5.334" rot="R270"/>
+<element name="U1" library="sf-bluegiga" package="BLE112-A" value="BLE112-A" x="26.924" y="26.924" smashed="yes">
+<attribute name="NAME" x="33.37" y="34.546" size="1.016" layer="25" rot="SR0"/>
+<attribute name="VALUE" x="26.924" y="36.324" size="1.016" layer="27" rot="SR0"/>
+</element>
+<element name="C4" library="resistor" package="C0805K" value="1uF" x="16.764" y="31.75" smashed="yes" rot="R180">
+<attribute name="NAME" x="14.494" y="29.831" size="1.016" layer="25"/>
+</element>
+<element name="C5" library="resistor" package="C0805K" value="1uF" x="16.764" y="33.782" smashed="yes" rot="R180">
+<attribute name="NAME" x="16.494" y="35.701" size="1.016" layer="25" rot="R180"/>
+</element>
+<element name="C6" library="resistor" package="C1206K" value="100uF" x="22.098" y="5.334" smashed="yes" rot="R270">
+<attribute name="NAME" x="19.642" y="4.902" size="1.016" layer="25" rot="R270"/>
+</element>
 <element name="U$1" library="remote" package="DOME-M-SERIES" value="SNAPTRON-DOME" x="26.162" y="26.162" rot="MR0"/>
 <element name="U$2" library="remote" package="DOME-M-SERIES" value="SNAPTRON-DOME" x="10.668" y="26.162" rot="MR270"/>
 <element name="U$3" library="remote" package="DOME-M-SERIES" value="SNAPTRON-DOME" x="26.162" y="10.668" rot="MR90"/>
