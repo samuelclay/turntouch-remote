@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['sharing_20bonding_20information',['Sharing bonding information',['../a00085.html',1,'bledfu_application']]],
+  ['switching_20to_20bootloader_2fdfu_20mode',['Switching to bootloader/DFU mode',['../a00089.html',1,'bledfu_application']]],
+  ['safety_2dchecking_20the_20image',['Safety-checking the image',['../a00099.html',1,'bledfu_bootloader_introduction']]],
+  ['serial_20_28hci_29_20packet_20format',['Serial (HCI) packet format',['../a00106.html',1,'bledfu_transport']]],
+  ['spi_20master',['SPI Master',['../a00012.html',1,'hardware_drivers']]],
+  ['spi_20slave',['SPI Slave',['../a00013.html',1,'hardware_drivers']]],
+  ['swi',['SWI',['../a00014.html',1,'hardware_drivers']]],
+  ['schedule_20handling_20library',['Schedule handling library',['../a00024.html',1,'general_libraries']]],
+  ['sensor_20data_20simulator',['Sensor Data Simulator',['../a00031.html',1,'general_libraries']]],
+  ['sha_2d256_20hash_20computation',['SHA-256 hash computation',['../a00032.html',1,'general_libraries']]],
+  ['simple_20timer',['Simple timer',['../a00026.html',1,'general_libraries']]],
+  ['slip_20handling_20library',['SLIP handling library',['../a00173.html',1,'transport_libraries']]],
+  ['softdevice_20handler_20library',['SoftDevice Handler Library',['../a00174.html',1,'general_libraries']]],
+  ['simple_20timer_20example',['Simple Timer Example',['../a00056.html',1,'examples_hw_peripheral_devices']]],
+  ['spi_5f5w_20raw_20protocol',['SPI_5W RAW protocol',['../a00127.html',1,'serialization_phy']]],
+  ['spi_20raw_20protocol',['SPI RAW protocol',['../a00126.html',1,'serialization_phy']]],
+  ['serialization_20codecs',['Serialization Codecs',['../a00111.html',1,'lib_serialization']]],
+  ['serialization_20phy',['Serialization PHY',['../a00112.html',1,'lib_serialization']]],
+  ['serialization_20hal_20transport',['Serialization HAL Transport',['../a00114.html',1,'lib_serialization']]],
+  ['spi_20master_20loopback_20example',['SPI Master Loopback Example',['../a00051.html',1,'examples_hw_peripheral_devices']]],
+  ['spi_20master_20example_20to_20be_20used_20with_20spi_20slave_20example',['SPI Master Example to be used with SPI Slave Example',['../a00052.html',1,'examples_hw_peripheral_devices']]],
+  ['spi_20slave_20example',['SPI Slave Example',['../a00053.html',1,'examples_hw_peripheral_devices']]]
+];
