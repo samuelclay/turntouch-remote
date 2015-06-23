@@ -37,20 +37,50 @@ remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-ou
 
 #source common to all targets
 C_SOURCE_FILES += \
-./libs/components/toolchain/system_nrf51.c \
 ./src/main.c \
+./libs/bsp/bsp.c \
+./libs/RTT/SEGGER_RTT.c \
+./libs/RTT/SEGGER_RTT_printf.c \
+./libs/components/drivers_nrf/common/nrf_drv_common.c \
+./libs/components/drivers_nrf/gpiote/nrf_drv_gpiote.c \
 ./libs/components/drivers_nrf/hal/nrf_delay.c \
+./libs/components/drivers_nrf/ppi/nrf_drv_ppi.c \
+./libs/components/drivers_nrf/pstorage/pstorage.c \
+./libs/components/drivers_nrf/timer/nrf_drv_timer.c \
+./libs/components/libraries/button/app_button.c \
+./libs/components/libraries/timer/app_timer.c \
+./libs/components/libraries/util/app_error.c \
+./libs/components/libraries/util/nrf_assert.c \
+./libs/components/toolchain/system_nrf51.c \
+
 
 #assembly files common to all targets
 ASM_SOURCE_FILES  = ./libs/components/toolchain/gcc/gcc_startup_nrf51.s
 
 #includes common to all targets
-INC_PATHS  = -I./libs/components/toolchain/gcc
-INC_PATHS += -I./libs/components/toolchain
-INC_PATHS += -I./libs/components/softdevice/s110/headers
+INC_PATHS  = -I./config
 INC_PATHS += -I./libs/bsp
+INC_PATHS += -I./libs/RTT
+INC_PATHS += -I./libs/components/ble/ble_advertising
+INC_PATHS += -I./libs/components/ble/common
 INC_PATHS += -I./libs/components/device
+INC_PATHS += -I./libs/components/drivers_nrf/common
+INC_PATHS += -I./libs/components/drivers_nrf/gpiote
 INC_PATHS += -I./libs/components/drivers_nrf/hal
+INC_PATHS += -I./libs/components/drivers_nrf/ppi
+INC_PATHS += -I./libs/components/drivers_nrf/pstorage
+INC_PATHS += -I./libs/components/drivers_nrf/timer
+INC_PATHS += -I./libs/components/libraries/button
+INC_PATHS += -I./libs/components/libraries/scheduler
+INC_PATHS += -I./libs/components/libraries/timer
+INC_PATHS += -I./libs/components/libraries/trace
+INC_PATHS += -I./libs/components/libraries/trace
+INC_PATHS += -I./libs/components/libraries/util
+INC_PATHS += -I./libs/components/softdevice/common/softdevice_handler
+INC_PATHS += -I./libs/components/softdevice/s110/headers
+INC_PATHS += -I./libs/components/toolchain
+INC_PATHS += -I./libs/components/toolchain/gcc
+
 
 OBJECT_DIRECTORY = build
 LISTING_DIRECTORY = $(OBJECT_DIRECTORY)
@@ -61,11 +91,9 @@ BUILD_DIRECTORIES := $(sort $(OBJECT_DIRECTORY) $(OUTPUT_BINARY_DIRECTORY) $(LIS
 
 #flags common to all targets
 CFLAGS  = -DBOARD_PCA10028
-CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -DNRF51
 CFLAGS += -DS110
-CFLAGS += -DBLE_STACK_SUPPORT_REQD
-CFLAGS += -DBSP_DEFINES_ONLY
+CFLAGS += -DENABLE_DEBUG_LOG_SUPPORT
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs --std=gnu99
 CFLAGS += -Wall -Werror -O3
@@ -86,11 +114,8 @@ LDFLAGS += --specs=nano.specs -lc -lnosys
 # Assembler flags
 ASMFLAGS += -x assembler-with-cpp
 ASMFLAGS += -DBOARD_PCA10028
-ASMFLAGS += -DSOFTDEVICE_PRESENT
 ASMFLAGS += -DNRF51
 ASMFLAGS += -DS110
-ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
-ASMFLAGS += -DBSP_DEFINES_ONLY
 #default target - first one defined
 default: clean nrf51422_xxac
 
@@ -157,15 +182,15 @@ $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex: $(OUTPUT_BINARY_DIRECTORY)/$(
 	@echo Preparing: $(OUTPUT_FILENAME).hex
 	$(NO_ECHO)$(OBJCOPY) -O ihex $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 
-finalize: genbin genhex echosize
+finalize: genbin genhex echosize flash
 
 genbin:
-	@echo Preparing: $(OUTPUT_FILENAME).bin
+	@echo Preparing/gen: $(OUTPUT_FILENAME).bin
 	$(NO_ECHO)$(OBJCOPY) -O binary $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).bin
 
 ## Create binary .hex file from the .out file
 genhex: 
-	@echo Preparing: $(OUTPUT_FILENAME).hex
+	@echo Preparing/gen: $(OUTPUT_FILENAME).hex
 	$(NO_ECHO)$(OBJCOPY) -O ihex $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 
 echosize:
@@ -180,7 +205,9 @@ cleanobj:
 	$(RM) $(BUILD_DIRECTORIES)/*.o
 
 flash: $(MAKECMDGOALS)
-	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/$<.hex
-	nrfjprog --reset --program $(OUTPUT_BINARY_DIRECTORY)/$<.hex
+	# @echo Assembling: $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
+	# nrfjprog --reset --program $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
+	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
+	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 
 ## Flash softdevice

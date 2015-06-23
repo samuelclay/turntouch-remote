@@ -1,0 +1,2 @@
+exclude = '{$exclude,*.tgz,*.gz,static/*.js,static/*.css}'
+excludeDirectories = "{$excludeDirectories,doc}"
