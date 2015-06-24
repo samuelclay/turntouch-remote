@@ -47,35 +47,62 @@ const char * indications_list[] = BSP_INDICATIONS_LIST;
 
 void bsp_evt_handler(bsp_event_t evt)
 {
-    uint32_t err_code;
     rtt_print(0, "%sEvt handler: %s%X%s\n", RTT_CTRL_TEXT_YELLOW, RTT_CTRL_TEXT_BRIGHT_YELLOW, evt, RTT_CTRL_RESET);
-    
+    bool pushed;
     switch (evt)
     {
         case BSP_EVENT_KEY_0:
 
-            if (actual_state != BSP_INDICATE_FIRST)
-                actual_state--;
-            else
-                actual_state = BSP_INDICATE_LAST;
+            app_button_is_pushed(0, &pushed);
+            if (pushed) {
+                LEDS_ON(BSP_LED_0_MASK);
+            } else {
+                LEDS_OFF(BSP_LED_0_MASK);
+            }
             break;
 
         case BSP_EVENT_KEY_1:
 
-            if (actual_state != BSP_INDICATE_LAST)
-                actual_state++;
-            else
-                actual_state = BSP_INDICATE_FIRST;
+            app_button_is_pushed(1, &pushed);
+            if (pushed) {
+                LEDS_ON(BSP_LED_1_MASK);
+            } else {
+                LEDS_OFF(BSP_LED_1_MASK);
+            }   
             break;
 
+        case BSP_EVENT_KEY_2:
+
+            app_button_is_pushed(2, &pushed);
+            if (pushed) {
+                LEDS_ON(BSP_LED_2_MASK);
+            } else {
+                LEDS_OFF(BSP_LED_2_MASK);
+            }   
+            break;
+
+        case BSP_EVENT_KEY_3:
+
+            app_button_is_pushed(3, &pushed);
+            if (pushed) {
+                LEDS_ON(BSP_LED_3_MASK);
+            } else {
+                LEDS_OFF(BSP_LED_3_MASK);
+            }   
+            break;
+        
+        case BSP_EVENT_KEY_4:
+        case BSP_EVENT_KEY_5:
+        case BSP_EVENT_KEY_6:
+        case BSP_EVENT_KEY_7:
+
+            LEDS_ON(LEDS_MASK);
+            break;
+        
         default:
             return; // no implementation needed
     }
 
-    err_code = bsp_indication_text_set(actual_state, indications_list[actual_state]);
-    APP_ERROR_CHECK(err_code);
-
-    rtt_print(0, "%sButton press: %s%s%s\n", RTT_CTRL_TEXT_GREEN, RTT_CTRL_TEXT_BRIGHT_GREEN, indications_list[actual_state], RTT_CTRL_RESET);
 }
 
 
