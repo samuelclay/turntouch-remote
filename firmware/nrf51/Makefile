@@ -38,6 +38,7 @@ remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-ou
 #source common to all targets
 C_SOURCE_FILES += \
 ./src/main.c \
+./src/rtt.c \
 ./libs/bsp/bsp.c \
 ./libs/RTT/SEGGER_RTT.c \
 ./libs/RTT/SEGGER_RTT_printf.c \
@@ -59,6 +60,7 @@ ASM_SOURCE_FILES  = ./libs/components/toolchain/gcc/gcc_startup_nrf51.s
 
 #includes common to all targets
 INC_PATHS  = -I./config
+INC_PATHS += -I./src
 INC_PATHS += -I./libs/bsp
 INC_PATHS += -I./libs/RTT
 INC_PATHS += -I./libs/components/ble/ble_advertising

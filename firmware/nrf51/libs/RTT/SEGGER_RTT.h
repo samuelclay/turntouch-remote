@@ -30,7 +30,7 @@ Purpose : Implementation of SEGGER real-time terminal which allows
 #define SEGGER_RTT_MODE_NO_BLOCK_TRIM         (1 << 0)
 #define SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL    (1 << 1)
 
-#define RTT_CTRL_RESET                "[0m"
+#define RTT_CTRL_RESET                "[2:39;49m"
 
 #define RTT_CTRL_CLEAR                "[2J"
 
@@ -61,14 +61,14 @@ Purpose : Implementation of SEGGER real-time terminal which allows
 #define RTT_CTRL_BG_CYAN              "[24;46m"
 #define RTT_CTRL_BG_WHITE             "[24;47m"
 
-#define RTT_CTRL_BG_BRIGHT_BLACK      "[4;40m"
-#define RTT_CTRL_BG_BRIGHT_RED        "[4;41m"
-#define RTT_CTRL_BG_BRIGHT_GREEN      "[4;42m"
-#define RTT_CTRL_BG_BRIGHT_YELLOW     "[4;43m"
-#define RTT_CTRL_BG_BRIGHT_BLUE       "[4;44m"
-#define RTT_CTRL_BG_BRIGHT_MAGENTA    "[4;45m"
-#define RTT_CTRL_BG_BRIGHT_CYAN       "[4;46m"
-#define RTT_CTRL_BG_BRIGHT_WHITE      "[4;47m"
+#define RTT_CTRL_BG_BRIGHT_BLACK      "[1;40m"
+#define RTT_CTRL_BG_BRIGHT_RED        "[1;41m"
+#define RTT_CTRL_BG_BRIGHT_GREEN      "[1;42m"
+#define RTT_CTRL_BG_BRIGHT_YELLOW     "[1;43m"
+#define RTT_CTRL_BG_BRIGHT_BLUE       "[1;44m"
+#define RTT_CTRL_BG_BRIGHT_MAGENTA    "[1;45m"
+#define RTT_CTRL_BG_BRIGHT_CYAN       "[1;46m"
+#define RTT_CTRL_BG_BRIGHT_WHITE      "[1;47m"
 
 
 /*********************************************************************
