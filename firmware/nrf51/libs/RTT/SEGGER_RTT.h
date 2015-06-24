@@ -30,18 +30,18 @@ Purpose : Implementation of SEGGER real-time terminal which allows
 #define SEGGER_RTT_MODE_NO_BLOCK_TRIM         (1 << 0)
 #define SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL    (1 << 1)
 
-#define RTT_CTRL_RESET                "[2:39;49m"
+#define RTT_CTRL_RESET                "[0;39;49m"
 
 #define RTT_CTRL_CLEAR                "[2J"
 
-#define RTT_CTRL_TEXT_BLACK           "[2;30m"
-#define RTT_CTRL_TEXT_RED             "[2;31m"
-#define RTT_CTRL_TEXT_GREEN           "[2;32m"
-#define RTT_CTRL_TEXT_YELLOW          "[2;33m"
-#define RTT_CTRL_TEXT_BLUE            "[2;34m"
-#define RTT_CTRL_TEXT_MAGENTA         "[2;35m"
-#define RTT_CTRL_TEXT_CYAN            "[2;36m"
-#define RTT_CTRL_TEXT_WHITE           "[2;37m"
+#define RTT_CTRL_TEXT_BLACK           "[0;30m"
+#define RTT_CTRL_TEXT_RED             "[0;31m"
+#define RTT_CTRL_TEXT_GREEN           "[0;32m"
+#define RTT_CTRL_TEXT_YELLOW          "[0;33m"
+#define RTT_CTRL_TEXT_BLUE            "[0;34m"
+#define RTT_CTRL_TEXT_MAGENTA         "[0;35m"
+#define RTT_CTRL_TEXT_CYAN            "[0;36m"
+#define RTT_CTRL_TEXT_WHITE           "[0;37m"
 
 #define RTT_CTRL_TEXT_BRIGHT_BLACK    "[1;30m"
 #define RTT_CTRL_TEXT_BRIGHT_RED      "[1;31m"
@@ -52,14 +52,14 @@ Purpose : Implementation of SEGGER real-time terminal which allows
 #define RTT_CTRL_TEXT_BRIGHT_CYAN     "[1;36m"
 #define RTT_CTRL_TEXT_BRIGHT_WHITE    "[1;37m"
 
-#define RTT_CTRL_BG_BLACK             "[24;40m"
-#define RTT_CTRL_BG_RED               "[24;41m"
-#define RTT_CTRL_BG_GREEN             "[24;42m"
-#define RTT_CTRL_BG_YELLOW            "[24;43m"
-#define RTT_CTRL_BG_BLUE              "[24;44m"
-#define RTT_CTRL_BG_MAGENTA           "[24;45m"
-#define RTT_CTRL_BG_CYAN              "[24;46m"
-#define RTT_CTRL_BG_WHITE             "[24;47m"
+#define RTT_CTRL_BG_BLACK             "[40m"
+#define RTT_CTRL_BG_RED               "[41m"
+#define RTT_CTRL_BG_GREEN             "[42m"
+#define RTT_CTRL_BG_YELLOW            "[43m"
+#define RTT_CTRL_BG_BLUE              "[44m"
+#define RTT_CTRL_BG_MAGENTA           "[45m"
+#define RTT_CTRL_BG_CYAN              "[46m"
+#define RTT_CTRL_BG_WHITE             "[47m"
 
 #define RTT_CTRL_BG_BRIGHT_BLACK      "[1;40m"
 #define RTT_CTRL_BG_BRIGHT_RED        "[1;41m"

@@ -279,6 +279,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
                             2. Make sure the app_button module is initialized. */
             err_code = app_button_enable();
             APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%sBluetooth connected.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
@@ -289,6 +290,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
                          to a peer. */
             err_code = app_button_disable();
             APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%sBluetooth %sdisconnected.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
             break;
 
         case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
@@ -297,6 +299,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
                                                    &m_sec_params,
                                                    &m_keys);
             APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%sBluetooth params request.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
             break;
 
         case BLE_GATTS_EVT_SYS_ATTR_MISSING:
@@ -305,10 +308,12 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
                                                  0,
                                                  BLE_GATTS_SYS_ATTR_FLAG_SYS_SRVCS | BLE_GATTS_SYS_ATTR_FLAG_USR_SRVCS);
             APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%sBluetooth sys attr missing.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
             break;
 
         case BLE_GAP_EVT_AUTH_STATUS:
             m_auth_status = p_ble_evt->evt.gap_evt.params.auth_status;
+            rtt_print(0, "%sBluetooth auth status.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
             break;
 
         case BLE_GAP_EVT_SEC_INFO_REQUEST:
@@ -323,10 +328,12 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 
             err_code = sd_ble_gap_sec_info_reply(m_conn_handle, p_enc_info, p_id_info, p_sign_info);
                 APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%sBluetooth security info request.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
             break;
 
         default:
             // No implementation needed.
+            rtt_print(0, "%sBluetooth event unhandled: %d%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, RTT_CTRL_RESET);
             break;
     }
 }
@@ -348,6 +355,8 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     YOUR_JOB: Add service ble_evt handlers calls here, like, for example:
     ble_bas_on_ble_evt(&m_bas, p_ble_evt);
     */
+
+    rtt_print(0, "%sBluetooth event: %s%X%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_TEXT_BRIGHT_GREEN, p_ble_evt, RTT_CTRL_RESET);
 }
 
 /**@brief Function for handling the Connection Parameters Module.
@@ -368,6 +377,8 @@ static void on_conn_params_evt(ble_conn_params_evt_t * p_evt)
     {
         err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_CONN_INTERVAL_UNACCEPTABLE);
         APP_ERROR_CHECK(err_code);
+
+        rtt_print(0, "%s%sConnection params failed: %s%X%s\n", RTT_CTRL_BG_BRIGHT_RED, RTT_CTRL_TEXT_BRIGHT_WHITE, RTT_CTRL_TEXT_BRIGHT_RED, p_evt, RTT_CTRL_RESET);
     }
 }
 
@@ -378,6 +389,7 @@ static void on_conn_params_evt(ble_conn_params_evt_t * p_evt)
 static void conn_params_error_handler(uint32_t nrf_error)
 {
     APP_ERROR_HANDLER(nrf_error);
+    rtt_print(0, "%s%sConnection params error: %s%X%s\n", RTT_CTRL_BG_BRIGHT_RED, RTT_CTRL_TEXT_BRIGHT_WHITE, RTT_CTRL_TEXT_BRIGHT_RED, nrf_error, RTT_CTRL_RESET);
 }
 
 /**@brief Function for initializing the BLE stack.
@@ -387,16 +399,13 @@ static void conn_params_error_handler(uint32_t nrf_error)
 static void ble_stack_init(void)
 {
     uint32_t err_code;
-    rtt_print(0, "%sIn ble_stack_init...%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
 
     // Initialize the SoftDevice handler module.
     SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, NULL);
-    rtt_print(0, "%s  1 ble_stack_init.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
 
     // Enable BLE stack 
     ble_enable_params_t ble_enable_params;
     memset(&ble_enable_params, 0, sizeof(ble_enable_params));
-    rtt_print(0, "%s 2 ble_stack_init.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     ble_enable_params.gatts_enable_params.service_changed = IS_SRVC_CHANGED_CHARACT_PRESENT;
     err_code = sd_ble_enable(&ble_enable_params);
     APP_ERROR_CHECK(err_code);
@@ -408,8 +417,8 @@ static void ble_stack_init(void)
     // Register with the SoftDevice handler module for BLE events.
     err_code = softdevice_sys_evt_handler_set(sys_evt_dispatch);
     APP_ERROR_CHECK(err_code);
-    rtt_print(0, "%sOut ble_stack_init.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     
+    rtt_print(0, "%sStarted bluetooth stack.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
 }
 
 /**@brief Function for the GAP initialization.
@@ -443,6 +452,8 @@ static void gap_params_init(void)
 
     err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
     APP_ERROR_CHECK(err_code);
+    
+    rtt_print(0, "%sBluetooth GAP connection params init.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
 }
 
 /**@brief Function for initializing the Advertising functionality.
@@ -471,6 +482,8 @@ static void advertising_init(void)
 
     err_code = ble_advertising_init(&advdata, NULL, &options, on_adv_evt, NULL);
     APP_ERROR_CHECK(err_code);
+    
+    rtt_print(0, "%sStarted bluetooth advertising.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
 }
 
 /**@brief Function for initializing the Connection Parameters module.
@@ -493,6 +506,8 @@ static void conn_params_init(void)
 
     err_code = ble_conn_params_init(&cp_init);
     APP_ERROR_CHECK(err_code);
+    
+    rtt_print(0, "%sConnection params initialized.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
 }
 
 /**@brief Function for initializing security parameters.
@@ -522,24 +537,29 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
         case BLE_ADV_EVT_DIRECTED:
             err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING_DIRECTED);
             APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%sAdvertising directed%s\n", RTT_CTRL_TEXT_BRIGHT_CYAN, RTT_CTRL_RESET);
             break;
 
         case BLE_ADV_EVT_FAST:
             err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
             APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%sAdvertising fast%s\n", RTT_CTRL_TEXT_BRIGHT_CYAN, RTT_CTRL_RESET);
             break;
 
         case BLE_ADV_EVT_FAST_WHITELIST:
             err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING_WHITELIST);
             APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%sAdvertising fast whitelist%s\n", RTT_CTRL_TEXT_BRIGHT_CYAN, RTT_CTRL_RESET);
             break;
 
         case BLE_ADV_EVT_SLOW:
             err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING_SLOW);
             APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%sAdvertising slow%s\n", RTT_CTRL_TEXT_BRIGHT_CYAN, RTT_CTRL_RESET);
             break;
 
         case BLE_ADV_EVT_IDLE:
+            rtt_print(0, "%sAdvertising idle%s\n", RTT_CTRL_TEXT_BRIGHT_CYAN, RTT_CTRL_RESET);
             sleep_mode_enter();
             break;
 
@@ -559,6 +579,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
             //
             // err_code = ble_advertising_whitelist_reply(&whitelist);
             // APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%sAdvertising whitelist request, ignoring%s\n", RTT_CTRL_TEXT_BRIGHT_CYAN, RTT_CTRL_RESET);
             break;
         }
 
@@ -592,6 +613,8 @@ static void power_manage(void)
  */
 static void sleep_mode_enter(void)
 {
+    rtt_print(0, "%sSleeping...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
+
     uint32_t err_code = bsp_indication_set(BSP_INDICATE_IDLE);
     APP_ERROR_CHECK(err_code);
 

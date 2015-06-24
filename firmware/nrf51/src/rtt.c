@@ -10,7 +10,7 @@
 
 void rtt_print(unsigned BufferIndex, const char * sFormat, ...) {
     char colorStringFormat[256];
-    sprintf(colorStringFormat, "%s %s--->%s %s", RTT_CTRL_RESET, RTT_CTRL_TEXT_BRIGHT_MAGENTA, RTT_CTRL_RESET, sFormat);
+    sprintf(colorStringFormat, "%s %s--->%s %s%s", RTT_CTRL_RESET, RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET, sFormat, RTT_CTRL_RESET);
     va_list ParamList;
 
     va_start(ParamList, sFormat);
