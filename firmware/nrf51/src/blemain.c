@@ -520,6 +520,8 @@ static void advertising_init(void)
 
 
 /**@brief Function for the Event Scheduler initialization.
+ *
+ * The scheduler is used for transferring execution from the interrupt context to the main context.
  */
 static void scheduler_init(void)
 {

@@ -48,10 +48,15 @@ C_SOURCE_FILES += \
 ./libs/components/drivers_nrf/ppi/nrf_drv_ppi.c \
 ./libs/components/drivers_nrf/pstorage/pstorage.c \
 ./libs/components/drivers_nrf/timer/nrf_drv_timer.c \
+./libs/components/libraries/scheduler/app_scheduler.c \
 ./libs/components/libraries/button/app_button.c \
 ./libs/components/libraries/timer/app_timer.c \
 ./libs/components/libraries/util/app_error.c \
 ./libs/components/libraries/util/nrf_assert.c \
+./libs/components/ble/ble_advertising/ble_advertising.c \
+./libs/components/ble/common/ble_conn_params.c \
+./libs/components/ble/common/ble_advdata.c \
+./libs/components/softdevice/common/softdevice_handler/softdevice_handler.c \
 ./libs/components/toolchain/system_nrf51.c \
 
 
@@ -96,6 +101,7 @@ CFLAGS  = -DBOARD_PCA10028
 CFLAGS += -DNRF51
 CFLAGS += -DS110
 CFLAGS += -DENABLE_DEBUG_LOG_SUPPORT
+CFLAGS += -DBLE_STACK_SUPPORT_REQD
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs --std=gnu99
 CFLAGS += -Wall -Werror -O3
