@@ -40,24 +40,26 @@ C_SOURCE_FILES += \
 ./src/main.c \
 ./src/rtt.c \
 ./libs/bsp/bsp.c \
-./libs/RTT/SEGGER_RTT.c \
-./libs/RTT/SEGGER_RTT_printf.c \
+./libs/components/ble/ble_advertising/ble_advertising.c \
+./libs/components/ble/common/ble_advdata.c \
+./libs/components/ble/common/ble_conn_params.c \
+./libs/components/ble/common/ble_srv_common.c \
 ./libs/components/drivers_nrf/common/nrf_drv_common.c \
 ./libs/components/drivers_nrf/gpiote/nrf_drv_gpiote.c \
 ./libs/components/drivers_nrf/hal/nrf_delay.c \
 ./libs/components/drivers_nrf/ppi/nrf_drv_ppi.c \
 ./libs/components/drivers_nrf/pstorage/pstorage.c \
 ./libs/components/drivers_nrf/timer/nrf_drv_timer.c \
-./libs/components/libraries/scheduler/app_scheduler.c \
 ./libs/components/libraries/button/app_button.c \
+./libs/components/libraries/scheduler/app_scheduler.c \
 ./libs/components/libraries/timer/app_timer.c \
 ./libs/components/libraries/util/app_error.c \
 ./libs/components/libraries/util/nrf_assert.c \
-./libs/components/ble/ble_advertising/ble_advertising.c \
-./libs/components/ble/common/ble_conn_params.c \
-./libs/components/ble/common/ble_advdata.c \
 ./libs/components/softdevice/common/softdevice_handler/softdevice_handler.c \
 ./libs/components/toolchain/system_nrf51.c \
+./libs/RTT/SEGGER_RTT.c \
+./libs/RTT/SEGGER_RTT_printf.c \
+
 
 
 #assembly files common to all targets
@@ -102,6 +104,8 @@ CFLAGS += -DNRF51
 CFLAGS += -DS110
 CFLAGS += -DENABLE_DEBUG_LOG_SUPPORT
 CFLAGS += -DBLE_STACK_SUPPORT_REQD
+CFLAGS += -DSWI_DISABLE0
+CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs --std=gnu99
 CFLAGS += -Wall -Werror -O3
@@ -124,6 +128,8 @@ ASMFLAGS += -x assembler-with-cpp
 ASMFLAGS += -DBOARD_PCA10028
 ASMFLAGS += -DNRF51
 ASMFLAGS += -DS110
+ASMFLAGS += -DSOFTDEVICE_PRESENT
+ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
 #default target - first one defined
 default: clean nrf51422_xxac
 

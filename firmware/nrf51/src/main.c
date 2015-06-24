@@ -393,19 +393,14 @@ static void ble_stack_init(void)
     SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, NULL);
     rtt_print(0, "%s  1 ble_stack_init.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
 
-#if defined(S110) || defined(S130)
     // Enable BLE stack 
     ble_enable_params_t ble_enable_params;
     memset(&ble_enable_params, 0, sizeof(ble_enable_params));
     rtt_print(0, "%s 2 ble_stack_init.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
-#ifdef S130
-    ble_enable_params.gatts_enable_params.attr_tab_size   = BLE_GATTS_ATTR_TAB_SIZE_DEFAULT;
-#endif
     ble_enable_params.gatts_enable_params.service_changed = IS_SRVC_CHANGED_CHARACT_PRESENT;
     err_code = sd_ble_enable(&ble_enable_params);
     APP_ERROR_CHECK(err_code);
-#endif
-    
+
     // Register with the SoftDevice handler module for BLE events.
     err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
     APP_ERROR_CHECK(err_code);
@@ -623,8 +618,9 @@ int main(void)
     bsp_configuration();
 
     // Initialize
-    ble_stack_init();
     scheduler_init();
+    ble_stack_init();
+
     gap_params_init();
     advertising_init();
     services_init();
@@ -639,8 +635,8 @@ int main(void)
 
     while (true)
     {
-        // app_sched_execute();
-        // power_manage();
+        app_sched_execute();
+        power_manage();
     }
 }
 
