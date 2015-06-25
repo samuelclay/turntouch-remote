@@ -59,7 +59,7 @@
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 0                                           /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
 
-#define DEVICE_NAME                     "Turn Touch Mac Remote"                           /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "Turn Touch Remote"                           /**< Name of device. Will be included in the advertising data. */
 
 #define APP_ADV_FAST_INTERVAL           40                                          /**< The advertising interval (in units of 0.625 ms). The default value corresponds to 25 ms. */
 #define APP_ADV_SLOW_INTERVAL           3200                                        /**< Slow advertising interval (in units of 0.625 ms). The default value corresponds to 2 seconds. */
@@ -401,7 +401,6 @@ static void ble_stack_init(void)
 
     // Initialize the SoftDevice handler module.
     SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, NULL);
-    rtt_print(0, "%sInit 1a...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
 
     // Enable BLE stack 
     ble_enable_params_t ble_enable_params;
@@ -409,7 +408,6 @@ static void ble_stack_init(void)
     ble_enable_params.gatts_enable_params.service_changed = IS_SRVC_CHANGED_CHARACT_PRESENT;
     err_code = sd_ble_enable(&ble_enable_params);
     APP_ERROR_CHECK(err_code);
-    rtt_print(0, "%sInit 1b...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
 
     // ble_gap_addr_t addr;
     //
@@ -421,12 +419,10 @@ static void ble_stack_init(void)
     // Register with the SoftDevice handler module for BLE events.
     err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
     APP_ERROR_CHECK(err_code);
-    rtt_print(0, "%sInit 1c...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
     
     // Register with the SoftDevice handler module for BLE events.
     err_code = softdevice_sys_evt_handler_set(sys_evt_dispatch);
     APP_ERROR_CHECK(err_code);
-    rtt_print(0, "%sInit 1d...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
     
     rtt_print(0, "%sStarted bluetooth stack.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
 }
@@ -490,6 +486,7 @@ static void advertising_init(void)
     options.ble_adv_slow_interval  = APP_ADV_SLOW_INTERVAL;
     options.ble_adv_slow_timeout   = APP_ADV_SLOW_TIMEOUT;
 
+    rtt_print(0, "%sStarting bluetooth advertising: %X, %X, %X, %s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, advdata, options, on_adv_evt, RTT_CTRL_RESET);
     err_code = ble_advertising_init(&advdata, NULL, &options, on_adv_evt, NULL);
     APP_ERROR_CHECK(err_code);
     
@@ -669,27 +666,22 @@ int main(void)
     // clock_initialization();
     timers_init();
     bsp_configuration();
-    rtt_print(0, "%sInit 1...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
 
     // Initialize
     ble_stack_init();
     scheduler_init();
-    rtt_print(0, "%sInit 2...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
 
     gap_params_init();
     advertising_init();
-    rtt_print(0, "%sInit 3...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
     services_init();
     conn_params_init();
     sec_params_init();
-    rtt_print(0, "%sInit 4...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
 
     // Start execution
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
     // err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
     // APP_ERROR_CHECK(err_code);
-    rtt_print(0, "%sInit 5...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
 
     while (true)
     {
