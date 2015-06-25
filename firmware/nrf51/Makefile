@@ -38,6 +38,7 @@ remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-ou
 #source common to all targets
 C_SOURCE_FILES += \
 ./src/main.c \
+./src/button_status.c \
 ./src/rtt.c \
 ./libs/bsp/bsp.c \
 ./libs/components/ble/ble_advertising/ble_advertising.c \
@@ -53,6 +54,7 @@ C_SOURCE_FILES += \
 ./libs/components/libraries/button/app_button.c \
 ./libs/components/libraries/scheduler/app_scheduler.c \
 ./libs/components/libraries/timer/app_timer.c \
+./libs/components/libraries/timer/app_timer_appsh.c \
 ./libs/components/libraries/util/app_error.c \
 ./libs/components/libraries/util/nrf_assert.c \
 ./libs/components/softdevice/common/softdevice_handler/softdevice_handler.c \
@@ -101,6 +103,7 @@ BUILD_DIRECTORIES := $(sort $(OBJECT_DIRECTORY) $(OUTPUT_BINARY_DIRECTORY) $(LIS
 #flags common to all targets
 CFLAGS  = -DBOARD_PCA10028
 CFLAGS += -DNRF51
+CFLAGS += -DDEBUG
 CFLAGS += -DS110
 CFLAGS += -DENABLE_DEBUG_LOG_SUPPORT
 CFLAGS += -DBLE_STACK_SUPPORT_REQD

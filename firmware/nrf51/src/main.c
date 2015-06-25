@@ -25,7 +25,7 @@
 #include "ble_srv_common.h"
 #include "boards.h"
 #include "bsp.h"
-#include "bsp.h"
+#include "button_status.h"
 #include "nordic_common.h"
 #include "nrf.h"
 #include "nrf51_bitfields.h"
@@ -59,7 +59,7 @@
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 0                                           /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
 
-#define DEVICE_NAME                     "Nordic_Template"                           /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "Turn Touch Mac Remote"                           /**< Name of device. Will be included in the advertising data. */
 
 #define APP_ADV_FAST_INTERVAL           40                                          /**< The advertising interval (in units of 0.625 ms). The default value corresponds to 25 ms. */
 #define APP_ADV_SLOW_INTERVAL           3200                                        /**< Slow advertising interval (in units of 0.625 ms). The default value corresponds to 2 seconds. */
@@ -91,9 +91,10 @@
 
 static ble_gap_sec_params_t             m_sec_params;                               /**< Security requirements for this application. */
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
+static ble_buttonservice_t              m_buttonservice;
 
 // YOUR_JOB: Initialize UUIDs for service(s) used in your application.
-ble_uuid_t m_adv_uuids[] = {{BLE_UUID_BATTERY_SERVICE, BLE_UUID_TYPE_BLE}};         /**< Universally unique service identifiers. */
+ble_uuid_t m_adv_uuids[] = {{BUTTONSERVICE_UUID_SERVICE, BLE_UUID_TYPE_BLE}};         /**< Universally unique service identifiers. */
 
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt);
 static void sleep_mode_enter(void);
@@ -350,12 +351,10 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     on_ble_evt(p_ble_evt);
     ble_conn_params_on_ble_evt(p_ble_evt);
     ble_advertising_on_ble_evt(p_ble_evt);
+    rtt_print(0, "%sInit bs...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
 
-    /*
-    YOUR_JOB: Add service ble_evt handlers calls here, like, for example:
-    ble_bas_on_ble_evt(&m_bas, p_ble_evt);
-    */
-
+    ble_buttonstatus_on_ble_evt(&m_buttonservice, p_ble_evt);
+    
     rtt_print(0, "%sBluetooth event: %s%X%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_TEXT_BRIGHT_GREEN, p_ble_evt, RTT_CTRL_RESET);
 }
 
@@ -402,6 +401,7 @@ static void ble_stack_init(void)
 
     // Initialize the SoftDevice handler module.
     SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, NULL);
+    rtt_print(0, "%sInit 1a...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
 
     // Enable BLE stack 
     ble_enable_params_t ble_enable_params;
@@ -409,14 +409,24 @@ static void ble_stack_init(void)
     ble_enable_params.gatts_enable_params.service_changed = IS_SRVC_CHANGED_CHARACT_PRESENT;
     err_code = sd_ble_enable(&ble_enable_params);
     APP_ERROR_CHECK(err_code);
+    rtt_print(0, "%sInit 1b...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
+
+    // ble_gap_addr_t addr;
+    //
+    // err_code = sd_ble_gap_address_get(&addr);
+    // APP_ERROR_CHECK(err_code);
+    // sd_ble_gap_address_set(BLE_GAP_ADDR_CYCLE_MODE_NONE, &addr);
+    // APP_ERROR_CHECK(err_code);
 
     // Register with the SoftDevice handler module for BLE events.
     err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
     APP_ERROR_CHECK(err_code);
+    rtt_print(0, "%sInit 1c...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
     
     // Register with the SoftDevice handler module for BLE events.
     err_code = softdevice_sys_evt_handler_set(sys_evt_dispatch);
     APP_ERROR_CHECK(err_code);
+    rtt_print(0, "%sInit 1d...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
     
     rtt_print(0, "%sStarted bluetooth stack.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
 }
@@ -588,16 +598,37 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
     }
 }
 
+static void firmware_nickname_write_handler(ble_buttonservice_t *p_buttonservice, uint8_t nickname) {
+    rtt_print(0, "%s%sNew nickname: %s%X%s", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_WHITE,
+              RTT_CTRL_TEXT_BRIGHT_GREEN, nickname, RTT_CTRL_RESET);
+}
+
 /**@brief Function for initializing services that will be used by the application.
  */
 static void services_init(void)
 {
-    // YOUR_JOB: Add code to initialize the services used by the application.
+    uint32_t err_code;
+    ble_buttonstatus_init_t init;
+    
+    init.firmware_nickname_write_handler = firmware_nickname_write_handler;
+    
+    err_code = ble_buttonstatus_init(&m_buttonservice, &init);
+    APP_ERROR_CHECK(err_code);
 }
 
 // =========
 // = Power =
 // =========
+
+/**@brief Function for the Timer initialization.
+ *
+ * @details Initializes the timer module.
+ */
+static void timers_init(void)
+{
+    // Initialize timer module, making it use the scheduler
+    APP_TIMER_APPSH_INIT(APP_TIMER_PRESCALER, APP_TIMER_MAX_TIMERS, APP_TIMER_OP_QUEUE_SIZE, true);
+}
 
 /**@brief Function for the Power manager.
  */
@@ -635,26 +666,30 @@ int main(void)
                                                           RTT_CTRL_RESET);
     
     // Initialize buttons
-    clock_initialization();
-    APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_MAX_TIMERS, 
-                   APP_TIMER_OP_QUEUE_SIZE, NULL);
+    // clock_initialization();
+    timers_init();
     bsp_configuration();
+    rtt_print(0, "%sInit 1...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
 
     // Initialize
-    scheduler_init();
     ble_stack_init();
+    scheduler_init();
+    rtt_print(0, "%sInit 2...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
 
     gap_params_init();
     advertising_init();
+    rtt_print(0, "%sInit 3...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
     services_init();
     conn_params_init();
     sec_params_init();
+    rtt_print(0, "%sInit 4...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
 
     // Start execution
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
     // err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
     // APP_ERROR_CHECK(err_code);
+    rtt_print(0, "%sInit 5...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
 
     while (true)
     {

@@ -10,3 +10,14 @@ MEMORY
 }
 
 INCLUDE "gcc_nrf51_common.ld"
+
+
+/*
+
+   text	   data	    bss	    dec	    hex	filename
+  23732	    256	   3232	  27220	   6a54	build/nrf51422_xxac.out
+
+   text	   data	    bss	    dec	    hex	filename
+  24464	    256	   3260	  27980	   6d4c	build/nrf51422_xxac.out
+
+*/
