@@ -93,9 +93,6 @@ static ble_gap_sec_params_t             m_sec_params;                           
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
 static ble_buttonservice_t              m_buttonservice;
 
-// YOUR_JOB: Initialize UUIDs for service(s) used in your application.
-ble_uuid_t m_adv_uuids[] = {{BUTTONSERVICE_UUID_SERVICE, BLE_UUID_TYPE_BLE}};         /**< Universally unique service identifiers. */
-
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt);
 static void sleep_mode_enter(void);
 
@@ -159,6 +156,8 @@ void bsp_evt_handler(bsp_event_t evt) {
         default:
             return; // no implementation needed
     }
+    
+    
 
 }
 
@@ -351,11 +350,10 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     on_ble_evt(p_ble_evt);
     ble_conn_params_on_ble_evt(p_ble_evt);
     ble_advertising_on_ble_evt(p_ble_evt);
-    rtt_print(0, "%sInit bs...%s\n", RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
 
     ble_buttonstatus_on_ble_evt(&m_buttonservice, p_ble_evt);
     
-    rtt_print(0, "%sBluetooth event: %s%X%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_TEXT_BRIGHT_GREEN, p_ble_evt, RTT_CTRL_RESET);
+    rtt_print(0, "%sBluetooth event: %s%X%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_TEXT_BRIGHT_GREEN, p_ble_evt->header, RTT_CTRL_RESET);
 }
 
 /**@brief Function for handling the Connection Parameters Module.
@@ -469,6 +467,8 @@ static void advertising_init(void)
     uint32_t      err_code;
     ble_advdata_t advdata;
 
+    ble_uuid_t m_adv_uuids[] = {{BUTTONSERVICE_UUID_SERVICE, BLE_UUID_TYPE_BLE}};         /**< Universally unique service identifiers. */
+
     // Build advertising data struct to pass into @ref ble_advertising_init.
     memset(&advdata, 0, sizeof(advdata));
 
@@ -486,7 +486,6 @@ static void advertising_init(void)
     options.ble_adv_slow_interval  = APP_ADV_SLOW_INTERVAL;
     options.ble_adv_slow_timeout   = APP_ADV_SLOW_TIMEOUT;
 
-    rtt_print(0, "%sStarting bluetooth advertising: %X, %X, %X, %s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, advdata, options, on_adv_evt, RTT_CTRL_RESET);
     err_code = ble_advertising_init(&advdata, NULL, &options, on_adv_evt, NULL);
     APP_ERROR_CHECK(err_code);
     
@@ -686,7 +685,7 @@ int main(void)
     while (true)
     {
         app_sched_execute();
-        power_manage();
+        // power_manage();
     }
 }
 
