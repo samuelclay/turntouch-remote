@@ -101,16 +101,19 @@ static void sleep_mode_enter(void);
 // ===========
 
 void bsp_evt_handler(bsp_event_t evt) {
-    rtt_print(0, "%sButton handler: %s%X%s\n", RTT_CTRL_TEXT_YELLOW, RTT_CTRL_TEXT_BRIGHT_YELLOW, evt, RTT_CTRL_RESET);
     bool pushed;
+    uint8_t button_state[2] = {0x0F, 0x00};
+    
     switch (evt)
     {
         case BSP_EVENT_KEY_0:
 
             app_button_is_pushed(0, &pushed);
             if (pushed) {
+                button_state[0] ^= (1 << 0);
                 LEDS_ON(BSP_LED_0_MASK);
             } else {
+                button_state[0] |= (1 << 0);
                 LEDS_OFF(BSP_LED_0_MASK);
             }
             break;
@@ -119,8 +122,10 @@ void bsp_evt_handler(bsp_event_t evt) {
 
             app_button_is_pushed(1, &pushed);
             if (pushed) {
+                button_state[0] ^= (1 << 1);
                 LEDS_ON(BSP_LED_1_MASK);
             } else {
+                button_state[0] |= (1 << 1);
                 LEDS_OFF(BSP_LED_1_MASK);
             }   
             break;
@@ -129,8 +134,10 @@ void bsp_evt_handler(bsp_event_t evt) {
 
             app_button_is_pushed(2, &pushed);
             if (pushed) {
+                button_state[0] ^= (1 << 2);
                 LEDS_ON(BSP_LED_2_MASK);
             } else {
+                button_state[0] |= (1 << 2);
                 LEDS_OFF(BSP_LED_2_MASK);
             }   
             break;
@@ -139,17 +146,20 @@ void bsp_evt_handler(bsp_event_t evt) {
 
             app_button_is_pushed(3, &pushed);
             if (pushed) {
+                button_state[0] ^= (1 << 3);
                 LEDS_ON(BSP_LED_3_MASK);
             } else {
+                button_state[0] |= (1 << 3);
                 LEDS_OFF(BSP_LED_3_MASK);
             }   
             break;
         
-        case BSP_EVENT_KEY_4:
+        case BSP_EVENT_KEY_4:            
         case BSP_EVENT_KEY_5:
         case BSP_EVENT_KEY_6:
         case BSP_EVENT_KEY_7:
 
+            button_state[1] |= 0xFF;
             LEDS_ON(LEDS_MASK);
             break;
         
@@ -157,7 +167,8 @@ void bsp_evt_handler(bsp_event_t evt) {
             return; // no implementation needed
     }
     
-    
+    rtt_print(0, "%sButton handler: %s%X: %X%X%s\n", RTT_CTRL_TEXT_YELLOW, RTT_CTRL_TEXT_BRIGHT_YELLOW, evt, button_state[0], button_state[1], RTT_CTRL_RESET);
+    ble_buttonstatus_on_button_change(&m_buttonservice, button_state);
 
 }
 

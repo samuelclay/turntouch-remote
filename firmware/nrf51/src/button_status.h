@@ -63,7 +63,7 @@ void ble_buttonstatus_on_ble_evt(ble_buttonservice_t * p_buttonservice, ble_evt_
 
 /**@brief Function for sending a button state notification.
  */
-uint32_t ble_buttonstatus_on_button_change(ble_buttonservice_t * p_buttonservice, uint8_t button_state);
+uint32_t ble_buttonstatus_on_button_change(ble_buttonservice_t * p_buttonservice, uint8_t *button_state);
 
 #endif // BLE_BUTTONSTATUS_H__
 

@@ -49,7 +49,7 @@ static void on_disconnect(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_b
 static void on_write(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_ble_evt)
 {
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
-    
+    rtt_print(0, "on_write: %X(%X) / %X", p_evt_write->handle, *p_evt_write->data, p_buttonservice->firmware_nickname_char_handles.value_handle);
     if ((p_evt_write->handle == p_buttonservice->firmware_nickname_char_handles.value_handle) &&
         (p_evt_write->len <= FIRMWARE_NICKNAME_MAX_LENGTH) &&
         (p_buttonservice->firmware_nickname_write_handler != NULL))
@@ -124,9 +124,9 @@ static uint32_t button_status_char_add(ble_buttonservice_t *p_buttonservice, con
 
     attr_char_value.p_uuid       = &ble_uuid;
     attr_char_value.p_attr_md    = &attr_md;
-    attr_char_value.init_len     = sizeof(uint8_t);
+    attr_char_value.init_len     = sizeof(uint16_t);
     attr_char_value.init_offs    = 0;
-    attr_char_value.max_len      = sizeof(uint8_t);
+    attr_char_value.max_len      = sizeof(uint16_t);
     attr_char_value.p_value      = NULL;
     
     return sd_ble_gatts_characteristic_add(p_buttonservice->service_handle, &char_md,
@@ -214,16 +214,17 @@ uint32_t ble_buttonstatus_init(ble_buttonservice_t * p_buttonservice,
     return NRF_SUCCESS;
 }
 
-uint32_t ble_buttonstatus_on_button_change(ble_buttonservice_t * p_buttonservice, uint8_t button_state)
-{
+uint32_t ble_buttonstatus_on_button_change(ble_buttonservice_t * p_buttonservice, uint8_t *button_state) {
     ble_gatts_hvx_params_t params;
     uint16_t len = sizeof(button_state);
     
     memset(&params, 0, sizeof(params));
     params.type = BLE_GATT_HVX_NOTIFICATION;
     params.handle = p_buttonservice->button_status_char_handles.value_handle;
-    params.p_data = &button_state;
+    params.p_data = button_state;
     params.p_len = &len;
+
+    rtt_print(0, "%sButton change: %s%X%X%s\n", RTT_CTRL_TEXT_YELLOW, RTT_CTRL_TEXT_BRIGHT_YELLOW, button_state[0], button_state[1], RTT_CTRL_RESET);
     
     return sd_ble_gatts_hvx(p_buttonservice->conn_handle, &params);
 }
