@@ -68,7 +68,7 @@ __WEAK void app_error_handler(uint32_t error_code, uint32_t line_num, const uint
     //ble_debug_assert_handler(error_code, line_num, p_file_name);
 #endif // BSP_DEFINES_ONLY
 
-    rtt_print(0, "%sError %X: %X: %X%s\n", RTT_CTRL_TEXT_BRIGHT_RED, error_code, line_num, p_file_name, RTT_CTRL_RESET);
+    rtt_print(0, "%sError %d at line %d: %X%s\n", RTT_CTRL_TEXT_BRIGHT_RED, error_code, line_num, *p_file_name, RTT_CTRL_RESET);
 
     // The following variable helps Keil keep the call stack visible, in addition, it can be set to
     // 0 in the debugger to continue executing code after the error check.

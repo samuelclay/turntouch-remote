@@ -50,8 +50,11 @@ static void on_disconnect(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_b
 static void on_write(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_ble_evt)
 {
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
-    rtt_print(0, "on_write: %X(%d) / %X\n", p_evt_write->handle, *p_evt_write->data, p_buttonservice->firmware_nickname_char_handles.value_handle);
-    if ((p_evt_write->handle == p_buttonservice->firmware_nickname_char_handles.value_handle) &&
+    rtt_print(0, "on_write: %X(%X) / %X/%X\n", p_evt_write->handle, p_evt_write->data[0], p_buttonservice->button_status_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.value_handle);
+    if (p_evt_write->handle == p_buttonservice->button_status_char_handles.value_handle) {
+        rtt_print(0, "on_write, button status");
+        
+    } else if ((p_evt_write->handle == p_buttonservice->firmware_nickname_char_handles.value_handle) &&
         (p_evt_write->len <= FIRMWARE_NICKNAME_MAX_LENGTH) &&
         (p_buttonservice->firmware_nickname_write_handler != NULL))
     {
@@ -166,7 +169,7 @@ static uint32_t firmware_nickname_char_add(ble_buttonservice_t * p_buttonservice
     attr_md.vlen       = 0;
     
     memset(&attr_char_value, 0, sizeof(attr_char_value));
-    rtt_print(0, "At firmware_nickname_char_add 0");
+    rtt_print(0, "At firmware_nickname_char_add 0\n");
 
     attr_char_value.p_uuid       = &ble_uuid;
     attr_char_value.p_attr_md    = &attr_md;

@@ -201,6 +201,7 @@ static void bsp_button_event_handler(uint8_t pin_no, uint8_t button_action)
 
     if ((event != BSP_EVENT_NOTHING) && (m_registered_callback != NULL))
     {
+        rtt_print(0, "BSP event: pin: %d, button_action: %X\n", pin_no, button_action);
         m_registered_callback(event);
     }
 }
@@ -211,6 +212,7 @@ static void bsp_button_event_handler(uint8_t pin_no, uint8_t button_action)
  */
 static void button_timer_handler(void * p_context)
 {
+    rtt_print(0, "%sbutton_timer_handler\n", RTT_CTRL_TEXT_BLUE);
     bsp_button_event_handler(*(uint8_t *)p_context, BSP_BUTTON_ACTION_LONG_PUSH);
 }
 

@@ -101,78 +101,100 @@ static void sleep_mode_enter(void);
 // ===========
 
 void bsp_evt_handler(bsp_event_t evt) {
-    uint32_t err_code;
-    bool pushed;
-    uint8_t button_state[BUTTON_STATUS_PACKET_BYTES] = {0x0F, 0x00};
-    bool mode_change;
-    switch (evt)
-    {
-        case BSP_EVENT_KEY_4:            
-        case BSP_EVENT_KEY_5:
-        case BSP_EVENT_KEY_6:
-        case BSP_EVENT_KEY_7:
-            mode_change = true;
-            break;
-        default:
-            break;
-    }
     
-    // Button down
-    if ((evt == BSP_EVENT_KEY_0) || mode_change) {
-        app_button_is_pushed(0, &pushed);
-        if (pushed) {
-            button_state[0] ^= (1 << 0);
-            LEDS_ON(BSP_LED_0_MASK);
-        } else {
-            button_state[0] |= (1 << 0);
-            LEDS_OFF(BSP_LED_0_MASK);
+    if (evt == BSP_EVENT_KEY_0 ||
+        evt == BSP_EVENT_KEY_1 ||
+        evt == BSP_EVENT_KEY_2 ||
+        evt == BSP_EVENT_KEY_3 ||
+        evt == BSP_EVENT_KEY_4 ||
+        evt == BSP_EVENT_KEY_5 ||
+        evt == BSP_EVENT_KEY_6 ||
+        evt == BSP_EVENT_KEY_7) {
+        uint32_t err_code;
+        bool pushed;
+        uint8_t button_state[BUTTON_STATUS_PACKET_BYTES] = {0x0F, 0x00};
+        bool mode_change;
+        switch (evt)
+        {
+            case BSP_EVENT_KEY_4:            
+            case BSP_EVENT_KEY_5:
+            case BSP_EVENT_KEY_6:
+            case BSP_EVENT_KEY_7:
+                mode_change = true;
+                break;
+            default:
+                break;
         }
-    }
-    if ((evt == BSP_EVENT_KEY_1) || mode_change) {
-        app_button_is_pushed(1, &pushed);
-        if (pushed) {
-            button_state[0] ^= (1 << 1);
-            LEDS_ON(BSP_LED_1_MASK);
-        } else {
-            button_state[0] |= (1 << 1);
-            LEDS_OFF(BSP_LED_1_MASK);
+    
+        // Button down
+        if ((evt == BSP_EVENT_KEY_0) || mode_change) {
+            app_button_is_pushed(0, &pushed);
+            if (pushed) {
+                button_state[0] ^= (1 << 0);
+                LEDS_ON(BSP_LED_0_MASK);
+            } else {
+                button_state[0] |= (1 << 0);
+                LEDS_OFF(BSP_LED_0_MASK);
+            }
         }
-    }
-    if ((evt == BSP_EVENT_KEY_2) || mode_change) {
-        app_button_is_pushed(2, &pushed);
-        if (pushed) {
-            button_state[0] ^= (1 << 2);
-            LEDS_ON(BSP_LED_2_MASK);
-        } else {
-            button_state[0] |= (1 << 2);
-            LEDS_OFF(BSP_LED_2_MASK);
+        if ((evt == BSP_EVENT_KEY_1) || mode_change) {
+            app_button_is_pushed(1, &pushed);
+            if (pushed) {
+                button_state[0] ^= (1 << 1);
+                LEDS_ON(BSP_LED_1_MASK);
+            } else {
+                button_state[0] |= (1 << 1);
+                LEDS_OFF(BSP_LED_1_MASK);
+            }
         }
-    }
-    if ((evt == BSP_EVENT_KEY_3) || mode_change) {
-        app_button_is_pushed(3, &pushed);
-        if (pushed) {
-            button_state[0] ^= (1 << 3);
-            LEDS_ON(BSP_LED_3_MASK);
-        } else {
-            button_state[0] |= (1 << 3);
-            LEDS_OFF(BSP_LED_3_MASK);
+        if ((evt == BSP_EVENT_KEY_2) || mode_change) {
+            app_button_is_pushed(2, &pushed);
+            if (pushed) {
+                button_state[0] ^= (1 << 2);
+                LEDS_ON(BSP_LED_2_MASK);
+            } else {
+                button_state[0] |= (1 << 2);
+                LEDS_OFF(BSP_LED_2_MASK);
+            }
         }
+        if ((evt == BSP_EVENT_KEY_3) || mode_change) {
+            app_button_is_pushed(3, &pushed);
+            if (pushed) {
+                button_state[0] ^= (1 << 3);
+                LEDS_ON(BSP_LED_3_MASK);
+            } else {
+                button_state[0] |= (1 << 3);
+                LEDS_OFF(BSP_LED_3_MASK);
+            }
+        }
+    
+        // Mode change
+        if ((evt == BSP_EVENT_KEY_4) || 
+            (evt == BSP_EVENT_KEY_5) ||
+            (evt == BSP_EVENT_KEY_6) ||
+            (evt == BSP_EVENT_KEY_7)) {
+            button_state[1] |= 0xFF;
+            LEDS_ON(LEDS_MASK);
+        }    
+    
+        rtt_print(0, "%sButton handler: %s%X: %X%X%s\n", RTT_CTRL_TEXT_YELLOW, RTT_CTRL_TEXT_BRIGHT_YELLOW, evt, button_state[0], button_state[1], RTT_CTRL_RESET);
+    
+        if (m_conn_handle != BLE_CONN_HANDLE_INVALID) {
+            rtt_print(0, "Not ignoring button, connected: %X/%X (%d/%d)\n", m_conn_handle, BLE_GAP_EVT_CONNECTED, evt, BSP_EVENT_KEY_5);
+        
+            err_code = ble_buttonstatus_on_button_change(&m_buttonservice, button_state);
+            if (err_code == BLE_ERROR_GATTS_SYS_ATTR_MISSING) {
+                // Can ignore this error, just means that bluetooth is connected but nobody's listening yet
+                rtt_print(0, "BLE_ERROR_GATTS_SYS_ATTR_MISSING\n");
+            } else {
+                APP_ERROR_CHECK(err_code);
+            }
+        } else {
+            rtt_print(0, "%sIgnoring button, not connected: %s%X/%X\n", RTT_CTRL_TEXT_BRIGHT_BLACK, RTT_CTRL_TEXT_BLUE, m_conn_handle, BLE_GAP_EVT_CONNECTED);
+        }
+    } else {
+        rtt_print(0, "%sUnhandled bsp_evt: %s%X%s\n", RTT_CTRL_TEXT_RED, RTT_CTRL_TEXT_BRIGHT_RED, evt, RTT_CTRL_RESET);
     }
-    
-    // Mode change
-    if ((evt == BSP_EVENT_KEY_4) || 
-        (evt == BSP_EVENT_KEY_5) ||
-        (evt == BSP_EVENT_KEY_6) ||
-        (evt == BSP_EVENT_KEY_7)) {
-        button_state[1] |= 0xFF;
-        LEDS_ON(LEDS_MASK);
-    }    
-    
-    rtt_print(0, "%sButton handler: %s%X: %X%X%s\n", RTT_CTRL_TEXT_YELLOW, RTT_CTRL_TEXT_BRIGHT_YELLOW, evt, button_state[0], button_state[1], RTT_CTRL_RESET);
-    
-    err_code = ble_buttonstatus_on_button_change(&m_buttonservice, button_state);
-    
-    APP_ERROR_CHECK(err_code);
 }
 
 
@@ -272,6 +294,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
     ble_gap_enc_info_t *             p_enc_info;
     ble_gap_irk_t *                  p_id_info;
     ble_gap_sign_info_t *            p_sign_info;
+    ble_gatts_evt_write_t *          p_evt_write;
 
     static ble_gap_enc_key_t         m_enc_key;           /**< Encryption Key (Encryption Info and Master ID). */
     static ble_gap_id_key_t          m_id_key;            /**< Identity Key (IRK and address). */
@@ -281,6 +304,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GAP_EVT_CONNECTED:
+            rtt_print(0, "m_conn_handle: connected: %X\n", p_ble_evt->evt.gap_evt.conn_handle);
             err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
             APP_ERROR_CHECK(err_code);
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
@@ -293,21 +317,23 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
                             2. Make sure the app_button module is initialized. */
             err_code = app_button_enable();
             APP_ERROR_CHECK(err_code);
-            rtt_print(0, "%sBluetooth connected.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+            rtt_print(0, "%s%sBluetooth connected.%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_YELLOW, RTT_CTRL_RESET);
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
+            rtt_print(0, "m_conn_handle: invalid\n");
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
 
             /* YOUR_JOB: Uncomment this part if you are using the app_button module to handle button
                          events. This should be done to save power when not connected
                          to a peer. */
-            err_code = app_button_disable();
-            APP_ERROR_CHECK(err_code);
-            rtt_print(0, "%sBluetooth %sdisconnected.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
+            // err_code = app_button_disable();
+            // APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%s%sBluetooth %sdisconnected.%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
             break;
 
         case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
+            rtt_print(0, "m_conn_handle: sec params request");
             err_code = sd_ble_gap_sec_params_reply(m_conn_handle,
                                                    BLE_GAP_SEC_STATUS_SUCCESS,
                                                    &m_sec_params,
@@ -344,10 +370,23 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
                 APP_ERROR_CHECK(err_code);
             rtt_print(0, "%sBluetooth security info request.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
             break;
+        
+        case BLE_EVT_TX_COMPLETE:
+            rtt_print(0, "%sTX complete\n", RTT_CTRL_TEXT_BLUE);
+            break;
 
+        case BLE_GAP_EVT_CONN_PARAM_UPDATE:
+            rtt_print(0, "%sConnection params update\n", RTT_CTRL_TEXT_BLUE);
+            break;
+            
+        case BLE_GATTS_EVT_WRITE:
+            p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
+            rtt_print(0, "%sGatt written to by server: %s%X\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_evt_write);
+            break;
+            
         default:
             // No implementation needed.
-            rtt_print(0, "%sBluetooth event unhandled: %d%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, RTT_CTRL_RESET);
+            rtt_print(0, "%sBluetooth event unhandled: %s%d(%d)%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, p_ble_evt->header.evt_len, RTT_CTRL_RESET);
             break;
     }
 }
@@ -367,7 +406,7 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 
     ble_buttonstatus_on_ble_evt(&m_buttonservice, p_ble_evt);
     
-    rtt_print(0, "%sBluetooth event: %s%X%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_TEXT_BRIGHT_GREEN, p_ble_evt->header, RTT_CTRL_RESET);
+    rtt_print(0, "%sBluetooth event: %s%X%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header, RTT_CTRL_RESET);
 }
 
 /**@brief Function for handling the Connection Parameters Module.
@@ -436,7 +475,7 @@ static void ble_stack_init(void)
     err_code = softdevice_sys_evt_handler_set(sys_evt_dispatch);
     APP_ERROR_CHECK(err_code);
     
-    rtt_print(0, "%sStarted bluetooth stack.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    rtt_print(0, "%sStarted bluetooth stack.%s\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET);
 }
 
 /**@brief Function for the GAP initialization.
@@ -471,7 +510,7 @@ static void gap_params_init(void)
     err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
     APP_ERROR_CHECK(err_code);
     
-    rtt_print(0, "%sBluetooth GAP connection params init.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    rtt_print(0, "%sBluetooth GAP connection params init.%s\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET);
 }
 
 /**@brief Function for initializing the Advertising functionality.
@@ -503,7 +542,7 @@ static void advertising_init(void)
     err_code = ble_advertising_init(&advdata, NULL, &options, on_adv_evt, NULL);
     APP_ERROR_CHECK(err_code);
     
-    rtt_print(0, "%sStarted bluetooth advertising.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    rtt_print(0, "%sStarted bluetooth advertising.%s\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET);
 }
 
 /**@brief Function for initializing the Connection Parameters module.
@@ -527,7 +566,7 @@ static void conn_params_init(void)
     err_code = ble_conn_params_init(&cp_init);
     APP_ERROR_CHECK(err_code);
     
-    rtt_print(0, "%sConnection params initialized.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    rtt_print(0, "%sConnection params initialized.%s\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET);
 }
 
 /**@brief Function for initializing security parameters.

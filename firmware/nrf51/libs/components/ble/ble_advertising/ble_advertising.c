@@ -16,9 +16,8 @@
 #include "app_trace.h"
 #include "nordic_common.h"
 #include "pstorage.h"
-#include "rtt.h"
 
-#define LOG rtt_log
+#define LOG app_trace_log
 
 static bool                            m_advertising_start_pending = false; /**< Flag to keep track of ongoing operations on persistent memory. */
 
