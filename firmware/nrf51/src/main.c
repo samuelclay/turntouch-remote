@@ -104,69 +104,69 @@ void bsp_evt_handler(bsp_event_t evt) {
     uint32_t err_code;
     bool pushed;
     uint8_t button_state[BUTTON_STATUS_PACKET_BYTES] = {0x0F, 0x00};
-    
+    bool mode_change;
     switch (evt)
     {
-        case BSP_EVENT_KEY_0:
-
-            app_button_is_pushed(0, &pushed);
-            if (pushed) {
-                button_state[0] ^= (1 << 0);
-                LEDS_ON(BSP_LED_0_MASK);
-            } else {
-                button_state[0] |= (1 << 0);
-                LEDS_OFF(BSP_LED_0_MASK);
-            }
-            break;
-
-        case BSP_EVENT_KEY_1:
-
-            app_button_is_pushed(1, &pushed);
-            if (pushed) {
-                button_state[0] ^= (1 << 1);
-                LEDS_ON(BSP_LED_1_MASK);
-            } else {
-                button_state[0] |= (1 << 1);
-                LEDS_OFF(BSP_LED_1_MASK);
-            }   
-            break;
-
-        case BSP_EVENT_KEY_2:
-
-            app_button_is_pushed(2, &pushed);
-            if (pushed) {
-                button_state[0] ^= (1 << 2);
-                LEDS_ON(BSP_LED_2_MASK);
-            } else {
-                button_state[0] |= (1 << 2);
-                LEDS_OFF(BSP_LED_2_MASK);
-            }   
-            break;
-
-        case BSP_EVENT_KEY_3:
-
-            app_button_is_pushed(3, &pushed);
-            if (pushed) {
-                button_state[0] ^= (1 << 3);
-                LEDS_ON(BSP_LED_3_MASK);
-            } else {
-                button_state[0] |= (1 << 3);
-                LEDS_OFF(BSP_LED_3_MASK);
-            }   
-            break;
-        
         case BSP_EVENT_KEY_4:            
         case BSP_EVENT_KEY_5:
         case BSP_EVENT_KEY_6:
         case BSP_EVENT_KEY_7:
-
-            button_state[1] |= 0xFF;
-            LEDS_ON(LEDS_MASK);
+            mode_change = true;
             break;
-        
         default:
-            return; // no implementation needed
+            break;
     }
+    
+    // Button down
+    if ((evt == BSP_EVENT_KEY_0) || mode_change) {
+        app_button_is_pushed(0, &pushed);
+        if (pushed) {
+            button_state[0] ^= (1 << 0);
+            LEDS_ON(BSP_LED_0_MASK);
+        } else {
+            button_state[0] |= (1 << 0);
+            LEDS_OFF(BSP_LED_0_MASK);
+        }
+    }
+    if ((evt == BSP_EVENT_KEY_1) || mode_change) {
+        app_button_is_pushed(1, &pushed);
+        if (pushed) {
+            button_state[0] ^= (1 << 1);
+            LEDS_ON(BSP_LED_1_MASK);
+        } else {
+            button_state[0] |= (1 << 1);
+            LEDS_OFF(BSP_LED_1_MASK);
+        }
+    }
+    if ((evt == BSP_EVENT_KEY_2) || mode_change) {
+        app_button_is_pushed(2, &pushed);
+        if (pushed) {
+            button_state[0] ^= (1 << 2);
+            LEDS_ON(BSP_LED_2_MASK);
+        } else {
+            button_state[0] |= (1 << 2);
+            LEDS_OFF(BSP_LED_2_MASK);
+        }
+    }
+    if ((evt == BSP_EVENT_KEY_3) || mode_change) {
+        app_button_is_pushed(3, &pushed);
+        if (pushed) {
+            button_state[0] ^= (1 << 3);
+            LEDS_ON(BSP_LED_3_MASK);
+        } else {
+            button_state[0] |= (1 << 3);
+            LEDS_OFF(BSP_LED_3_MASK);
+        }
+    }
+    
+    // Mode change
+    if ((evt == BSP_EVENT_KEY_4) || 
+        (evt == BSP_EVENT_KEY_5) ||
+        (evt == BSP_EVENT_KEY_6) ||
+        (evt == BSP_EVENT_KEY_7)) {
+        button_state[1] |= 0xFF;
+        LEDS_ON(LEDS_MASK);
+    }    
     
     rtt_print(0, "%sButton handler: %s%X: %X%X%s\n", RTT_CTRL_TEXT_YELLOW, RTT_CTRL_TEXT_BRIGHT_YELLOW, evt, button_state[0], button_state[1], RTT_CTRL_RESET);
     
