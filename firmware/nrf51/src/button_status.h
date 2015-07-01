@@ -16,7 +16,7 @@
 #define BUTTONSERVICE_UUID_SERVICE                  0x1523
 #define BUTTONSERVICE_UUID_BUTTONSTATUS_CHAR        0x1525
 #define BUTTONSERVICE_UUID_FIRMWARE_NICKNAME_CHAR   0x1526
-
+#define BUTTON_STATUS_PACKET_BYTES                  2
 #define FIRMWARE_NICKNAME_MAX_LENGTH                32
 
 // Forward declaration of the ble_buttonservice_t type. 
@@ -63,7 +63,7 @@ void ble_buttonstatus_on_ble_evt(ble_buttonservice_t * p_buttonservice, ble_evt_
 
 /**@brief Function for sending a button state notification.
  */
-uint32_t ble_buttonstatus_on_button_change(ble_buttonservice_t * p_buttonservice, uint8_t *button_state);
+uint32_t ble_buttonstatus_on_button_change(ble_buttonservice_t * p_buttonservice, uint8_t button_state[]);
 
 #endif // BLE_BUTTONSTATUS_H__
 

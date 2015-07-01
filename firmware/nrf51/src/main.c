@@ -103,7 +103,7 @@ static void sleep_mode_enter(void);
 void bsp_evt_handler(bsp_event_t evt) {
     uint32_t err_code;
     bool pushed;
-    uint8_t button_state[2] = {0x0F, 0x00};
+    uint8_t button_state[BUTTON_STATUS_PACKET_BYTES] = {0x0F, 0x00};
     
     switch (evt)
     {
@@ -169,7 +169,9 @@ void bsp_evt_handler(bsp_event_t evt) {
     }
     
     rtt_print(0, "%sButton handler: %s%X: %X%X%s\n", RTT_CTRL_TEXT_YELLOW, RTT_CTRL_TEXT_BRIGHT_YELLOW, evt, button_state[0], button_state[1], RTT_CTRL_RESET);
+    
     err_code = ble_buttonstatus_on_button_change(&m_buttonservice, button_state);
+    
     APP_ERROR_CHECK(err_code);
 }
 
