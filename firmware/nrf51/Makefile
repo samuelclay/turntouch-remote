@@ -45,6 +45,7 @@ C_SOURCE_FILES += \
 ./libs/components/ble/common/ble_advdata.c \
 ./libs/components/ble/common/ble_conn_params.c \
 ./libs/components/ble/common/ble_srv_common.c \
+./libs/components/ble/device_manager/device_manager_peripheral.c \
 ./libs/components/drivers_nrf/common/nrf_drv_common.c \
 ./libs/components/drivers_nrf/gpiote/nrf_drv_gpiote.c \
 ./libs/components/drivers_nrf/hal/nrf_delay.c \
@@ -74,6 +75,7 @@ INC_PATHS += -I./libs/bsp
 INC_PATHS += -I./libs/RTT
 INC_PATHS += -I./libs/components/ble/ble_advertising
 INC_PATHS += -I./libs/components/ble/common
+INC_PATHS += -I./libs/components/ble/device_manager
 INC_PATHS += -I./libs/components/device
 INC_PATHS += -I./libs/components/drivers_nrf/common
 INC_PATHS += -I./libs/components/drivers_nrf/gpiote

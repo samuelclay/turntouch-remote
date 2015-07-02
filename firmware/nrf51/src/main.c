@@ -25,13 +25,16 @@
 #include "ble_srv_common.h"
 #include "boards.h"
 #include "bsp.h"
+#include "bsp_btn_ble.h"
 #include "button_status.h"
+#include "device_manager.h"
 #include "nordic_common.h"
 #include "nrf.h"
 #include "nrf51_bitfields.h"
 #include "nrf_drv_gpiote.h"
 #include "nrf_error.h"
 #include "nrf_gpio.h"
+#include "pstorage.h"
 #include "rtt.h"
 #include "softdevice_handler.h"
 
@@ -92,6 +95,8 @@
 static ble_gap_sec_params_t             m_sec_params;                               /**< Security requirements for this application. */
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
 static ble_buttonservice_t              m_buttonservice;
+static dm_application_instance_t        m_app_handle;                                  /**< Application identifier allocated by device manager. */
+static dm_handle_t                      m_bonded_peer_handle;                          /**< Device reference handle to the current bonded central. */
 
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt);
 static void sleep_mode_enter(void);
@@ -213,16 +218,30 @@ void clock_initialization()
 }
 
 
+void storage_init() {
+    uint32_t err_code;
+    
+    err_code = pstorage_init();
+    
+    APP_ERROR_CHECK(err_code);
+}
+
 /**@brief Function for initializing bsp module.
  */
-void bsp_configuration()
+void bsp_configuration(bool * p_erase_bonds)
 {
+    // bsp_event_t startup_event;
     uint32_t err_code;
 
     err_code = bsp_init(BSP_INIT_LED | BSP_INIT_BUTTONS,
                         APP_TIMER_TICKS(100, APP_TIMER_PRESCALER),
                         bsp_evt_handler);
     APP_ERROR_CHECK(err_code);
+    
+    // err_code = bsp_btn_ble_init(NULL, &startup_event);
+    // APP_ERROR_CHECK(err_code);
+
+    *p_erase_bonds = false;
 }
 
 /**@brief Function for the Event Scheduler initialization.
@@ -581,6 +600,67 @@ static void sec_params_init(void)
     m_sec_params.max_key_size = SEC_PARAM_MAX_KEY_SIZE;
 }
 
+
+/**@brief Function for handling the Device Manager events.
+ *
+ * @param[in]   p_evt   Data associated to the device manager event.
+ */
+static uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
+                                           dm_event_t const     * p_event,
+                                           ret_code_t           event_result)
+{
+    rtt_print(0, ">> device_manager_evt_handler");
+    APP_ERROR_CHECK(event_result);
+
+    switch(p_event->event_id)
+    {
+        case DM_EVT_DEVICE_CONTEXT_LOADED: // Fall through.
+        case DM_EVT_SECURITY_SETUP_COMPLETE:
+            m_bonded_peer_handle = (*p_handle);
+            break;
+    }
+
+    return NRF_SUCCESS;
+}
+
+
+/**@brief Function for the Device Manager initialization.
+ *
+ * @param[in] erase_bonds  Indicates whether bonding information should be cleared from
+ *                         persistent storage during initialization of the Device Manager.
+ */
+static void device_manager_init(bool erase_bonds)
+{
+    uint32_t               err_code;
+    dm_init_param_t        init_param = {.clear_persistent_data = erase_bonds};
+    dm_application_param_t  register_param;
+
+    // Initialize peer device handle.
+    err_code = dm_handle_initialize(&m_bonded_peer_handle);
+    APP_ERROR_CHECK(err_code);
+    
+    // Initialize persistent storage module.
+    err_code = pstorage_init();
+    APP_ERROR_CHECK(err_code);
+
+    err_code = dm_init(&init_param);
+    APP_ERROR_CHECK(err_code);
+    
+    memset(&register_param.sec_param, 0, sizeof(ble_gap_sec_params_t));
+
+    register_param.sec_param.bond         = SEC_PARAM_BOND;
+    register_param.sec_param.mitm         = SEC_PARAM_MITM;
+    register_param.sec_param.io_caps      = SEC_PARAM_IO_CAPABILITIES;
+    register_param.sec_param.oob          = SEC_PARAM_OOB;
+    register_param.sec_param.min_key_size = SEC_PARAM_MIN_KEY_SIZE;
+    register_param.sec_param.max_key_size = SEC_PARAM_MAX_KEY_SIZE;
+    register_param.evt_handler            = device_manager_evt_handler;
+    register_param.service_type           = DM_PROTOCOL_CNTXT_GATT_SRVR_ID;
+
+    err_code = dm_register(&m_app_handle, &register_param);
+    APP_ERROR_CHECK(err_code);
+}
+
 /**@brief Function for handling advertising events.
  *
  * @details This function will be called for advertising events which are passed to the application.
@@ -708,6 +788,7 @@ static void sleep_mode_enter(void)
  */
 int main(void)
 {
+    bool erase_bonds;
     uint32_t err_code;
 
     rtt_print(0, "%s%sStarting up Turn Touch Remote%s\n", RTT_CTRL_TEXT_BRIGHT_YELLOW,
@@ -717,12 +798,12 @@ int main(void)
     // Initialize buttons
     // clock_initialization();
     timers_init();
-    bsp_configuration();
+    bsp_configuration(&erase_bonds);
 
     // Initialize
     ble_stack_init();
     scheduler_init();
-
+    device_manager_init(erase_bonds);
     gap_params_init();
     advertising_init();
     services_init();

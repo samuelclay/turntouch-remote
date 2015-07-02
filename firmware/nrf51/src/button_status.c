@@ -79,9 +79,13 @@ void ble_buttonstatus_on_ble_evt(ble_buttonservice_t * p_buttonservice, ble_evt_
         case BLE_GATTS_EVT_WRITE:
             on_write(p_buttonservice, p_ble_evt);
             break;
-            
+        
+        case BLE_GAP_EVT_CONN_PARAM_UPDATE:
+            break;
+        
         default:
             // No implementation needed.
+            rtt_print(0, "%sUnhandled ble buttonstatus ble event: %s%X\n", RTT_CTRL_TEXT_YELLOW, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id);
             break;
     }
 }
