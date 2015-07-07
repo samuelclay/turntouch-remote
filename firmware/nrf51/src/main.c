@@ -738,8 +738,14 @@ static void services_init(void)
 {
     uint32_t err_code;
     ble_buttonstatus_init_t init;
-    
+    char nickname[FIRMWARE_NICKNAME_MAX_LENGTH];
+
     init.firmware_nickname_write_handler = firmware_nickname_write_handler;
+
+    strcpy(nickname, "Teeeemote");
+    memset(init.nickname_str, 0, FIRMWARE_NICKNAME_MAX_LENGTH);
+    strcpy(init.nickname_str, nickname);
+    rtt_print(0, "Setting nickname: %s/%s (%d)\n", nickname, init.nickname_str, strlen(nickname));
     
     err_code = ble_buttonstatus_init(&m_buttonservice, &init);
     APP_ERROR_CHECK(err_code);
