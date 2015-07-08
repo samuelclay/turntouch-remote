@@ -50,14 +50,14 @@ static void on_disconnect(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_b
 static void on_write(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_ble_evt)
 {
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
-    rtt_print(0, "%son_write: %s%X(%d:%X) / %X/%X-%X\n", RTT_CTRL_TEXT_GREEN, RTT_CTRL_TEXT_BRIGHT_GREEN, p_evt_write->handle, p_ble_evt->header.evt_len, *p_evt_write->data, p_buttonservice->button_status_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.cccd_handle);
+    rtt_print(0, "%son_write: %s%X(%d:%X) / %X/%X-%X\n", RTT_CTRL_TEXT_GREEN, RTT_CTRL_TEXT_BRIGHT_GREEN, p_evt_write->handle, p_ble_evt->header.evt_len, *(&p_evt_write->data[8]), p_buttonservice->button_status_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.cccd_handle);
+    
     if (p_evt_write->handle == p_buttonservice->button_status_char_handles.value_handle) {
-        rtt_print(0, "on_write, button status");
-        
+        rtt_print(0, "on_write, button status");        
     } else if ((p_evt_write->handle == p_buttonservice->firmware_nickname_char_handles.value_handle) &&
-        (p_buttonservice->firmware_nickname_write_handler != NULL))
-    {
-        rtt_print(0, "on_write, firmware: %X(%d) / %X\n", p_evt_write->handle, *p_evt_write->data, p_buttonservice->firmware_nickname_char_handles.value_handle);
+               (p_buttonservice->firmware_nickname_write_handler != NULL)) {
+        rtt_print(0, "on_write, firmware: %X(%d) / %X\n", p_evt_write->handle, *p_evt_write->data, 
+                  p_buttonservice->firmware_nickname_char_handles.value_handle);
         p_buttonservice->firmware_nickname_write_handler(p_buttonservice, p_evt_write->data);
     }
 }

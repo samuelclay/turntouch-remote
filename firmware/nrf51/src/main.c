@@ -405,7 +405,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             
         case BLE_GATTS_EVT_WRITE:
             p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
-            rtt_print(0, "%sGatt written to by server: %s%X\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_evt_write);
+            rtt_print(0, "%sGatt written to by client: %s%X\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_evt_write);
             break;
 
         case BLE_EVT_USER_MEM_REQUEST:
@@ -427,17 +427,12 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             break;
 
         case BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST:
-            rtt_print(0, "%sBluetooth RW authorize request\n", RTT_CTRL_TEXT_BLUE);
+            rtt_print(0, "%sBluetooth RW authorize request: %X == %X/%x, %X\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gatts_evt.params.write.op, BLE_GATTS_OP_PREP_WRITE_REQ, BLE_GATTS_OP_EXEC_WRITE_REQ_NOW, p_ble_evt->evt.gatts_evt.params.write.data[0]);
             m_rw_authorize_reply.params.write.gatt_status = BLE_GATT_STATUS_SUCCESS;
             m_rw_authorize_reply.type = BLE_GATTS_AUTHORIZE_TYPE_WRITE;
             
-            if (p_ble_evt->evt.gatts_evt.params.write.op == BLE_GATTS_OP_PREP_WRITE_REQ) {
-                err_code = sd_ble_gatts_rw_authorize_reply(m_conn_handle, &m_rw_authorize_reply);
-                APP_ERROR_CHECK(err_code);
-            } else if (p_ble_evt->evt.gatts_evt.params.write.op == BLE_GATTS_OP_EXEC_WRITE_REQ_NOW) {
-                err_code = sd_ble_gatts_rw_authorize_reply(m_conn_handle, &m_rw_authorize_reply);
-                APP_ERROR_CHECK(err_code);
-            }
+            err_code = sd_ble_gatts_rw_authorize_reply(m_conn_handle, &m_rw_authorize_reply);
+            APP_ERROR_CHECK(err_code);
             break;
 
         default:
@@ -765,8 +760,8 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
 }
 
 static void firmware_nickname_write_handler(ble_buttonservice_t *p_buttonservice, uint8_t* nickname) {
-    rtt_print(0, "%s%sNew nickname: %s%X%s", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_WHITE,
-              RTT_CTRL_TEXT_BRIGHT_GREEN, nickname, RTT_CTRL_RESET);
+    rtt_print(0, "%s%sNew nickname: %s%X%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_WHITE,
+              RTT_CTRL_TEXT_BRIGHT_GREEN, nickname[8], RTT_CTRL_RESET);
 }
 
 /**@brief Function for initializing services that will be used by the application.
