@@ -303,159 +303,6 @@ static void sys_evt_dispatch(uint32_t sys_evt)
     ble_advertising_on_sys_evt(sys_evt);
 }
 
-/**@brief Function for handling the Application's BLE Stack events.
- *
- * @param[in]   p_ble_evt   Bluetooth stack event.
- */
-static void on_ble_evt(ble_evt_t * p_ble_evt)
-{
-    uint32_t                         err_code;
-    static ble_gap_evt_auth_status_t m_auth_status;
-    bool                             master_id_matches;
-    ble_gap_sec_kdist_t *            p_distributed_keys;
-    ble_gap_enc_info_t *             p_enc_info;
-    ble_gap_irk_t *                  p_id_info;
-    ble_gap_sign_info_t *            p_sign_info;
-    ble_gatts_evt_write_t *          p_evt_write;
-
-    static ble_gap_enc_key_t         m_enc_key;           /**< Encryption Key (Encryption Info and Master ID). */
-    static ble_gap_id_key_t          m_id_key;            /**< Identity Key (IRK and address). */
-    static ble_gap_sign_info_t       m_sign_key;          /**< Signing Key (Connection Signature Resolving Key). */
-    static ble_gap_sec_keyset_t      m_keys = {.keys_periph = {&m_enc_key, &m_id_key, &m_sign_key}};
-
-    switch (p_ble_evt->header.evt_id)
-    {
-        case BLE_GAP_EVT_CONNECTED:
-            rtt_print(0, "m_conn_handle: connected: %X\n", p_ble_evt->evt.gap_evt.conn_handle);
-            err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
-            APP_ERROR_CHECK(err_code);
-            m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
-
-            /* YOUR_JOB: Uncomment this part if you are using the app_button module to handle button
-                         events (assuming that the button events are only needed in connected
-                         state). If this is uncommented out here,
-                            1. Make sure that app_button_disable() is called when handling
-                               BLE_GAP_EVT_DISCONNECTED below.
-                            2. Make sure the app_button module is initialized. */
-            err_code = app_button_enable();
-            APP_ERROR_CHECK(err_code);
-            rtt_print(0, "%s%sBluetooth connected.%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_YELLOW, RTT_CTRL_RESET);
-            break;
-
-        case BLE_GAP_EVT_DISCONNECTED:
-            rtt_print(0, "m_conn_handle: invalid\n");
-            m_conn_handle = BLE_CONN_HANDLE_INVALID;
-
-            /* YOUR_JOB: Uncomment this part if you are using the app_button module to handle button
-                         events. This should be done to save power when not connected
-                         to a peer. */
-            // err_code = app_button_disable();
-            // APP_ERROR_CHECK(err_code);
-            
-            rtt_print(0, "%s%sBluetooth %sdisconnected.%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
-            break;
-
-        case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
-            rtt_print(0, "m_conn_handle: sec params request");
-            err_code = sd_ble_gap_sec_params_reply(m_conn_handle,
-                                                   BLE_GAP_SEC_STATUS_SUCCESS,
-                                                   &m_sec_params,
-                                                   &m_keys);
-            APP_ERROR_CHECK(err_code);
-            rtt_print(0, "%sBluetooth params request.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
-            break;
-
-        case BLE_GATTS_EVT_SYS_ATTR_MISSING:
-            err_code = sd_ble_gatts_sys_attr_set(m_conn_handle,
-                                                 NULL,
-                                                 0,
-                                                 BLE_GATTS_SYS_ATTR_FLAG_SYS_SRVCS | BLE_GATTS_SYS_ATTR_FLAG_USR_SRVCS);
-            APP_ERROR_CHECK(err_code);
-            rtt_print(0, "%sBluetooth sys attr missing.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
-            break;
-
-        case BLE_GAP_EVT_AUTH_STATUS:
-            m_auth_status = p_ble_evt->evt.gap_evt.params.auth_status;
-            rtt_print(0, "%sBluetooth auth status.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
-            break;
-
-        case BLE_GAP_EVT_SEC_INFO_REQUEST:
-            master_id_matches  = memcmp(&p_ble_evt->evt.gap_evt.params.sec_info_request.master_id,
-                                        &m_enc_key.master_id,
-                                        sizeof(ble_gap_master_id_t)) == 0;
-            p_distributed_keys = &m_auth_status.kdist_periph;
-
-            p_enc_info  = (p_distributed_keys->enc  && master_id_matches) ? &m_enc_key.enc_info : NULL;
-            p_id_info   = (p_distributed_keys->id   && master_id_matches) ? &m_id_key.id_info   : NULL;
-            p_sign_info = (p_distributed_keys->sign && master_id_matches) ? &m_sign_key         : NULL;
-
-            err_code = sd_ble_gap_sec_info_reply(m_conn_handle, p_enc_info, p_id_info, p_sign_info);
-                APP_ERROR_CHECK(err_code);
-            rtt_print(0, "%sBluetooth security info request.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
-            break;
-        
-        case BLE_EVT_TX_COMPLETE:
-            rtt_print(0, "%sTX complete\n", RTT_CTRL_TEXT_BLUE);
-            break;
-
-        case BLE_GAP_EVT_CONN_PARAM_UPDATE:
-            rtt_print(0, "%sConnection params update\n", RTT_CTRL_TEXT_BLUE);
-            break;
-            
-        case BLE_GATTS_EVT_WRITE:
-            p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
-            rtt_print(0, "%sGatt written to by client: %s%X\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_evt_write);
-            break;
-
-        case BLE_EVT_USER_MEM_REQUEST:
-            rtt_print(0, "%sBluetooth user mem request (%X)\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gap_evt.conn_handle);
-            m_mem_block.p_mem = &m_mem_queue[0];
-            m_mem_block.len = MEM_BLOCK_SIZE;
-            err_code = sd_ble_user_mem_reply(p_ble_evt->evt.gap_evt.conn_handle, &m_mem_block);
-            APP_ERROR_CHECK(err_code);
-            break;
-
-        case BLE_EVT_USER_MEM_RELEASE:
-            rtt_print(0, "%sBluetooth user mem release (%X)\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gap_evt.conn_handle);
-            if (p_ble_evt->evt.common_evt.params.user_mem_release.mem_block.p_mem == m_mem_block.p_mem) {
-            
-            }
-            break;
-
-        case BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST:
-            rtt_print(0, "%sBluetooth RW authorize request: %X == %X/%x, %X\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gatts_evt.params.write.op, BLE_GATTS_OP_PREP_WRITE_REQ, BLE_GATTS_OP_EXEC_WRITE_REQ_NOW, p_ble_evt->evt.gatts_evt.params.write.data[0]);
-            m_rw_authorize_reply.params.write.gatt_status = BLE_GATT_STATUS_SUCCESS;
-            m_rw_authorize_reply.type = BLE_GATTS_AUTHORIZE_TYPE_WRITE;
-            
-            err_code = sd_ble_gatts_rw_authorize_reply(m_conn_handle, &m_rw_authorize_reply);
-            APP_ERROR_CHECK(err_code);
-            break;
-
-        default:
-            // No implementation needed.
-            rtt_print(0, "%sBluetooth event unhandled: %s%X(%d)%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, p_ble_evt->header.evt_len, RTT_CTRL_RESET);
-            break;
-    }
-}
-
-/**@brief Function for dispatching a BLE stack event to all modules with a BLE stack event handler.
- *
- * @details This function is called from the scheduler in the main loop after a BLE stack
- *          event has been received.
- *
- * @param[in] p_ble_evt  Bluetooth stack event.
- */
-static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
-{
-    rtt_print(0, "%sBluetooth event: %s%X%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, RTT_CTRL_RESET);
-    dm_ble_evt_handler(p_ble_evt);
-    on_ble_evt(p_ble_evt);
-    ble_conn_params_on_ble_evt(p_ble_evt);
-    ble_advertising_on_ble_evt(p_ble_evt);
-
-    ble_buttonstatus_on_ble_evt(&m_buttonservice, p_ble_evt);    
-}
-
 /**@brief Function for handling the Connection Parameters Module.
  *
  * @details This function will be called for all events in the Connection Parameters Module which
@@ -754,6 +601,168 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
             break;
     }
 }
+
+// ====================
+// = Bluetooth events =
+// ====================
+
+
+/**@brief Function for dispatching a BLE stack event to all modules with a BLE stack event handler.
+ *
+ * @details This function is called from the scheduler in the main loop after a BLE stack
+ *          event has been received.
+ *
+ * @param[in] p_ble_evt  Bluetooth stack event.
+ */
+static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
+{
+    rtt_print(0, "%sBluetooth event: %s%X%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, RTT_CTRL_RESET);
+    dm_ble_evt_handler(p_ble_evt);
+    on_ble_evt(p_ble_evt);
+    ble_conn_params_on_ble_evt(p_ble_evt);
+    ble_advertising_on_ble_evt(p_ble_evt);
+
+    ble_buttonstatus_on_ble_evt(&m_buttonservice, p_ble_evt);    
+}
+
+/**@brief Function for handling the Application's BLE Stack events.
+ *
+ * @param[in]   p_ble_evt   Bluetooth stack event.
+ */
+static void on_ble_evt(ble_evt_t * p_ble_evt)
+{
+    uint32_t                         err_code;
+    static ble_gap_evt_auth_status_t m_auth_status;
+    bool                             master_id_matches;
+    ble_gap_sec_kdist_t *            p_distributed_keys;
+    ble_gap_enc_info_t *             p_enc_info;
+    ble_gap_irk_t *                  p_id_info;
+    ble_gap_sign_info_t *            p_sign_info;
+    ble_gatts_evt_write_t *          p_evt_write;
+
+    static ble_gap_enc_key_t         m_enc_key;           /**< Encryption Key (Encryption Info and Master ID). */
+    static ble_gap_id_key_t          m_id_key;            /**< Identity Key (IRK and address). */
+    static ble_gap_sign_info_t       m_sign_key;          /**< Signing Key (Connection Signature Resolving Key). */
+    static ble_gap_sec_keyset_t      m_keys = {.keys_periph = {&m_enc_key, &m_id_key, &m_sign_key}};
+
+    switch (p_ble_evt->header.evt_id)
+    {
+        case BLE_GAP_EVT_CONNECTED:
+            rtt_print(0, "m_conn_handle: connected: %X\n", p_ble_evt->evt.gap_evt.conn_handle);
+            err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
+            APP_ERROR_CHECK(err_code);
+            m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+
+            /* YOUR_JOB: Uncomment this part if you are using the app_button module to handle button
+                         events (assuming that the button events are only needed in connected
+                         state). If this is uncommented out here,
+                            1. Make sure that app_button_disable() is called when handling
+                               BLE_GAP_EVT_DISCONNECTED below.
+                            2. Make sure the app_button module is initialized. */
+            err_code = app_button_enable();
+            APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%s%sBluetooth connected.%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_YELLOW, RTT_CTRL_RESET);
+            break;
+
+        case BLE_GAP_EVT_DISCONNECTED:
+            rtt_print(0, "m_conn_handle: invalid\n");
+            m_conn_handle = BLE_CONN_HANDLE_INVALID;
+
+            /* YOUR_JOB: Uncomment this part if you are using the app_button module to handle button
+                         events. This should be done to save power when not connected
+                         to a peer. */
+            // err_code = app_button_disable();
+            // APP_ERROR_CHECK(err_code);
+            
+            rtt_print(0, "%s%sBluetooth %sdisconnected.%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
+            break;
+
+        case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
+            rtt_print(0, "m_conn_handle: sec params request");
+            err_code = sd_ble_gap_sec_params_reply(m_conn_handle,
+                                                   BLE_GAP_SEC_STATUS_SUCCESS,
+                                                   &m_sec_params,
+                                                   &m_keys);
+            APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%sBluetooth params request.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+            break;
+
+        case BLE_GATTS_EVT_SYS_ATTR_MISSING:
+            err_code = sd_ble_gatts_sys_attr_set(m_conn_handle,
+                                                 NULL,
+                                                 0,
+                                                 BLE_GATTS_SYS_ATTR_FLAG_SYS_SRVCS | BLE_GATTS_SYS_ATTR_FLAG_USR_SRVCS);
+            APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%sBluetooth sys attr missing.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+            break;
+
+        case BLE_GAP_EVT_AUTH_STATUS:
+            m_auth_status = p_ble_evt->evt.gap_evt.params.auth_status;
+            rtt_print(0, "%sBluetooth auth status.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+            break;
+
+        case BLE_GAP_EVT_SEC_INFO_REQUEST:
+            master_id_matches  = memcmp(&p_ble_evt->evt.gap_evt.params.sec_info_request.master_id,
+                                        &m_enc_key.master_id,
+                                        sizeof(ble_gap_master_id_t)) == 0;
+            p_distributed_keys = &m_auth_status.kdist_periph;
+
+            p_enc_info  = (p_distributed_keys->enc  && master_id_matches) ? &m_enc_key.enc_info : NULL;
+            p_id_info   = (p_distributed_keys->id   && master_id_matches) ? &m_id_key.id_info   : NULL;
+            p_sign_info = (p_distributed_keys->sign && master_id_matches) ? &m_sign_key         : NULL;
+
+            err_code = sd_ble_gap_sec_info_reply(m_conn_handle, p_enc_info, p_id_info, p_sign_info);
+                APP_ERROR_CHECK(err_code);
+            rtt_print(0, "%sBluetooth security info request.%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+            break;
+        
+        case BLE_EVT_TX_COMPLETE:
+            rtt_print(0, "%sTX complete\n", RTT_CTRL_TEXT_BLUE);
+            break;
+
+        case BLE_GAP_EVT_CONN_PARAM_UPDATE:
+            rtt_print(0, "%sConnection params update\n", RTT_CTRL_TEXT_BLUE);
+            break;
+            
+        case BLE_GATTS_EVT_WRITE:
+            p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
+            rtt_print(0, "%sGatt written to by client: %s%X\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_evt_write);
+            break;
+
+        case BLE_EVT_USER_MEM_REQUEST:
+            rtt_print(0, "%sBluetooth user mem request (%X)\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gap_evt.conn_handle);
+            m_mem_block.p_mem = &m_mem_queue[0];
+            m_mem_block.len = MEM_BLOCK_SIZE;
+            err_code = sd_ble_user_mem_reply(p_ble_evt->evt.gap_evt.conn_handle, &m_mem_block);
+            APP_ERROR_CHECK(err_code);
+            break;
+
+        case BLE_EVT_USER_MEM_RELEASE:
+            rtt_print(0, "%sBluetooth user mem release (%X)\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gap_evt.conn_handle);
+            if (p_ble_evt->evt.common_evt.params.user_mem_release.mem_block.p_mem == m_mem_block.p_mem) {
+            
+            }
+            break;
+
+        case BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST:
+            rtt_print(0, "%sBluetooth RW authorize request: %X == %X/%x, %X\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gatts_evt.params.write.op, BLE_GATTS_OP_PREP_WRITE_REQ, BLE_GATTS_OP_EXEC_WRITE_REQ_NOW, p_ble_evt->evt.gatts_evt.params.write.data[0]);
+            m_rw_authorize_reply.params.write.gatt_status = BLE_GATT_STATUS_SUCCESS;
+            m_rw_authorize_reply.type = BLE_GATTS_AUTHORIZE_TYPE_WRITE;
+            
+            err_code = sd_ble_gatts_rw_authorize_reply(m_conn_handle, &m_rw_authorize_reply);
+            APP_ERROR_CHECK(err_code);
+            break;
+
+        default:
+            // No implementation needed.
+            rtt_print(0, "%sBluetooth event unhandled: %s%X(%d)%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, p_ble_evt->header.evt_len, RTT_CTRL_RESET);
+            break;
+    }
+}
+
+// ============
+// = Services =
+// ============
 
 static void firmware_nickname_write_handler(ble_buttonservice_t *p_buttonservice, uint8_t* nickname) {
     rtt_print(0, "%s%sNew nickname: %s%X%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_WHITE,
