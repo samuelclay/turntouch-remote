@@ -42,6 +42,7 @@
 #define APP_TIMER_PRESCALER      0                           /**< Value of the RTC1 PRESCALER register. */
 #define APP_TIMER_MAX_TIMERS     (2 + BSP_APP_TIMERS_NUMBER) /**< Maximum number of simultaneously created timers. */
 #define APP_TIMER_OP_QUEUE_SIZE  4                           /**< Size of timer operation queues. */
+#define APP_FEATURE_NOT_SUPPORTED            BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2                    /**< Reply when unsupported features are requested. */
 
 // #define BUTTON_PREV_ID           0                           /**< Button used to switch the state. */
 // #define BUTTON_NEXT_ID           1                           /**< Button used to switch the state. */
@@ -84,7 +85,7 @@
 #define SEC_PARAM_OOB                   0                                           /**< Out Of Band data not available. */
 #define SEC_PARAM_MIN_KEY_SIZE          7                                           /**< Minimum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE          16                                          /**< Maximum encryption key size. */
-
+#define MEM_BLOCK_SIZE                  52                                          /**< Maximum length (an example) for write long, according to https://devzone.nordicsemi.com/documentation/nrf51/5.1.0/html/a01222.html */
 #define DEAD_BEEF                       0xDEADBEEF                                  /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
 // YOUR_JOB: Modify these according to requirements (e.g. if other event types are to pass through
@@ -97,6 +98,9 @@ static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;
 static ble_buttonservice_t              m_buttonservice;
 static dm_application_instance_t        m_app_handle;                                  /**< Application identifier allocated by device manager. */
 static dm_handle_t                      m_bonded_peer_handle;                          /**< Device reference handle to the current bonded central. */
+static ble_user_mem_block_t             m_mem_block;                                /**< Memory block structure, used during a BLE_EVT_USER_MEM_REQUEST event. */
+static ble_gatts_rw_authorize_reply_params_t    m_rw_authorize_reply;               /**< Authorize reply structure, used during BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST event. */
+static uint8_t                          m_mem_queue[MEM_BLOCK_SIZE];                /**< Memory block for m_mem_block */
 
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt);
 static void sleep_mode_enter(void);
@@ -348,6 +352,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
                          to a peer. */
             // err_code = app_button_disable();
             // APP_ERROR_CHECK(err_code);
+            
             rtt_print(0, "%s%sBluetooth %sdisconnected.%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
             break;
 
@@ -402,10 +407,42 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
             rtt_print(0, "%sGatt written to by server: %s%X\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_evt_write);
             break;
+
+        case BLE_EVT_USER_MEM_REQUEST:
+            rtt_print(0, "%sBluetooth user mem request (%X)\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gap_evt.conn_handle);
+            if (p_ble_evt->evt.common_evt.params.user_mem_request.type == BLE_USER_MEM_TYPE_GATTS_QUEUED_WRITES) {
+                m_mem_block.p_mem = m_mem_queue;
+                m_mem_block.len = MEM_BLOCK_SIZE;
+                err_code = sd_ble_user_mem_reply(p_ble_evt->evt.gap_evt.conn_handle, &m_mem_block);
+                APP_ERROR_CHECK(err_code);
+                
+            }
+            break;
+
+        case BLE_EVT_USER_MEM_RELEASE:
+            rtt_print(0, "%sBluetooth user mem release (%X)\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gap_evt.conn_handle);
+            if (p_ble_evt->evt.common_evt.params.user_mem_release.mem_block.p_mem == m_mem_block.p_mem) {
             
+            }
+            break;
+
+        case BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST:
+            rtt_print(0, "%sBluetooth RW authorize request\n", RTT_CTRL_TEXT_BLUE);
+            m_rw_authorize_reply.params.write.gatt_status = BLE_GATT_STATUS_SUCCESS;
+            m_rw_authorize_reply.type = BLE_GATTS_AUTHORIZE_TYPE_WRITE;
+            
+            if (p_ble_evt->evt.gatts_evt.params.write.op == BLE_GATTS_OP_PREP_WRITE_REQ) {
+                err_code = sd_ble_gatts_rw_authorize_reply(m_conn_handle, &m_rw_authorize_reply);
+                APP_ERROR_CHECK(err_code);
+            } else if (p_ble_evt->evt.gatts_evt.params.write.op == BLE_GATTS_OP_EXEC_WRITE_REQ_NOW) {
+                err_code = sd_ble_gatts_rw_authorize_reply(m_conn_handle, &m_rw_authorize_reply);
+                APP_ERROR_CHECK(err_code);
+            }
+            break;
+
         default:
             // No implementation needed.
-            rtt_print(0, "%sBluetooth event unhandled: %s%d(%d)%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, p_ble_evt->header.evt_len, RTT_CTRL_RESET);
+            rtt_print(0, "%sBluetooth event unhandled: %s%X(%d)%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, p_ble_evt->header.evt_len, RTT_CTRL_RESET);
             break;
     }
 }
@@ -419,13 +456,13 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
  */
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
+    rtt_print(0, "%sBluetooth event: %s%X%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, RTT_CTRL_RESET);
+
     on_ble_evt(p_ble_evt);
     ble_conn_params_on_ble_evt(p_ble_evt);
     ble_advertising_on_ble_evt(p_ble_evt);
 
-    ble_buttonstatus_on_ble_evt(&m_buttonservice, p_ble_evt);
-    
-    rtt_print(0, "%sBluetooth event: %s%X%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header, RTT_CTRL_RESET);
+    ble_buttonstatus_on_ble_evt(&m_buttonservice, p_ble_evt);    
 }
 
 /**@brief Function for handling the Connection Parameters Module.
@@ -479,12 +516,12 @@ static void ble_stack_init(void)
     err_code = sd_ble_enable(&ble_enable_params);
     APP_ERROR_CHECK(err_code);
 
-    // ble_gap_addr_t addr;
-    //
-    // err_code = sd_ble_gap_address_get(&addr);
-    // APP_ERROR_CHECK(err_code);
-    // sd_ble_gap_address_set(BLE_GAP_ADDR_CYCLE_MODE_NONE, &addr);
-    // APP_ERROR_CHECK(err_code);
+    ble_gap_addr_t addr;
+
+    err_code = sd_ble_gap_address_get(&addr);
+    APP_ERROR_CHECK(err_code);
+    sd_ble_gap_address_set(BLE_GAP_ADDR_CYCLE_MODE_NONE, &addr);
+    APP_ERROR_CHECK(err_code);
 
     // Register with the SoftDevice handler module for BLE events.
     err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
@@ -727,7 +764,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
     }
 }
 
-static void firmware_nickname_write_handler(ble_buttonservice_t *p_buttonservice, uint8_t nickname) {
+static void firmware_nickname_write_handler(ble_buttonservice_t *p_buttonservice, uint8_t* nickname) {
     rtt_print(0, "%s%sNew nickname: %s%X%s", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_WHITE,
               RTT_CTRL_TEXT_BRIGHT_GREEN, nickname, RTT_CTRL_RESET);
 }
@@ -742,7 +779,7 @@ static void services_init(void)
 
     init.firmware_nickname_write_handler = firmware_nickname_write_handler;
 
-    strcpy(nickname, "Teeeemote");
+    strcpy(nickname, "\0");
     memset(init.nickname_str, 0, FIRMWARE_NICKNAME_MAX_LENGTH);
     strcpy(init.nickname_str, nickname);
     rtt_print(0, "Setting nickname: %s/%s (%d)\n", nickname, init.nickname_str, strlen(nickname));

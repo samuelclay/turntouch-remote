@@ -12,7 +12,7 @@
 #include "ble_srv_common.h"
 #include "button_status.h"
 #include "rtt.h"
-
+#include "app_error.h"
 
 // ====================
 // = Bluetooth Events =
@@ -50,19 +50,17 @@ static void on_disconnect(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_b
 static void on_write(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_ble_evt)
 {
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
-    rtt_print(0, "on_write: %X(%X) / %X/%X\n", p_evt_write->handle, p_evt_write->data[0], p_buttonservice->button_status_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.value_handle);
+    rtt_print(0, "%son_write: %s%X(%d:%X) / %X/%X-%X\n", RTT_CTRL_TEXT_GREEN, RTT_CTRL_TEXT_BRIGHT_GREEN, p_evt_write->handle, p_ble_evt->header.evt_len, *p_evt_write->data, p_buttonservice->button_status_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.cccd_handle);
     if (p_evt_write->handle == p_buttonservice->button_status_char_handles.value_handle) {
         rtt_print(0, "on_write, button status");
         
     } else if ((p_evt_write->handle == p_buttonservice->firmware_nickname_char_handles.value_handle) &&
-        (p_evt_write->len <= FIRMWARE_NICKNAME_MAX_LENGTH) &&
         (p_buttonservice->firmware_nickname_write_handler != NULL))
     {
         rtt_print(0, "on_write, firmware: %X(%d) / %X\n", p_evt_write->handle, *p_evt_write->data, p_buttonservice->firmware_nickname_char_handles.value_handle);
-        p_buttonservice->firmware_nickname_write_handler(p_buttonservice, p_evt_write->data[0]);
+        p_buttonservice->firmware_nickname_write_handler(p_buttonservice, p_evt_write->data);
     }
 }
-
 
 void ble_buttonstatus_on_ble_evt(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_ble_evt)
 {
@@ -81,8 +79,14 @@ void ble_buttonstatus_on_ble_evt(ble_buttonservice_t * p_buttonservice, ble_evt_
             break;
         
         case BLE_GAP_EVT_CONN_PARAM_UPDATE:
+        case BLE_EVT_USER_MEM_REQUEST:
             break;
-        
+
+        case BLE_EVT_USER_MEM_RELEASE:
+        case BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST:
+            on_write(p_buttonservice, p_ble_evt);
+            break;
+            
         default:
             // No implementation needed.
             rtt_print(0, "%sUnhandled ble buttonstatus ble event: %s%X\n", RTT_CTRL_TEXT_YELLOW, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id);
@@ -146,17 +150,24 @@ static uint32_t button_status_char_add(ble_buttonservice_t *p_buttonservice, con
 static uint32_t firmware_nickname_char_add(ble_buttonservice_t * p_buttonservice, const ble_buttonstatus_init_t * p_buttonservice_init)
 {
     ble_gatts_char_md_t char_md;
+    ble_gatts_attr_md_t cccd_md;
     ble_gatts_attr_t    attr_char_value;
     ble_uuid_t          ble_uuid;
     ble_gatts_attr_md_t attr_md;
+
+    memset(&cccd_md, 0, sizeof(cccd_md));
+    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.read_perm);
+    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.write_perm);
+    cccd_md.vloc       = BLE_GATTS_VLOC_STACK;
+        
     memset(&char_md, 0, sizeof(char_md));
-    
     char_md.char_props.read   = 1;
     char_md.char_props.write  = 1;
+    char_md.char_props.notify = 1;
     char_md.p_char_user_desc  = NULL;
     char_md.p_char_pf         = NULL;
     char_md.p_user_desc_md    = NULL;
-    char_md.p_cccd_md         = NULL;
+    char_md.p_cccd_md         = &cccd_md;
     char_md.p_sccd_md         = NULL;
     
     ble_uuid.type = p_buttonservice->uuid_type;
@@ -169,7 +180,7 @@ static uint32_t firmware_nickname_char_add(ble_buttonservice_t * p_buttonservice
     attr_md.vloc       = BLE_GATTS_VLOC_STACK;
     attr_md.rd_auth    = 0;
     attr_md.wr_auth    = 0;
-    attr_md.vlen       = 0;
+    attr_md.vlen       = 1;
     
     memset(&attr_char_value, 0, sizeof(attr_char_value));
 
@@ -177,14 +188,15 @@ static uint32_t firmware_nickname_char_add(ble_buttonservice_t * p_buttonservice
     attr_char_value.p_attr_md    = &attr_md;
     attr_char_value.init_len     = strlen(p_buttonservice->nickname_str);
     attr_char_value.init_offs    = 0;
-    attr_char_value.max_len      = strlen(p_buttonservice->nickname_str);
+    attr_char_value.max_len      = 32;
     attr_char_value.p_value      = (uint8_t *)p_buttonservice->nickname_str;
 
     rtt_print(0, "At firmware_nickname_char_add 0: %s/%X (%X)\n", attr_char_value.p_value, p_buttonservice->nickname_str, strlen(p_buttonservice->nickname_str));
     
-    return sd_ble_gatts_characteristic_add(p_buttonservice->service_handle, &char_md,
-                                               &attr_char_value,
-                                               &p_buttonservice->firmware_nickname_char_handles);
+    return sd_ble_gatts_characteristic_add(p_buttonservice->service_handle, 
+                                           &char_md,
+                                           &attr_char_value,
+                                           &p_buttonservice->firmware_nickname_char_handles);
 }
 
 uint32_t ble_buttonstatus_init(ble_buttonservice_t * p_buttonservice, 

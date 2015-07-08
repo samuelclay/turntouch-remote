@@ -22,7 +22,7 @@
 // Forward declaration of the ble_buttonservice_t type. 
 typedef struct ble_buttonservice_s ble_buttonservice_t;
 
-typedef void (*ble_buttonservice_firmware_nickname_write_handler_t) (ble_buttonservice_t * p_buttonservice, uint8_t nickname);
+typedef void (*ble_buttonservice_firmware_nickname_write_handler_t) (ble_buttonservice_t * p_buttonservice, uint8_t *nickname);
 
 typedef struct
 {
