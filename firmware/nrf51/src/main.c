@@ -486,7 +486,7 @@ static uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
                                            dm_event_t const     * p_event,
                                            ret_code_t           event_result)
 {
-    rtt_print(0, ">> device_manager_evt_handler");
+    // rtt_print(0, ">> device_manager_evt_handler");
     APP_ERROR_CHECK(event_result);
 
     switch(p_event->event_id)
@@ -624,7 +624,7 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     ble_conn_params_on_ble_evt(p_ble_evt);
     ble_advertising_on_ble_evt(p_ble_evt);
 
-    ble_buttonstatus_on_ble_evt(&m_buttonservice, p_ble_evt);    
+    ble_buttonstatus_on_ble_evt(&m_buttonservice, p_ble_evt, &m_mem_block);
 }
 
 /**@brief Function for handling the Application's BLE Stack events.
@@ -740,7 +740,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             break;
 
         case BLE_EVT_USER_MEM_RELEASE:
-            rtt_print(0, "%sBluetooth user mem release (%X)\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gap_evt.conn_handle);
+            rtt_print(0, "%sBluetooth user mem release (%X, %X)\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gap_evt.conn_handle, *((uint16_t *)m_mem_block.p_mem));
             if (p_ble_evt->evt.common_evt.params.user_mem_release.mem_block.p_mem == m_mem_block.p_mem) {
             
             }
@@ -766,9 +766,32 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 // = Services =
 // ============
 
-static void firmware_nickname_write_handler(ble_buttonservice_t *p_buttonservice, uint8_t* nickname) {
-    rtt_print(0, "%s%sNew nickname: %s%X%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_WHITE,
-              RTT_CTRL_TEXT_BRIGHT_GREEN, nickname[8], RTT_CTRL_RESET);
+static void firmware_nickname_write_handler(ble_buttonservice_t *p_buttonservice, uint16_t* nickname) {
+    // ble_gatts_value_t gatts_value;
+    // uint8_t  cccd_value_buf[FIRMWARE_NICKNAME_MAX_LENGTH];
+    // uint32_t err_code;
+    
+    // // Initialize value struct.
+    // memset(&gatts_value, 0, sizeof(gatts_value));
+    //
+    // gatts_value.len     = FIRMWARE_NICKNAME_MAX_LENGTH;
+    // gatts_value.offset  = 0;
+    // gatts_value.p_value = cccd_value_buf;
+    //
+    // err_code = sd_ble_gatts_value_get(p_buttonservice->conn_handle,
+    //                                   p_buttonservice->firmware_nickname_char_handles.cccd_handle,
+    //                                   &gatts_value);
+    // if (err_code == NRF_SUCCESS)
+    // {
+    //     nickname = gatts_value.p_value;
+        rtt_print(0, "%s%sNew nickname :: %s%X - %X%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_WHITE,
+                  RTT_CTRL_TEXT_BRIGHT_GREEN, nickname, nickname[8], RTT_CTRL_RESET);
+    // } else {
+    //     rtt_print(0, "Nickname error: %X, %X\n", err_code, gatts_value.p_value[8]);
+    //     for (int i=0;i < gatts_value.len; i++) {
+    //         SEGGER_RTT_printf(0, "%X", gatts_value.p_value[i]);
+    //     }
+    // }
 }
 
 /**@brief Function for initializing services that will be used by the application.

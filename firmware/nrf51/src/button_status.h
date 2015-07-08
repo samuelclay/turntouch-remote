@@ -22,7 +22,7 @@
 // Forward declaration of the ble_buttonservice_t type. 
 typedef struct ble_buttonservice_s ble_buttonservice_t;
 
-typedef void (*ble_buttonservice_firmware_nickname_write_handler_t) (ble_buttonservice_t * p_buttonservice, uint8_t *nickname);
+typedef void (*ble_buttonservice_firmware_nickname_write_handler_t) (ble_buttonservice_t * p_buttonservice, uint16_t *nickname);
 
 typedef struct
 {
@@ -61,7 +61,8 @@ uint32_t ble_buttonstatus_init(ble_buttonservice_t * p_buttonservice, const ble_
  * @param[in]   p_buttonservice      LED Button Service structure.
  * @param[in]   p_ble_evt  Event received from the BLE stack.
  */
-void ble_buttonstatus_on_ble_evt(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_ble_evt);
+void ble_buttonstatus_on_ble_evt(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_ble_evt, 
+                                 ble_user_mem_block_t *m_mem_block);
 
 /**@brief Function for sending a button state notification.
  */
