@@ -104,6 +104,8 @@ static uint8_t                          m_mem_queue[MEM_BLOCK_SIZE];            
 
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt);
 static void sleep_mode_enter(void);
+static void ble_evt_dispatch(ble_evt_t * p_ble_evt);
+static void on_ble_evt(ble_evt_t * p_ble_evt);
 
 // ===========
 // = Buttons =
