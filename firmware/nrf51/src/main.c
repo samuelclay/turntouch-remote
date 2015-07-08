@@ -85,7 +85,7 @@
 #define SEC_PARAM_OOB                   0                                           /**< Out Of Band data not available. */
 #define SEC_PARAM_MIN_KEY_SIZE          7                                           /**< Minimum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE          16                                          /**< Maximum encryption key size. */
-#define MEM_BLOCK_SIZE                  52                                          /**< Maximum length (an example) for write long, according to https://devzone.nordicsemi.com/documentation/nrf51/5.1.0/html/a01222.html */
+#define MEM_BLOCK_SIZE                  54                                          /**< Maximum length (an example) for write long, according to https://devzone.nordicsemi.com/documentation/nrf51/5.1.0/html/a01222.html */
 #define DEAD_BEEF                       0xDEADBEEF                                  /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
 // YOUR_JOB: Modify these according to requirements (e.g. if other event types are to pass through
@@ -232,7 +232,7 @@ void storage_init() {
 
 /**@brief Function for initializing bsp module.
  */
-void bsp_configuration(bool * p_erase_bonds)
+void bsp_configuration()
 {
     // bsp_event_t startup_event;
     uint32_t err_code;
@@ -244,8 +244,6 @@ void bsp_configuration(bool * p_erase_bonds)
     
     // err_code = bsp_btn_ble_init(NULL, &startup_event);
     // APP_ERROR_CHECK(err_code);
-
-    *p_erase_bonds = false;
 }
 
 /**@brief Function for the Event Scheduler initialization.
@@ -301,6 +299,7 @@ static void scheduler_init(void)
  */
 static void sys_evt_dispatch(uint32_t sys_evt)
 {
+    pstorage_sys_event_handler(sys_evt);
     ble_advertising_on_sys_evt(sys_evt);
 }
 
@@ -410,13 +409,10 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 
         case BLE_EVT_USER_MEM_REQUEST:
             rtt_print(0, "%sBluetooth user mem request (%X)\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gap_evt.conn_handle);
-            if (p_ble_evt->evt.common_evt.params.user_mem_request.type == BLE_USER_MEM_TYPE_GATTS_QUEUED_WRITES) {
-                m_mem_block.p_mem = m_mem_queue;
-                m_mem_block.len = MEM_BLOCK_SIZE;
-                err_code = sd_ble_user_mem_reply(p_ble_evt->evt.gap_evt.conn_handle, &m_mem_block);
-                APP_ERROR_CHECK(err_code);
-                
-            }
+            m_mem_block.p_mem = &m_mem_queue[0];
+            m_mem_block.len = MEM_BLOCK_SIZE;
+            err_code = sd_ble_user_mem_reply(p_ble_evt->evt.gap_evt.conn_handle, &m_mem_block);
+            APP_ERROR_CHECK(err_code);
             break;
 
         case BLE_EVT_USER_MEM_RELEASE:
@@ -452,7 +448,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
     rtt_print(0, "%sBluetooth event: %s%X%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, RTT_CTRL_RESET);
-
+    dm_ble_evt_handler(p_ble_evt);
     on_ble_evt(p_ble_evt);
     ble_conn_params_on_ble_evt(p_ble_evt);
     ble_advertising_on_ble_evt(p_ble_evt);
@@ -661,10 +657,10 @@ static uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
  * @param[in] erase_bonds  Indicates whether bonding information should be cleared from
  *                         persistent storage during initialization of the Device Manager.
  */
-static void device_manager_init(bool erase_bonds)
+static void device_manager_init()
 {
     uint32_t               err_code;
-    dm_init_param_t        init_param = {.clear_persistent_data = erase_bonds};
+    dm_init_param_t        init_param;
     dm_application_param_t  register_param;
 
     // Initialize peer device handle.
@@ -826,7 +822,6 @@ static void sleep_mode_enter(void)
  */
 int main(void)
 {
-    bool erase_bonds;
     uint32_t err_code;
 
     rtt_print(0, "%s%sStarting up Turn Touch Remote%s\n", RTT_CTRL_TEXT_BRIGHT_YELLOW,
@@ -836,12 +831,12 @@ int main(void)
     // Initialize buttons
     // clock_initialization();
     timers_init();
-    bsp_configuration(&erase_bonds);
+    bsp_configuration();
 
     // Initialize
     ble_stack_init();
     scheduler_init();
-    device_manager_init(erase_bonds);
+    device_manager_init();
     gap_params_init();
     advertising_init();
     services_init();
