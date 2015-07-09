@@ -135,18 +135,20 @@ ASMFLAGS += -DNRF51
 ASMFLAGS += -DS110
 ASMFLAGS += -DSOFTDEVICE_PRESENT
 ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
+ASMFLAGS += -D__HEAP_SIZE=512
+
 #default target - first one defined
-default: clean nrf51422_xxac
+default: clean nrf51
 
 #building all targets
 all: clean
 	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e cleanobj
-	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e nrf51422_xxac 
+	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e nrf51 
 
 #target for printing all targets
 help:
 	@echo following targets are available:
-	@echo 	nrf51422_xxac
+	@echo 	nrf51
 
 
 C_SOURCE_FILE_NAMES = $(notdir $(C_SOURCE_FILES))
@@ -162,9 +164,9 @@ vpath %.s $(ASM_PATHS)
 
 OBJECTS = $(C_OBJECTS) $(ASM_OBJECTS)
 
-nrf51422_xxac: OUTPUT_FILENAME := nrf51422_xxac
-nrf51422_xxac: LINKER_SCRIPT=./src/remote_gcc_nrf51.ld
-nrf51422_xxac: $(BUILD_DIRECTORIES) $(OBJECTS)
+nrf51: OUTPUT_FILENAME := nrf51
+nrf51: LINKER_SCRIPT=./src/remote_gcc_nrf51.ld
+nrf51: $(BUILD_DIRECTORIES) $(OBJECTS)
 	@echo Linking target: $(OUTPUT_FILENAME).out
 	$(NO_ECHO)$(CC) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out
 	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e finalize
@@ -229,4 +231,3 @@ flash: $(MAKECMDGOALS)
 	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 
-## Flash softdevice

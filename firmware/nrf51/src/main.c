@@ -101,6 +101,8 @@ static dm_handle_t                      m_bonded_peer_handle;                   
 static ble_user_mem_block_t             m_mem_block;                                /**< Memory block structure, used during a BLE_EVT_USER_MEM_REQUEST event. */
 static ble_gatts_rw_authorize_reply_params_t    m_rw_authorize_reply;               /**< Authorize reply structure, used during BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST event. */
 static uint8_t                          m_mem_queue[MEM_BLOCK_SIZE];                /**< Memory block for m_mem_block */
+static uint8_t                          m_nickname_storage[FIRMWARE_NICKNAME_MAX_LENGTH];
+static pstorage_handle_t                m_flash_handle;
 
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt);
 static void sleep_mode_enter(void);
@@ -371,7 +373,7 @@ static void ble_stack_init(void)
     err_code = softdevice_sys_evt_handler_set(sys_evt_dispatch);
     APP_ERROR_CHECK(err_code);
     
-    rtt_print(0, "%sStarted bluetooth stack.%s\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET);
+    // rtt_print(0, "%sStarted bluetooth stack.%s\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET);
 }
 
 /**@brief Function for the GAP initialization.
@@ -406,7 +408,7 @@ static void gap_params_init(void)
     err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
     APP_ERROR_CHECK(err_code);
     
-    rtt_print(0, "%sBluetooth GAP connection params init.%s\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET);
+    // rtt_print(0, "%sBluetooth GAP connection params init.%s\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET);
 }
 
 /**@brief Function for initializing the Advertising functionality.
@@ -438,7 +440,7 @@ static void advertising_init(void)
     err_code = ble_advertising_init(&advdata, NULL, &options, on_adv_evt, NULL);
     APP_ERROR_CHECK(err_code);
     
-    rtt_print(0, "%sStarted bluetooth advertising.%s\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET);
+    // rtt_print(0, "%sStarted bluetooth advertising.%s\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET);
 }
 
 /**@brief Function for initializing the Connection Parameters module.
@@ -784,8 +786,14 @@ static void firmware_nickname_write_handler(ble_buttonservice_t *p_buttonservice
     // if (err_code == NRF_SUCCESS)
     // {
     //     nickname = gatts_value.p_value;
-        rtt_print(0, "%s%sNew nickname :: %s%X - %X%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_WHITE,
-                  RTT_CTRL_TEXT_BRIGHT_GREEN, nickname, nickname[8], RTT_CTRL_RESET);
+        rtt_print(0, "%s%sNew nickname : %s%X - %X%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_WHITE,
+                  RTT_CTRL_TEXT_BRIGHT_GREEN, nickname, nickname[3], RTT_CTRL_RESET);
+        memcpy(m_nickname_storage, &nickname[3], FIRMWARE_NICKNAME_MAX_LENGTH);
+        pstorage_store(&m_flash_handle,
+                       m_nickname_storage,
+                       FIRMWARE_NICKNAME_MAX_LENGTH,
+                       0);
+  
     // } else {
     //     rtt_print(0, "Nickname error: %X, %X\n", err_code, gatts_value.p_value[8]);
     //     for (int i=0;i < gatts_value.len; i++) {
@@ -794,21 +802,43 @@ static void firmware_nickname_write_handler(ble_buttonservice_t *p_buttonservice
     // }
 }
 
+static void pstorage_callback_handler(pstorage_handle_t * handle,
+                                      uint8_t             op_code,
+                                      uint32_t            reason,
+                                      uint8_t           * p_data,
+                                      uint32_t            param_len)
+{
+    if (reason != NRF_SUCCESS)
+    {
+        rtt_print(0, "pstorage error: %X", reason);
+    } else {
+        rtt_print(0, "pstorage success: %X (%d)", p_data, param_len);
+    }
+}
+
+
 /**@brief Function for initializing services that will be used by the application.
  */
 static void services_init(void)
 {
-    uint32_t err_code;
+    uint32_t                err_code;
     ble_buttonstatus_init_t init;
-    char nickname[FIRMWARE_NICKNAME_MAX_LENGTH];
-
+    pstorage_module_param_t params;
     init.firmware_nickname_write_handler = firmware_nickname_write_handler;
-
-    strcpy(nickname, "\0");
-    memset(init.nickname_str, 0, FIRMWARE_NICKNAME_MAX_LENGTH);
-    strcpy(init.nickname_str, nickname);
-    rtt_print(0, "Setting nickname: %s/%s (%d)\n", nickname, init.nickname_str, strlen(nickname));
     
+    params.block_size   = 32;
+    params.block_count  = 1;
+    params.cb           = pstorage_callback_handler;
+    
+    err_code = pstorage_register(&params, &m_flash_handle);
+    // pstorage_block_identifier_get(&handle, 0, &block_0_handle);
+    pstorage_load(m_nickname_storage, &m_flash_handle, FIRMWARE_NICKNAME_MAX_LENGTH, 0);
+    
+    // strcpy(nickname, "\0");
+    memset(init.nickname_str, 0, FIRMWARE_NICKNAME_MAX_LENGTH);
+    memcpy(init.nickname_str, m_nickname_storage, FIRMWARE_NICKNAME_MAX_LENGTH);
+    rtt_print(0, "Setting nickname: %s/%s (%d)\n", m_nickname_storage, init.nickname_str, sizeof(m_nickname_storage));
+
     err_code = ble_buttonstatus_init(&m_buttonservice, &init);
     APP_ERROR_CHECK(err_code);
 }
@@ -857,7 +887,8 @@ static void sleep_mode_enter(void)
 int main(void)
 {
     uint32_t err_code;
-
+    SEGGER_RTT_Init();
+    
     rtt_print(0, "%s%sStarting up Turn Touch Remote%s\n", RTT_CTRL_TEXT_BRIGHT_YELLOW,
                                                           RTT_CTRL_BG_BRIGHT_MAGENTA, 
                                                           RTT_CTRL_RESET);

@@ -186,12 +186,12 @@ static uint32_t firmware_nickname_char_add(ble_buttonservice_t * p_buttonservice
 
     attr_char_value.p_uuid       = &ble_uuid;
     attr_char_value.p_attr_md    = &attr_md;
-    attr_char_value.init_len     = strlen(p_buttonservice->nickname_str);
+    attr_char_value.init_len     = sizeof(p_buttonservice->nickname_str);
     attr_char_value.init_offs    = 0;
     attr_char_value.max_len      = 32;
     attr_char_value.p_value      = (uint8_t *)p_buttonservice->nickname_str;
 
-    rtt_print(0, "At firmware_nickname_char_add 0: %s/%X (%X)\n", attr_char_value.p_value, p_buttonservice->nickname_str, strlen(p_buttonservice->nickname_str));
+    rtt_print(0, "At firmware_nickname_char_add 0: %s/%X (%X)\n", attr_char_value.p_value, p_buttonservice->nickname_str, sizeof(p_buttonservice->nickname_str));
     
     return sd_ble_gatts_characteristic_add(p_buttonservice->service_handle, 
                                            &char_md,
@@ -207,7 +207,7 @@ uint32_t ble_buttonstatus_init(ble_buttonservice_t * p_buttonservice,
     // Initialize service structure
     p_buttonservice->conn_handle = BLE_CONN_HANDLE_INVALID;
     p_buttonservice->firmware_nickname_write_handler = p_buttonservice_init->firmware_nickname_write_handler;
-    strcpy(p_buttonservice->nickname_str, p_buttonservice_init->nickname_str);
+    memcpy(p_buttonservice->nickname_str, p_buttonservice_init->nickname_str, 32);
     
     // Add service
     ble_uuid128_t base_uuid = {BUTTONSERVICE_UUID_BASE};

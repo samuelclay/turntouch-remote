@@ -27,7 +27,7 @@ typedef void (*ble_buttonservice_firmware_nickname_write_handler_t) (ble_buttons
 typedef struct
 {
     ble_buttonservice_firmware_nickname_write_handler_t firmware_nickname_write_handler;                    /**< Event handler to be called when Firmware Nickname characteristic is written. */
-    char                        nickname_str[FIRMWARE_NICKNAME_MAX_LENGTH];
+    uint8_t                        nickname_str[FIRMWARE_NICKNAME_MAX_LENGTH];
 } ble_buttonstatus_init_t;
 
 /**@brief Button Status Service structure. This contains various status information for the service. */
@@ -39,7 +39,7 @@ typedef struct ble_buttonservice_s
     uint8_t                     uuid_type;
     uint16_t                    conn_handle;
     ble_buttonservice_firmware_nickname_write_handler_t firmware_nickname_write_handler;
-    char                        nickname_str[FIRMWARE_NICKNAME_MAX_LENGTH];
+    uint8_t                        nickname_str[FIRMWARE_NICKNAME_MAX_LENGTH];
 } ble_buttonservice_t;
 
 /**@brief Function for initializing the Button Service.
