@@ -35,6 +35,8 @@ SIZE     		:= "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-size"
 #function for removing duplicates in a list
 remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-out $(firstword $1),$1))))
 
+SOFTDEVICE_HEX = ./libs/components/softdevice/s110/hex/s110_softdevice.hex
+
 #source common to all targets
 C_SOURCE_FILES += \
 ./src/main.c \
@@ -45,6 +47,7 @@ C_SOURCE_FILES += \
 ./libs/components/ble/common/ble_advdata.c \
 ./libs/components/ble/common/ble_conn_params.c \
 ./libs/components/ble/common/ble_srv_common.c \
+./libs/components/ble/ble_services/ble_bas/ble_bas.c \
 ./libs/components/ble/device_manager/device_manager_peripheral.c \
 ./libs/components/drivers_nrf/common/nrf_drv_common.c \
 ./libs/components/drivers_nrf/gpiote/nrf_drv_gpiote.c \
@@ -76,6 +79,7 @@ INC_PATHS += -I./libs/RTT
 INC_PATHS += -I./libs/components/ble/ble_advertising
 INC_PATHS += -I./libs/components/ble/common
 INC_PATHS += -I./libs/components/ble/device_manager
+INC_PATHS += -I./libs/components/ble/ble_services/ble_bas
 INC_PATHS += -I./libs/components/device
 INC_PATHS += -I./libs/components/drivers_nrf/common
 INC_PATHS += -I./libs/components/drivers_nrf/gpiote
@@ -231,3 +235,8 @@ flash: $(MAKECMDGOALS)
 	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 
+erase:
+	nrfjprog --erase-all
+
+flashsd:
+	nrfjprog --flash-softdevice $(SOFTDEVICE_HEX)

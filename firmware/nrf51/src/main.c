@@ -20,6 +20,7 @@
 #include "ble.h"
 #include "ble_advdata.h"
 #include "ble_advertising.h"
+#include "ble_bas.h"
 #include "ble_conn_params.h"
 #include "ble_hci.h"
 #include "ble_srv_common.h"
@@ -40,7 +41,7 @@
 
 
 #define APP_TIMER_PRESCALER      0                           /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_MAX_TIMERS     (2 + BSP_APP_TIMERS_NUMBER) /**< Maximum number of simultaneously created timers. */
+#define APP_TIMER_MAX_TIMERS     (3 + BSP_APP_TIMERS_NUMBER) /**< Maximum number of simultaneously created timers. */
 #define APP_TIMER_OP_QUEUE_SIZE  4                           /**< Size of timer operation queues. */
 #define APP_FEATURE_NOT_SUPPORTED            BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2                    /**< Reply when unsupported features are requested. */
 
@@ -78,6 +79,7 @@
 #define FIRST_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(5000, APP_TIMER_PRESCALER)  /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
 #define NEXT_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(30000, APP_TIMER_PRESCALER) /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
 #define MAX_CONN_PARAMS_UPDATE_COUNT    3                                           /**< Number of attempts before giving up the connection parameter negotiation. */
+#define BATTERY_LEVEL_MEAS_INTERVAL      APP_TIMER_TICKS(2000, APP_TIMER_PRESCALER) /**< Battery level measurement interval (ticks). */
 
 #define SEC_PARAM_BOND                  1                                           /**< Perform bonding. */
 #define SEC_PARAM_MITM                  0                                           /**< Man In The Middle protection not required. */
@@ -97,6 +99,8 @@ static ble_gap_sec_params_t             m_sec_params;                           
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
 static ble_buttonservice_t              m_buttonservice;
 static dm_application_instance_t        m_app_handle;                                  /**< Application identifier allocated by device manager. */
+static ble_bas_t                         m_bas;                                     /**< Structure used to identify the battery service. */
+static app_timer_id_t                    m_battery_timer_id;                        /**< Battery timer. */
 static dm_handle_t                      m_bonded_peer_handle;                          /**< Device reference handle to the current bonded central. */
 static ble_user_mem_block_t             m_mem_block;                                /**< Memory block structure, used during a BLE_EVT_USER_MEM_REQUEST event. */
 static ble_gatts_rw_authorize_reply_params_t    m_rw_authorize_reply;               /**< Authorize reply structure, used during BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST event. */
@@ -210,6 +214,9 @@ void bsp_evt_handler(bsp_event_t evt) {
     }
 }
 
+// ================
+// = Initializers =
+// ================
 
 /**@brief Function for initializing low frequency clock.
  */
@@ -289,6 +296,45 @@ static void scheduler_init(void)
 //
 //     nrf_drv_gpiote_in_event_enable(PIN_IN, true);
 // }
+
+// =================
+// = Battery Level =
+// =================
+
+/**@brief Function for performing battery measurement and updating the Battery Level characteristic
+ *        in Battery Service.
+ */
+static void battery_level_update(void)
+{
+    uint32_t err_code;
+    uint8_t  battery_level;
+
+    // battery_level = (uint8_t)sensorsim_measure(&m_battery_sim_state, &m_battery_sim_cfg);
+    battery_level = (uint8_t)50;
+
+    err_code = ble_bas_battery_level_update(&m_bas, battery_level);
+    if ((err_code != NRF_SUCCESS) &&
+        (err_code != NRF_ERROR_INVALID_STATE) &&
+        (err_code != BLE_ERROR_NO_TX_BUFFERS) &&
+        (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING)
+        )
+    {
+        APP_ERROR_HANDLER(err_code);
+    }
+}
+
+/**@brief Function for handling the Battery measurement timer timeout.
+ *
+ * @details This function will be called each time the battery level measurement timer expires.
+ *
+ * @param[in] p_context  Pointer used for passing some arbitrary information (context) from the
+ *                       app_start_timer() call to the timeout handler.
+ */
+static void battery_level_meas_timeout_handler(void * p_context)
+{
+    UNUSED_PARAMETER(p_context);
+    battery_level_update();
+}
 
 // =============
 // = Bluetooth =
@@ -625,6 +671,7 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     on_ble_evt(p_ble_evt);
     ble_conn_params_on_ble_evt(p_ble_evt);
     ble_advertising_on_ble_evt(p_ble_evt);
+    ble_bas_on_ble_evt(&m_bas, p_ble_evt);
 
     ble_buttonstatus_on_ble_evt(&m_buttonservice, p_ble_evt, &m_mem_block);
 }
@@ -810,9 +857,9 @@ static void pstorage_callback_handler(pstorage_handle_t * handle,
 {
     if (reason != NRF_SUCCESS)
     {
-        rtt_print(0, "pstorage error: %X", reason);
+        rtt_print(0, "pstorage error: %X\n", reason);
     } else {
-        rtt_print(0, "pstorage success: %X (%d)", p_data, param_len);
+        rtt_print(0, "pstorage success: %X (%d)\n", p_data, param_len);
     }
 }
 
@@ -824,6 +871,9 @@ static void services_init(void)
     uint32_t                err_code;
     ble_buttonstatus_init_t init;
     pstorage_module_param_t params;
+    ble_bas_init_t bas_init;
+    
+    // Nickname
     init.firmware_nickname_write_handler = firmware_nickname_write_handler;
     
     params.block_size   = 32;
@@ -831,15 +881,28 @@ static void services_init(void)
     params.cb           = pstorage_callback_handler;
     
     err_code = pstorage_register(&params, &m_flash_handle);
-    // pstorage_block_identifier_get(&handle, 0, &block_0_handle);
     pstorage_load(m_nickname_storage, &m_flash_handle, FIRMWARE_NICKNAME_MAX_LENGTH, 0);
-    
-    // strcpy(nickname, "\0");
     memset(init.nickname_str, 0, FIRMWARE_NICKNAME_MAX_LENGTH);
     memcpy(init.nickname_str, m_nickname_storage, FIRMWARE_NICKNAME_MAX_LENGTH);
     rtt_print(0, "Setting nickname: %s/%s (%d)\n", m_nickname_storage, init.nickname_str, sizeof(m_nickname_storage));
 
+    // Button Service
     err_code = ble_buttonstatus_init(&m_buttonservice, &init);
+    APP_ERROR_CHECK(err_code);
+
+    // Battery Service
+    memset(&bas_init, 0, sizeof(bas_init));
+    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&bas_init.battery_level_char_attr_md.cccd_write_perm);
+    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&bas_init.battery_level_char_attr_md.read_perm);
+    BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&bas_init.battery_level_char_attr_md.write_perm);
+    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&bas_init.battery_level_report_read_perm);
+
+    bas_init.evt_handler          = NULL;
+    bas_init.support_notification = true;
+    bas_init.p_report_ref         = NULL;
+    bas_init.initial_batt_level   = 100;
+
+    err_code = ble_bas_init(&m_bas, &bas_init);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -853,8 +916,26 @@ static void services_init(void)
  */
 static void timers_init(void)
 {
+    uint32_t err_code;
+    
     // Initialize timer module, making it use the scheduler
     APP_TIMER_APPSH_INIT(APP_TIMER_PRESCALER, APP_TIMER_MAX_TIMERS, APP_TIMER_OP_QUEUE_SIZE, true);
+    
+    err_code = app_timer_create(&m_battery_timer_id,
+                                APP_TIMER_MODE_REPEATED,
+                                battery_level_meas_timeout_handler);
+    APP_ERROR_CHECK(err_code);
+}
+
+/**@brief Function for starting application timers.
+ */
+static void application_timers_start(void)
+{
+    uint32_t err_code;
+
+    // Start application timers.
+    err_code = app_timer_start(m_battery_timer_id, BATTERY_LEVEL_MEAS_INTERVAL, NULL);
+    APP_ERROR_CHECK(err_code);
 }
 
 /**@brief Function for the Power manager.
@@ -909,6 +990,7 @@ int main(void)
     sec_params_init();
 
     // Start execution
+    application_timers_start();
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
     // err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
