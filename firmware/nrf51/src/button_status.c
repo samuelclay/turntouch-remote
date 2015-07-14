@@ -84,6 +84,7 @@ void ble_buttonstatus_on_ble_evt(ble_buttonservice_t * p_buttonservice, ble_evt_
         
         case BLE_GAP_EVT_CONN_PARAM_UPDATE:
         case BLE_EVT_USER_MEM_REQUEST:
+        case BLE_EVT_TX_COMPLETE:
             break;
 
         case BLE_EVT_USER_MEM_RELEASE:

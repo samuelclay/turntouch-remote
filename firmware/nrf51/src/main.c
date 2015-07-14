@@ -68,7 +68,7 @@
 
 #define APP_ADV_FAST_INTERVAL           40                                          /**< The advertising interval (in units of 0.625 ms). The default value corresponds to 25 ms. */
 #define APP_ADV_SLOW_INTERVAL           3200                                        /**< Slow advertising interval (in units of 0.625 ms). The default value corresponds to 2 seconds. */
-#define APP_ADV_FAST_TIMEOUT            180                                         /**< The advertising time-out in units of seconds. */
+#define APP_ADV_FAST_TIMEOUT            30                                         /**< The advertising time-out in units of seconds. */
 #define APP_ADV_SLOW_TIMEOUT            180                                         /**< The advertising time-out in units of seconds. */
 #define ADV_INTERVAL_FAST_PERIOD        30                                          /**< The duration of the fast advertising period (in seconds). */
 
@@ -79,7 +79,8 @@
 #define FIRST_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(5000, APP_TIMER_PRESCALER)  /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
 #define NEXT_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(30000, APP_TIMER_PRESCALER) /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
 #define MAX_CONN_PARAMS_UPDATE_COUNT    3                                           /**< Number of attempts before giving up the connection parameter negotiation. */
-#define BATTERY_LEVEL_MEAS_INTERVAL      APP_TIMER_TICKS(2000, APP_TIMER_PRESCALER) /**< Battery level measurement interval (ticks). */
+#define BATTERY_LEVEL_MEAS_INTERVAL      APP_TIMER_TICKS(60*1000, APP_TIMER_PRESCALER) /**< Battery level measurement interval (ticks). */
+#define VBAT_MAX_IN_MV                  3300
 
 #define SEC_PARAM_BOND                  1                                           /**< Perform bonding. */
 #define SEC_PARAM_MITM                  0                                           /**< Man In The Middle protection not required. */
@@ -194,11 +195,7 @@ void bsp_evt_handler(bsp_event_t evt) {
             LEDS_ON(LEDS_MASK);
         }    
     
-        rtt_print(0, "%sButton handler: %s%X: %X%X%s\n", RTT_CTRL_TEXT_YELLOW, RTT_CTRL_TEXT_BRIGHT_YELLOW, evt, button_state[0], button_state[1], RTT_CTRL_RESET);
-    
         if (m_conn_handle != BLE_CONN_HANDLE_INVALID) {
-            rtt_print(0, "Not ignoring button, connected: %X/%X (%d/%d)\n", m_conn_handle, BLE_GAP_EVT_CONNECTED, evt, BSP_EVENT_KEY_5);
-        
             err_code = ble_buttonstatus_on_button_change(&m_buttonservice, button_state);
             if (err_code == BLE_ERROR_GATTS_SYS_ATTR_MISSING) {
                 // Can ignore this error, just means that bluetooth is connected but nobody's listening yet
@@ -301,6 +298,48 @@ static void scheduler_init(void)
 // = Battery Level =
 // =================
 
+uint8_t battery_level_get(void)
+{
+    // Configure ADC
+    NRF_ADC->CONFIG     = (ADC_CONFIG_RES_8bit                        << ADC_CONFIG_RES_Pos)     |
+                          (ADC_CONFIG_INPSEL_SupplyOneThirdPrescaling << ADC_CONFIG_INPSEL_Pos)  |
+                          (ADC_CONFIG_REFSEL_VBG                      << ADC_CONFIG_REFSEL_Pos)  |
+                          (ADC_CONFIG_PSEL_Disabled                   << ADC_CONFIG_PSEL_Pos)    |
+                          (ADC_CONFIG_EXTREFSEL_None                  << ADC_CONFIG_EXTREFSEL_Pos);
+    NRF_ADC->EVENTS_END = 0;
+    NRF_ADC->ENABLE     = ADC_ENABLE_ENABLE_Enabled;
+
+    NRF_ADC->EVENTS_END  = 0;    // Stop any running conversions.
+    NRF_ADC->TASKS_START = 1;
+    
+    while (!NRF_ADC->EVENTS_END)
+    {
+    }
+    
+    uint16_t vbg_in_mv = 1200;
+    uint8_t adc_max = 255;
+    uint16_t vbat_current_in_mv = (NRF_ADC->RESULT * 3 * vbg_in_mv) / adc_max;
+    
+    NRF_ADC->EVENTS_END     = 0;
+    NRF_ADC->TASKS_STOP     = 1;
+    
+    return (uint8_t) ((vbat_current_in_mv * 100) / VBAT_MAX_IN_MV);
+}
+
+uint32_t temperature_data_get(void)
+{
+    int32_t temp;
+    uint32_t err_code;
+    
+    err_code = sd_temp_get(&temp);
+    APP_ERROR_CHECK(err_code);
+    
+    temp = (temp / 4) * 100;
+    
+    int8_t exponent = -2;
+    return ((exponent & 0xFF) << 24) | (temp & 0x00FFFFFF);
+}
+
 /**@brief Function for performing battery measurement and updating the Battery Level characteristic
  *        in Battery Service.
  */
@@ -310,8 +349,9 @@ static void battery_level_update(void)
     uint8_t  battery_level;
 
     // battery_level = (uint8_t)sensorsim_measure(&m_battery_sim_state, &m_battery_sim_cfg);
-    battery_level = (uint8_t)50;
-
+    battery_level = (uint8_t)battery_level_get();
+    rtt_print(0, "%sBattery level: %s%d%%\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_TEXT_BRIGHT_MAGENTA, battery_level);
+    
     err_code = ble_bas_battery_level_update(&m_bas, battery_level);
     if ((err_code != NRF_SUCCESS) &&
         (err_code != NRF_ERROR_INVALID_STATE) &&
@@ -510,7 +550,7 @@ static void conn_params_init(void)
     err_code = ble_conn_params_init(&cp_init);
     APP_ERROR_CHECK(err_code);
     
-    rtt_print(0, "%sConnection params initialized.%s\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET);
+    // rtt_print(0, "%sConnection params initialized.%s\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET);
 }
 
 /**@brief Function for initializing security parameters.
@@ -833,7 +873,7 @@ static void firmware_nickname_write_handler(ble_buttonservice_t *p_buttonservice
     // if (err_code == NRF_SUCCESS)
     // {
     //     nickname = gatts_value.p_value;
-        rtt_print(0, "%s%sNew nickname : %s%X - %X%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_WHITE,
+        rtt_print(0, "%s%sNew nickname : %s%s - %s%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_WHITE,
                   RTT_CTRL_TEXT_BRIGHT_GREEN, nickname, nickname[3], RTT_CTRL_RESET);
         memcpy(m_nickname_storage, &nickname[3], FIRMWARE_NICKNAME_MAX_LENGTH);
         pstorage_store(&m_flash_handle,
@@ -876,7 +916,7 @@ static void services_init(void)
     // Nickname
     init.firmware_nickname_write_handler = firmware_nickname_write_handler;
     
-    params.block_size   = 32;
+    params.block_size   = FIRMWARE_NICKNAME_MAX_LENGTH;
     params.block_count  = 1;
     params.cb           = pstorage_callback_handler;
     
@@ -884,7 +924,7 @@ static void services_init(void)
     pstorage_load(m_nickname_storage, &m_flash_handle, FIRMWARE_NICKNAME_MAX_LENGTH, 0);
     memset(init.nickname_str, 0, FIRMWARE_NICKNAME_MAX_LENGTH);
     memcpy(init.nickname_str, m_nickname_storage, FIRMWARE_NICKNAME_MAX_LENGTH);
-    rtt_print(0, "Setting nickname: %s/%s (%d)\n", m_nickname_storage, init.nickname_str, sizeof(m_nickname_storage));
+    rtt_print(0, "Setting nickname: %X/%s (%d)\n", m_nickname_storage, init.nickname_str, sizeof(m_nickname_storage));
 
     // Button Service
     err_code = ble_buttonstatus_init(&m_buttonservice, &init);
@@ -909,6 +949,13 @@ static void services_init(void)
 // =========
 // = Power =
 // =========
+
+
+static void gpio_start(void) {
+    NVIC_EnableIRQ(GPIOTE_IRQn);
+    NRF_GPIOTE->INTENSET = GPIOTE_INTENSET_PORT_Set << GPIOTE_INTENSET_PORT_Pos;
+}
+
 
 /**@brief Function for the Timer initialization.
  *
@@ -990,16 +1037,17 @@ int main(void)
     sec_params_init();
 
     // Start execution
+    gpio_start();
     application_timers_start();
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
-    // err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
-    // APP_ERROR_CHECK(err_code);
+    err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
+    APP_ERROR_CHECK(err_code);
 
     while (true)
     {
         app_sched_execute();
-        // power_manage();
+        power_manage();
     }
 }
 
