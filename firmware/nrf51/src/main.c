@@ -21,6 +21,7 @@
 #include "ble_advdata.h"
 #include "ble_advertising.h"
 #include "ble_bas.h"
+#include "ble_dis.h"
 #include "ble_conn_params.h"
 #include "ble_hci.h"
 #include "ble_srv_common.h"
@@ -64,22 +65,24 @@
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 0                                           /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
 
-#define DEVICE_NAME                     "Turn Touch Remote"                           /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "Turn Touch Remote"                         /**< Name of device. Will be included in the advertising data. */
+#define MANUFACTURER_NAME               "Turn Touch"                                /**< Manufacturer. Will be passed to Device Information Service. */
 
 #define APP_ADV_FAST_INTERVAL           40                                          /**< The advertising interval (in units of 0.625 ms). The default value corresponds to 25 ms. */
 #define APP_ADV_SLOW_INTERVAL           3200                                        /**< Slow advertising interval (in units of 0.625 ms). The default value corresponds to 2 seconds. */
-#define APP_ADV_FAST_TIMEOUT            30                                         /**< The advertising time-out in units of seconds. */
+#define APP_ADV_FAST_TIMEOUT            30                                          /**< The advertising time-out in units of seconds. */
 #define APP_ADV_SLOW_TIMEOUT            180                                         /**< The advertising time-out in units of seconds. */
 #define ADV_INTERVAL_FAST_PERIOD        30                                          /**< The duration of the fast advertising period (in seconds). */
 
 #define MIN_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)            /**< Minimum acceptable connection interval (0.5 seconds). */
-#define MAX_CONN_INTERVAL               MSEC_TO_UNITS(200, UNIT_1_25_MS)           /**< Maximum acceptable connection interval (1 second). */
+#define MAX_CONN_INTERVAL               MSEC_TO_UNITS(200, UNIT_1_25_MS)            /**< Maximum acceptable connection interval (1 second). */
 #define SLAVE_LATENCY                   4                                           /**< Slave latency. */
 #define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)             /**< Connection supervisory timeout (4 seconds). */
+
 #define FIRST_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(5000, APP_TIMER_PRESCALER)  /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
 #define NEXT_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(30000, APP_TIMER_PRESCALER) /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
 #define MAX_CONN_PARAMS_UPDATE_COUNT    3                                           /**< Number of attempts before giving up the connection parameter negotiation. */
-#define BATTERY_LEVEL_MEAS_INTERVAL      APP_TIMER_TICKS(60*1000, APP_TIMER_PRESCALER) /**< Battery level measurement interval (ticks). */
+#define BATTERY_LEVEL_MEAS_INTERVAL     APP_TIMER_TICKS(60*1000, APP_TIMER_PRESCALER) /**< Battery level measurement interval (ticks). */
 #define VBAT_MAX_IN_MV                  3300
 
 #define SEC_PARAM_BOND                  1                                           /**< Perform bonding. */
@@ -91,23 +94,21 @@
 #define MEM_BLOCK_SIZE                  54                                          /**< Maximum length (an example) for write long, according to https://devzone.nordicsemi.com/documentation/nrf51/5.1.0/html/a01222.html */
 #define DEAD_BEEF                       0xDEADBEEF                                  /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
-// YOUR_JOB: Modify these according to requirements (e.g. if other event types are to pass through
-//           the scheduler).
 #define SCHED_MAX_EVENT_DATA_SIZE       sizeof(app_timer_event_t)                   /**< Maximum size of scheduler events. Note that scheduler BLE stack events do not contain any data, as the events are being pulled from the stack in the event handler. */
 #define SCHED_QUEUE_SIZE                10                                          /**< Maximum number of events in the scheduler queue. */
 
 static ble_gap_sec_params_t             m_sec_params;                               /**< Security requirements for this application. */
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
-static ble_buttonservice_t              m_buttonservice;
-static dm_application_instance_t        m_app_handle;                                  /**< Application identifier allocated by device manager. */
-static ble_bas_t                         m_bas;                                     /**< Structure used to identify the battery service. */
-static app_timer_id_t                    m_battery_timer_id;                        /**< Battery timer. */
-static dm_handle_t                      m_bonded_peer_handle;                          /**< Device reference handle to the current bonded central. */
+static ble_buttonservice_t              m_buttonservice;                            /**< Struct for pressed and held buttons */
+static dm_application_instance_t        m_app_handle;                               /**< Application identifier allocated by device manager. */
+static ble_bas_t                        m_bas;                                      /**< Structure used to identify the battery service. */
+static app_timer_id_t                   m_battery_timer_id;                         /**< Battery timer. */
+static dm_handle_t                      m_bonded_peer_handle;                       /**< Device reference handle to the current bonded central. */
 static ble_user_mem_block_t             m_mem_block;                                /**< Memory block structure, used during a BLE_EVT_USER_MEM_REQUEST event. */
 static ble_gatts_rw_authorize_reply_params_t    m_rw_authorize_reply;               /**< Authorize reply structure, used during BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST event. */
 static uint8_t                          m_mem_queue[MEM_BLOCK_SIZE];                /**< Memory block for m_mem_block */
-static uint8_t                          m_nickname_storage[FIRMWARE_NICKNAME_MAX_LENGTH];
-static pstorage_handle_t                m_flash_handle;
+static uint8_t                          m_nickname_storage[FIRMWARE_NICKNAME_MAX_LENGTH]; /**< Memory block for nickname */
+static pstorage_handle_t                m_flash_handle;                             /**< Handle to pstorage */
 
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt);
 static void sleep_mode_enter(void);
@@ -503,18 +504,22 @@ static void advertising_init(void)
 {
     uint32_t      err_code;
     ble_advdata_t advdata;
-
-    ble_uuid_t m_adv_uuids[] = {{BUTTONSERVICE_UUID_SERVICE, BLE_UUID_TYPE_BLE}};         /**< Universally unique service identifiers. */
+    ble_uuid_t    adv_uuids[] = {
+        {BLE_UUID_BATTERY_SERVICE,              BLE_UUID_TYPE_BLE},
+        {BLE_UUID_DEVICE_INFORMATION_SERVICE,   BLE_UUID_TYPE_BLE},
+        {BUTTONSERVICE_UUID_SERVICE,            BLE_UUID_TYPE_BLE}
+    };
 
     // Build advertising data struct to pass into @ref ble_advertising_init.
     memset(&advdata, 0, sizeof(advdata));
 
-    advdata.name_type               = BLE_ADVDATA_FULL_NAME;
-    advdata.include_appearance      = true;
+    advdata.name_type               = BLE_ADVDATA_SHORT_NAME;
+    advdata.include_appearance      = false;
     advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
-    advdata.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
-    advdata.uuids_complete.p_uuids  = m_adv_uuids;
-
+    advdata.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
+    advdata.uuids_complete.p_uuids  = adv_uuids;
+    rtt_print(0, "%sAdvertising: %X.\n", RTT_CTRL_TEXT_MAGENTA, sizeof(adv_uuids) / sizeof(adv_uuids[0]));
+    
     ble_adv_modes_config_t options = {0};
     options.ble_adv_fast_enabled   = BLE_ADV_FAST_ENABLED;
     options.ble_adv_fast_interval  = APP_ADV_FAST_INTERVAL;
@@ -522,7 +527,7 @@ static void advertising_init(void)
     options.ble_adv_slow_enabled   = BLE_ADV_SLOW_ENABLED;
     options.ble_adv_slow_interval  = APP_ADV_SLOW_INTERVAL;
     options.ble_adv_slow_timeout   = APP_ADV_SLOW_TIMEOUT;
-
+    
     err_code = ble_advertising_init(&advdata, NULL, &options, on_adv_evt, NULL);
     APP_ERROR_CHECK(err_code);
     
@@ -910,8 +915,9 @@ static void services_init(void)
 {
     uint32_t                err_code;
     ble_buttonstatus_init_t init;
+    ble_bas_init_t          bas_init;
+    ble_dis_init_t          dis_init;
     pstorage_module_param_t params;
-    ble_bas_init_t bas_init;
     
     // Nickname
     init.firmware_nickname_write_handler = firmware_nickname_write_handler;
@@ -943,6 +949,17 @@ static void services_init(void)
     bas_init.initial_batt_level   = 100;
 
     err_code = ble_bas_init(&m_bas, &bas_init);
+    APP_ERROR_CHECK(err_code);
+    
+    // Initialize Device Information Service
+    memset(&dis_init, 0, sizeof(dis_init));
+
+    ble_srv_ascii_to_utf8(&dis_init.manufact_name_str, MANUFACTURER_NAME);
+
+    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&dis_init.dis_attr_md.read_perm);
+    BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&dis_init.dis_attr_md.write_perm);
+
+    err_code = ble_dis_init(&dis_init);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -1022,7 +1039,7 @@ int main(void)
                                                           RTT_CTRL_RESET);
     
     // Initialize buttons
-    // clock_initialization();
+    clock_initialization();
     timers_init();
     bsp_configuration();
 
