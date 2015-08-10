@@ -1,9 +1,0 @@
-VERSION 1.0
-BEGIN PROJECT "MITSI_Bottom_20Mold_2Eiam"
-STUDY "Bottom_20Mold_5FRemote_20Bottom_5FMP_2Eipt_gate" bottom_20mold_5fremote_20bottom_5fmp_2eipt_gate.sdy
-END PROJECT
-ORGANIZE 0
-BEGIN PROPERTIES
-END PROPERTIES
-Last Write Time: Wed Jul 08 19:01:06 2015
-
