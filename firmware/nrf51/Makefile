@@ -48,6 +48,7 @@ C_SOURCE_FILES += \
 ./libs/components/ble/common/ble_conn_params.c \
 ./libs/components/ble/common/ble_srv_common.c \
 ./libs/components/ble/ble_services/ble_bas/ble_bas.c \
+./libs/components/ble/ble_services/ble_dfu/ble_dfu.c \
 ./libs/components/ble/ble_services/ble_dis/ble_dis.c \
 ./libs/components/ble/device_manager/device_manager_peripheral.c \
 ./libs/components/drivers_nrf/common/nrf_drv_common.c \
@@ -56,6 +57,8 @@ C_SOURCE_FILES += \
 ./libs/components/drivers_nrf/ppi/nrf_drv_ppi.c \
 ./libs/components/drivers_nrf/pstorage/pstorage.c \
 ./libs/components/drivers_nrf/timer/nrf_drv_timer.c \
+./libs/components/libraries/bootloader_dfu/bootloader_util.c \
+./libs/components/libraries/bootloader_dfu/dfu_app_handler.c \
 ./libs/components/libraries/button/app_button.c \
 ./libs/components/libraries/scheduler/app_scheduler.c \
 ./libs/components/libraries/timer/app_timer.c \
@@ -82,6 +85,7 @@ INC_PATHS += -I./libs/components/ble/common
 INC_PATHS += -I./libs/components/ble/device_manager
 INC_PATHS += -I./libs/components/ble/ble_services/ble_bas
 INC_PATHS += -I./libs/components/ble/ble_services/ble_dis
+INC_PATHS += -I./libs/components/ble/ble_services/ble_dfu
 INC_PATHS += -I./libs/components/device
 INC_PATHS += -I./libs/components/drivers_nrf/common
 INC_PATHS += -I./libs/components/drivers_nrf/gpiote
@@ -89,6 +93,7 @@ INC_PATHS += -I./libs/components/drivers_nrf/hal
 INC_PATHS += -I./libs/components/drivers_nrf/ppi
 INC_PATHS += -I./libs/components/drivers_nrf/pstorage
 INC_PATHS += -I./libs/components/drivers_nrf/timer
+INC_PATHS += -I./libs/components/libraries/bootloader_dfu
 INC_PATHS += -I./libs/components/libraries/button
 INC_PATHS += -I./libs/components/libraries/scheduler
 INC_PATHS += -I./libs/components/libraries/timer
