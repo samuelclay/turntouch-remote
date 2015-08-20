@@ -51,7 +51,7 @@ static void on_write(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_ble_ev
                      ble_user_mem_block_t * m_mem_block)
 {
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
-    //rtt_print(0, "%son_write: %shandler=%X-%X (len:%d [8]:%X offset:%X) / %X/%X-%X\n", RTT_CTRL_TEXT_GREEN, RTT_CTRL_TEXT_BRIGHT_GREEN, p_evt_write->handle, *((uint16_t *)m_mem_block->p_mem), p_ble_evt->header.evt_len, *(&p_evt_write->data[8]), p_evt_write->offset, p_buttonservice->button_status_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.cccd_handle);
+    rtt_print(0, "%son_write: %shandler=%X-%X (len:%d [4]:%X [8]:%X offset:%X) / %X/%X-%X\n", RTT_CTRL_TEXT_GREEN, RTT_CTRL_TEXT_BRIGHT_GREEN, p_evt_write->handle, *((uint16_t *)m_mem_block->p_mem), p_ble_evt->header.evt_len, *(&p_evt_write->data[4]), *(&p_evt_write->data[8]), p_evt_write->offset, p_buttonservice->button_status_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.cccd_handle);
     
     if (p_evt_write->handle == p_buttonservice->button_status_char_handles.value_handle) {
         rtt_print(0, "on_write, button status");        
@@ -59,8 +59,8 @@ static void on_write(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_ble_ev
                 (p_ble_evt->header.evt_id == BLE_EVT_USER_MEM_RELEASE && 
                  *((uint16_t *)m_mem_block->p_mem) == p_buttonservice->firmware_nickname_char_handles.value_handle)) &&
                (p_buttonservice->firmware_nickname_write_handler != NULL)) {
-        //rtt_print(0, "on_write, firmware: %X(%d) / %X\n", p_evt_write->handle, *p_evt_write->data, 
-        //          p_buttonservice->firmware_nickname_char_handles.value_handle);
+        rtt_print(0, "on_write, firmware: %X(%d) / %X\n", p_evt_write->handle, *p_evt_write->data,
+                 p_buttonservice->firmware_nickname_char_handles.value_handle);
 				rtt_print(0, "on_write, firmware: ");
 				SEGGER_RTT_Write(0,p_evt_write->data,p_evt_write->len);
 				SEGGER_RTT_printf(0, "\n");
