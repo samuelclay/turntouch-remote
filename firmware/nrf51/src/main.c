@@ -21,8 +21,9 @@
 #include "ble_advdata.h"
 #include "ble_advertising.h"
 #include "ble_bas.h"
-#include "ble_dis.h"
 #include "ble_conn_params.h"
+#include "ble_dfu.h"
+#include "ble_dis.h"
 #include "ble_hci.h"
 #include "ble_srv_common.h"
 #include "boards.h"
@@ -30,9 +31,11 @@
 #include "bsp_btn_ble.h"
 #include "button_status.h"
 #include "device_manager.h"
+#include "dfu_app_handler.h"
 #include "nordic_common.h"
 #include "nrf.h"
 #include "nrf51_bitfields.h"
+#include "nrf_delay.h"
 #include "nrf_drv_gpiote.h"
 #include "nrf_error.h"
 #include "nrf_gpio.h"
@@ -40,6 +43,7 @@
 #include "rtt.h"
 #include "softdevice_handler.h"
 #include "main.h"
+
 
 // ===========
 // = Buttons =
@@ -516,6 +520,9 @@ static uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
         case DM_EVT_SECURITY_SETUP_COMPLETE:
             m_bonded_peer_handle = (*p_handle);
             break;
+        case DM_EVT_LINK_SECURED:
+            app_context_load(p_handle);
+            break;
     }
 
     return NRF_SUCCESS;
@@ -640,11 +647,13 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
     rtt_print(0, "%sBluetooth event: %s%X%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, RTT_CTRL_RESET);
+
     dm_ble_evt_handler(p_ble_evt);
-    on_ble_evt(p_ble_evt);
     ble_conn_params_on_ble_evt(p_ble_evt);
-    ble_advertising_on_ble_evt(p_ble_evt);
     ble_bas_on_ble_evt(&m_bas, p_ble_evt);
+    ble_dfu_on_ble_evt(&m_dfus, p_ble_evt);
+    on_ble_evt(p_ble_evt);
+    ble_advertising_on_ble_evt(p_ble_evt);
 
     ble_buttonstatus_on_ble_evt(&m_buttonservice, p_ble_evt, &m_mem_block);
 }
@@ -786,6 +795,104 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
     }
 }
 
+// =======
+// = DFU =
+// =======
+
+/**@brief Function for stopping advertising.
+ */
+static void advertising_stop(void)
+{
+    uint32_t err_code;
+
+    err_code = sd_ble_gap_adv_stop();
+    APP_ERROR_CHECK(err_code);
+
+    err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+    APP_ERROR_CHECK(err_code);
+}
+
+
+/**@brief Function for loading application-specific context after establishing a secure connection.
+ *
+ * @details This function will load the application context and check if the ATT table is marked as 
+ *          changed. If the ATT table is marked as changed, a Service Changed Indication
+ *          is sent to the peer if the Service Changed CCCD is set to indicate.
+ *
+ * @param[in] p_handle The Device Manager handle that identifies the connection for which the context 
+ *                     should be loaded.
+ */
+static void app_context_load(dm_handle_t const * p_handle)
+{
+    uint32_t                 err_code;
+    static uint32_t          context_data;
+    dm_application_context_t context;
+
+    context.len    = sizeof(context_data);
+    context.p_data = (uint8_t *)&context_data;
+
+    err_code = dm_application_context_get(p_handle, &context);
+    if (err_code == NRF_SUCCESS)
+    {
+        // Send Service Changed Indication if ATT table has changed.
+        if ((context_data & (DFU_APP_ATT_TABLE_CHANGED << DFU_APP_ATT_TABLE_POS)) != 0)
+        {
+            err_code = sd_ble_gatts_service_changed(m_conn_handle, APP_SERVICE_HANDLE_START, BLE_HANDLE_MAX);
+            if ((err_code != NRF_SUCCESS) &&
+                (err_code != BLE_ERROR_INVALID_CONN_HANDLE) &&
+                (err_code != NRF_ERROR_INVALID_STATE) &&
+                (err_code != BLE_ERROR_NO_TX_BUFFERS) &&
+                (err_code != NRF_ERROR_BUSY) &&
+                (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING))
+            {
+                APP_ERROR_HANDLER(err_code);
+            }
+        }
+
+        err_code = dm_application_context_delete(p_handle);
+        APP_ERROR_CHECK(err_code);
+    }
+    else if (err_code == DM_NO_APP_CONTEXT)
+    {
+        // No context available. Ignore.
+    }
+    else
+    {
+        APP_ERROR_HANDLER(err_code);
+    }
+}
+
+
+/**@brief Function for preparing for system reset.
+ *
+ * @details This function implements @ref dfu_app_reset_prepare_t. It will be called by 
+ *          @ref dfu_app_handler.c before entering the bootloader/DFU.
+ *          This allows the current running application to shut down gracefully.
+ */
+static void reset_prepare(void)
+{
+    uint32_t err_code;
+
+    if (m_conn_handle != BLE_CONN_HANDLE_INVALID)
+    {
+        // Disconnect from peer.
+        err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+        APP_ERROR_CHECK(err_code);
+        err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+        APP_ERROR_CHECK(err_code);
+    }
+    else
+    {
+        // If not connected, the device will be advertising. Hence stop the advertising.
+        advertising_stop();
+    }
+
+    err_code = ble_conn_params_stop();
+    APP_ERROR_CHECK(err_code);
+
+    nrf_delay_ms(500);
+}
+
 // ============
 // = Services =
 // ============
@@ -878,6 +985,7 @@ static void services_init(void)
     ble_buttonstatus_init_t init;
     ble_bas_init_t          bas_init;
     ble_dis_init_t          dis_init;
+    ble_dfu_init_t          dfus_init;
     pstorage_module_param_t params;
     
     // Nickname
@@ -919,14 +1027,26 @@ static void services_init(void)
     
     // Initialize Device Information Service
     memset(&dis_init, 0, sizeof(dis_init));
-
     ble_srv_ascii_to_utf8(&dis_init.manufact_name_str, MANUFACTURER_NAME);
-
     BLE_GAP_CONN_SEC_MODE_SET_OPEN(&dis_init.dis_attr_md.read_perm);
     BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&dis_init.dis_attr_md.write_perm);
-
+    
     err_code = ble_dis_init(&dis_init);
     APP_ERROR_CHECK(err_code);
+    
+    // Initialize the Device Firmware Update Service.
+    memset(&dfus_init, 0, sizeof(dfus_init));
+
+    dfus_init.evt_handler   = dfu_app_on_dfu_evt;
+    dfus_init.error_handler = NULL;
+    dfus_init.evt_handler   = dfu_app_on_dfu_evt;
+    dfus_init.revision      = DFU_REVISION;
+
+    err_code = ble_dfu_init(&m_dfus, &dfus_init);
+    APP_ERROR_CHECK(err_code);
+
+    dfu_app_reset_prepare_set(reset_prepare);
+    dfu_app_dm_appl_instance_set(m_app_handle);
 }
 
 // =========
