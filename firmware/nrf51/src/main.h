@@ -25,7 +25,7 @@
 // #endif
 
 
-#define IS_SRVC_CHANGED_CHARACT_PRESENT 0                                           /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
+#define IS_SRVC_CHANGED_CHARACT_PRESENT 1                                           /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
 
 #define DEVICE_NAME                     "Turn Touch Remote"                         /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "Turn Touch"                                /**< Manufacturer. Will be passed to Device Information Service. */
@@ -33,7 +33,7 @@
 #define APP_ADV_FAST_INTERVAL           40                                          /**< The advertising interval (in units of 0.625 ms). The default value corresponds to 25 ms. */
 #define APP_ADV_SLOW_INTERVAL           3200                                        /**< Slow advertising interval (in units of 0.625 ms). The default value corresponds to 2 seconds. */
 #define APP_ADV_FAST_TIMEOUT            30                                          /**< The advertising time-out in units of seconds. */
-#define APP_ADV_SLOW_TIMEOUT            180                                         /**< The advertising time-out in units of seconds. */
+#define APP_ADV_SLOW_TIMEOUT            86400                                       /**< The advertising time-out in units of seconds. */
 #define ADV_INTERVAL_FAST_PERIOD        30                                          /**< The duration of the fast advertising period (in seconds). */
 
 #define MIN_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)            /**< Minimum acceptable connection interval (0.5 seconds). */
@@ -59,6 +59,15 @@
 #define SCHED_MAX_EVENT_DATA_SIZE       sizeof(app_timer_event_t)                   /**< Maximum size of scheduler events. Note that scheduler BLE stack events do not contain any data, as the events are being pulled from the stack in the event handler. */
 #define SCHED_QUEUE_SIZE                10                                          /**< Maximum number of events in the scheduler queue. */
 
+#define DFU_APP_DATA_RESERVED           0x1000                                      /**< Preserve app data during DFU. 0x1000 is 4 pages (4k) */
+#define DFU_REV_MAJOR                   0x00                                        /** DFU Major revision number to be exposed. */
+#define DFU_REV_MINOR                   0x01                                        /** DFU Minor revision number to be exposed. */
+#define DFU_REVISION                    ((DFU_REV_MAJOR << 8) | DFU_REV_MINOR)      /** DFU Revision number to be exposed. Combined of major and minor versions. */
+#define APP_SERVICE_HANDLE_START        0x000C                                      /**< Handle of first application specific service when when service changed characteristic is present. */
+#define BLE_HANDLE_MAX                  0xFFFF                                      /**< Max handle value in BLE. */
+
+STATIC_ASSERT(IS_SRVC_CHANGED_CHARACT_PRESENT);                                     /** When having DFU Service support in application the Service Changed Characteristic should always be present. */
+
 static ble_gap_sec_params_t             m_sec_params;                               /**< Security requirements for this application. */
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
 static ble_buttonservice_t              m_buttonservice;                            /**< Struct for pressed and held buttons */
@@ -71,8 +80,10 @@ static ble_gatts_rw_authorize_reply_params_t    m_rw_authorize_reply;           
 static uint8_t                          m_mem_queue[MEM_BLOCK_SIZE];                /**< Memory block for m_mem_block */
 static uint8_t                          m_nickname_storage[FIRMWARE_NICKNAME_MAX_LENGTH]; /**< Memory block for nickname */
 static pstorage_handle_t                m_flash_handle;                             /**< Handle to pstorage */
+static ble_dfu_t                        m_dfus;                                     /**< Structure used to identify the DFU service. */
 
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt);
 static void sleep_mode_enter(void);
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt);
 static void on_ble_evt(ble_evt_t * p_ble_evt);
+static void app_context_load(dm_handle_t const * p_handle);
