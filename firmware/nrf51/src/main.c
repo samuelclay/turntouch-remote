@@ -364,6 +364,7 @@ static void ble_stack_init(void)
 
     // Initialize the SoftDevice handler module.
     SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_XTAL_500_PPM, NULL);
+    //SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_RC_250_PPM_4000MS_CALIBRATION, NULL);
 
     // Enable BLE stack 
     ble_enable_params_t ble_enable_params;
@@ -661,7 +662,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
     ble_gap_enc_info_t *             p_enc_info;
     ble_gap_irk_t *                  p_id_info;
     ble_gap_sign_info_t *            p_sign_info;
-    ble_gatts_evt_write_t *          p_evt_write;
+    //ble_gatts_evt_write_t *          p_evt_write;
 
     static ble_gap_enc_key_t         m_enc_key;           /**< Encryption Key (Encryption Info and Master ID). */
     static ble_gap_id_key_t          m_id_key;            /**< Identity Key (IRK and address). */
@@ -748,8 +749,8 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             break;
             
         case BLE_GATTS_EVT_WRITE:
-            p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
-            rtt_print(0, "%sGatt written to by client: %s%X\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_evt_write);
+            //p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
+            //rtt_print(0, "%sGatt written to by client: %s%X\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_evt_write);
             break;
 
         case BLE_EVT_USER_MEM_REQUEST:
@@ -787,10 +788,10 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 // = Services =
 // ============
 
-static void firmware_nickname_write_handler(ble_buttonservice_t *p_buttonservice, uint16_t* nickname) {
+static void firmware_nickname_write_handler(ble_buttonservice_t *p_buttonservice, uint8_t* nickname) {
     // ble_gatts_value_t gatts_value;
     // uint8_t  cccd_value_buf[FIRMWARE_NICKNAME_MAX_LENGTH];
-    // uint32_t err_code;
+     uint32_t err_code;
     
     // // Initialize value struct.
     // memset(&gatts_value, 0, sizeof(gatts_value));
@@ -805,14 +806,16 @@ static void firmware_nickname_write_handler(ble_buttonservice_t *p_buttonservice
     // if (err_code == NRF_SUCCESS)
     // {
     //     nickname = gatts_value.p_value;
-        rtt_print(0, "%s%sNew nickname : %s%s - %s%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_WHITE,
-                  RTT_CTRL_TEXT_BRIGHT_GREEN, nickname, nickname[3], RTT_CTRL_RESET);
-        memcpy(m_nickname_storage, &nickname[3], FIRMWARE_NICKNAME_MAX_LENGTH);
-        pstorage_store(&m_flash_handle,
-                       m_nickname_storage,
-                       FIRMWARE_NICKNAME_MAX_LENGTH,
-                       0);
-  
+        /*rtt_print(0, "%s%sNew nickname : %s%s - %s%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_WHITE,
+                  RTT_CTRL_TEXT_BRIGHT_GREEN, nickname, m_mem_block.p_mem, RTT_CTRL_RESET);*/
+									
+				//rtt_print(0, "New nickname : %s\n", nickname);
+        memcpy(m_nickname_storage, nickname, FIRMWARE_NICKNAME_MAX_LENGTH);
+				
+				// flash must be cleared before saving new data to it
+				err_code = pstorage_clear(&m_flash_handle,PSTORAGE_MAX_BLOCK_SIZE);
+        
+				APP_ERROR_CHECK(err_code);
     // } else {
     //     rtt_print(0, "Nickname error: %X, %X\n", err_code, gatts_value.p_value[8]);
     //     for (int i=0;i < gatts_value.len; i++) {
@@ -827,11 +830,62 @@ static void pstorage_callback_handler(pstorage_handle_t * handle,
                                       uint8_t           * p_data,
                                       uint32_t            param_len)
 {
-    if (reason != NRF_SUCCESS)
+		
+		switch(op_code)
     {
-        rtt_print(0, "pstorage error: %X\n", reason);
-    } else {
-        rtt_print(0, "pstorage success: %X (%d)\n", p_data, param_len);
+        case PSTORAGE_ERROR_OP_CODE:
+						
+            break;
+        case PSTORAGE_STORE_OP_CODE: 
+            if (reason != NRF_SUCCESS)
+						{
+								rtt_print(0, "pstorage store error: %x\n", reason);
+						} else {
+								rtt_print(0, "pstorage store success: \n");
+								for (int i = 0; i <param_len; i++)
+								{
+										SEGGER_RTT_printf(0,"%02X ", p_data[i]);
+								}
+								SEGGER_RTT_printf(0,"\n");
+								SEGGER_RTT_Write(0,p_data,param_len);
+								SEGGER_RTT_printf(0,"\n");
+						}        
+            break;
+        case PSTORAGE_LOAD_OP_CODE:
+            if (reason != NRF_SUCCESS)
+						{
+								rtt_print(0, "pstorage load error: %x\n", reason);
+						} else {
+								rtt_print(0, "pstorage load success: \n");
+								for (int i = 0; i <param_len; i++)
+								{
+										SEGGER_RTT_printf(0,"%02X ", p_data[i]);
+								}
+								SEGGER_RTT_printf(0,"\n");
+								SEGGER_RTT_Write(0,p_data,param_len);
+								SEGGER_RTT_printf(0,"\n");
+						}
+            break;
+        case PSTORAGE_CLEAR_OP_CODE:
+				if (reason != NRF_SUCCESS)
+						{
+								rtt_print(0, "pstorage clear error: %x\n", reason);
+						} else {
+								rtt_print(0, "pstorage clear success:\n");
+								//save new nickname
+                uint32_t err_code = pstorage_store(&m_flash_handle,
+                       m_nickname_storage,
+                       FIRMWARE_NICKNAME_MAX_LENGTH,
+                       0);
+								APP_ERROR_CHECK(err_code);
+						}
+            break;
+        case PSTORAGE_UPDATE_OP_CODE:
+                
+            break;
+        default:
+                
+            break;
     }
 }
 
@@ -854,10 +908,15 @@ static void services_init(void)
     params.cb           = pstorage_callback_handler;
     
     err_code = pstorage_register(&params, &m_flash_handle);
-    pstorage_load(m_nickname_storage, &m_flash_handle, FIRMWARE_NICKNAME_MAX_LENGTH, 0);
-    memset(init.nickname_str, 0, FIRMWARE_NICKNAME_MAX_LENGTH);
+		APP_ERROR_CHECK(err_code);
+    
+		memset(init.nickname_str, 0, FIRMWARE_NICKNAME_MAX_LENGTH);
     memcpy(init.nickname_str, m_nickname_storage, FIRMWARE_NICKNAME_MAX_LENGTH);
-    rtt_print(0, "Setting nickname: %X/%s (%d)\n", m_nickname_storage, init.nickname_str, sizeof(m_nickname_storage));
+    rtt_print(0, "Setting nickname: \n");
+		
+		err_code = pstorage_load(m_nickname_storage, &m_flash_handle, FIRMWARE_NICKNAME_MAX_LENGTH, 0);
+		APP_ERROR_CHECK(err_code);
+    
 
     // Button Service
     err_code = ble_buttonstatus_init(&m_buttonservice, &init);
