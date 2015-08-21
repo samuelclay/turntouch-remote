@@ -1059,7 +1059,6 @@ static void services_init(void)
 
     dfus_init.evt_handler   = dfu_app_on_dfu_evt;
     dfus_init.error_handler = NULL;
-    dfus_init.evt_handler   = dfu_app_on_dfu_evt;
     dfus_init.revision      = DFU_REVISION;
 
     err_code = ble_dfu_init(&m_dfus, &dfus_init);
