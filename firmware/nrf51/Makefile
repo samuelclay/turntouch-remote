@@ -4,6 +4,8 @@ export OUTPUT_FILENAME
 #MAKEFILE_NAME := $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 MAKEFILE_NAME := $(MAKEFILE_LIST)
 MAKEFILE_DIR := $(dir $(MAKEFILE_NAME) ) 
+OUTPUT_FILENAME := nrf51
+LINKER_SCRIPT=./src/remote_gcc_nrf51.ld
 
 TEMPLATE_PATH = ./libs/components/toolchain/gcc
 ifeq ($(OS),Windows_NT)
@@ -178,8 +180,6 @@ vpath %.s $(ASM_PATHS)
 
 OBJECTS = $(C_OBJECTS) $(ASM_OBJECTS)
 
-nrf51: OUTPUT_FILENAME := nrf51
-nrf51: LINKER_SCRIPT=./src/remote_gcc_nrf51.ld
 nrf51: $(BUILD_DIRECTORIES) $(OBJECTS)
 	@echo Linking target: $(OUTPUT_FILENAME).out
 	$(NO_ECHO)$(CC) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out
@@ -217,20 +217,21 @@ $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex: $(OUTPUT_BINARY_DIRECTORY)/$(
 	@echo Preparing: $(OUTPUT_FILENAME).hex
 	$(NO_ECHO)$(OBJCOPY) -O ihex $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 
-finalize: genbin genhex echosize flash
+finalize: genbin genhex echosize
+# finalize: echosize
 
 genbin:
 	@echo Preparing/gen: $(OUTPUT_FILENAME).bin
 	$(NO_ECHO)$(OBJCOPY) -O binary $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).bin
 
 ## Create binary .hex file from the .out file
-genhex: 
+genhex:
 	@echo Preparing/gen: $(OUTPUT_FILENAME).hex
 	$(NO_ECHO)$(OBJCOPY) -O ihex $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 
 echosize:
 	-@echo ""
-	$(NO_ECHO)$(SIZE) $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out
+	$(SIZE) $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out
 	-@echo ""
 
 clean:
@@ -250,3 +251,19 @@ erase:
 
 flashsd:
 	nrfjprog --flash-softdevice $(SOFTDEVICE_HEX)
+
+sdapp:
+	srec_cat $(SOFTDEVICE_HEX) -intel $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -intel --line-length=44 -o $(OUTPUT_BINARY_DIRECTORY)/sd_app.hex -intel
+	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/sd_app.hex
+
+bootloader:
+	srec_cat $(SOFTDEVICE_HEX) -intel $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -intel /Users/sclay/projects/code/nrf51SDK/examples/dfu/bootloader/pca10028/dual_bank_ble_s110/armgcc/_build/nrf51422_xxac.hex -intel --line-length=44 -o $(OUTPUT_BINARY_DIRECTORY)/sd_app_bootloader.hex -intel
+# At the address 0x3FC00 the bootloader stores its information. The first byte (0x01) marks that a 
+# valid application exists. The following two bytes are the CRC the application is checked against 
+# to determine its validity. This hex-File writes these values to 0x00 which forces the bootloader 
+# to ignore the CRC check.
+# See "E. How do I program the original application via programmer (JLINK), not by DFU" at
+# https://devzone.nordicsemi.com/blogs/685/common-faq-on-dfu/
+	sed -i.bak 's/10FC000000000000000000000000000000000000F4/10FC00000100000000000000FE000000FFFFFFFFF9/' build/sd_app_bootloader.hex
+	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/sd_app_bootloader.hex
+
