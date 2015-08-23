@@ -53,7 +53,6 @@
 #define SEC_PARAM_OOB                   0                                           /**< Out Of Band data not available. */
 #define SEC_PARAM_MIN_KEY_SIZE          7                                           /**< Minimum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE          16                                          /**< Maximum encryption key size. */
-#define MEM_BLOCK_SIZE                  54                                          /**< Maximum length (an example) for write long, according to https://devzone.nordicsemi.com/documentation/nrf51/5.1.0/html/a01222.html */
 #define DEAD_BEEF                       0xDEADBEEF                                  /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
 #define SCHED_MAX_EVENT_DATA_SIZE       sizeof(app_timer_event_t)                   /**< Maximum size of scheduler events. Note that scheduler BLE stack events do not contain any data, as the events are being pulled from the stack in the event handler. */
@@ -68,7 +67,6 @@ static app_timer_id_t                   m_battery_timer_id;                     
 static dm_handle_t                      m_bonded_peer_handle;                       /**< Device reference handle to the current bonded central. */
 static ble_user_mem_block_t             m_mem_block;                                /**< Memory block structure, used during a BLE_EVT_USER_MEM_REQUEST event. */
 static ble_gatts_rw_authorize_reply_params_t    m_rw_authorize_reply;               /**< Authorize reply structure, used during BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST event. */
-static uint8_t                          m_mem_queue[MEM_BLOCK_SIZE];                /**< Memory block for m_mem_block */
 static uint8_t                          m_nickname_storage[FIRMWARE_NICKNAME_MAX_LENGTH]; /**< Memory block for nickname */
 static pstorage_handle_t                m_flash_handle;                             /**< Handle to pstorage */
 

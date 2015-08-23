@@ -12,6 +12,7 @@
 #include "ble.h"
 #include "ble_srv_common.h"
 
+
 #define BUTTONSERVICE_UUID_BASE {0xdd, 0xfa, 0x81, 0xeb, 0x4d, 0x4e, 0x04, 0xbb, 0xb1, 0x41, 0x4f, 0xdc, 0x7a, 0x90, 0xc3, 0x99}
 #define BUTTONSERVICE_UUID_SERVICE                  0x1523
 #define BUTTONSERVICE_UUID_BUTTONSTATUS_CHAR        0x1525
@@ -22,7 +23,7 @@
 // Forward declaration of the ble_buttonservice_t type. 
 typedef struct ble_buttonservice_s ble_buttonservice_t;
 
-typedef void (*ble_buttonservice_firmware_nickname_write_handler_t) (ble_buttonservice_t * p_buttonservice, uint8_t *nickname);
+typedef void (*ble_buttonservice_firmware_nickname_write_handler_t) (ble_buttonservice_t * p_buttonservice, uint8_t *nickname,uint8_t length);
 
 typedef struct
 {
