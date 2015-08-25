@@ -982,32 +982,30 @@ static void pstorage_callback_handler(pstorage_handle_t * handle,
 static void services_init(void)
 {
     uint32_t                err_code;
-    ble_buttonstatus_init_t init;
+    ble_buttonstatus_init_t buttons_init;
     ble_bas_init_t          bas_init;
     ble_dis_init_t          dis_init;
     ble_dfu_init_t          dfus_init;
     pstorage_module_param_t params;
     
-    // Nickname
-    init.firmware_nickname_write_handler = firmware_nickname_write_handler;
-    
+    // Button Status Service
+    buttons_init.firmware_nickname_write_handler = firmware_nickname_write_handler;
+
     params.block_size   = FIRMWARE_NICKNAME_MAX_LENGTH;
     params.block_count  = 1;
-    params.cb           = pstorage_callback_handler;
-    
+    params.cb           = pstorage_callback_handler;    
     err_code = pstorage_register(&params, &m_flash_handle);
-		APP_ERROR_CHECK(err_code);
+    APP_ERROR_CHECK(err_code);
     
-		memset(init.nickname_str, 0, FIRMWARE_NICKNAME_MAX_LENGTH);
-    memcpy(init.nickname_str, m_nickname_storage, FIRMWARE_NICKNAME_MAX_LENGTH);
-    rtt_print(0, "Setting nickname: \n");
-		
-		err_code = pstorage_load(m_nickname_storage, &m_flash_handle, FIRMWARE_NICKNAME_MAX_LENGTH, 0);
-		APP_ERROR_CHECK(err_code);
-    
+    err_code = pstorage_load(m_nickname_storage, &m_flash_handle, FIRMWARE_NICKNAME_MAX_LENGTH, 0);
+    APP_ERROR_CHECK(err_code);
 
+    memset(buttons_init.nickname_str, 0, FIRMWARE_NICKNAME_MAX_LENGTH);
+    memcpy(buttons_init.nickname_str, m_nickname_storage, FIRMWARE_NICKNAME_MAX_LENGTH);
+    rtt_print(0, "Setting nickname: \n");
+  
     // Button Service
-    err_code = ble_buttonstatus_init(&m_buttonservice, &init);
+    err_code = ble_buttonstatus_init(&m_buttonservice, &buttons_init);
     APP_ERROR_CHECK(err_code);
 
     // Battery Service

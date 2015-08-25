@@ -44,7 +44,7 @@
 #define FIRST_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(5000, APP_TIMER_PRESCALER)  /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
 #define NEXT_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(30000, APP_TIMER_PRESCALER) /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
 #define MAX_CONN_PARAMS_UPDATE_COUNT    3                                           /**< Number of attempts before giving up the connection parameter negotiation. */
-#define BATTERY_LEVEL_MEAS_INTERVAL     APP_TIMER_TICKS(60*1000, APP_TIMER_PRESCALER) /**< Battery level measurement interval (ticks). */
+#define BATTERY_LEVEL_MEAS_INTERVAL     APP_TIMER_TICKS(60*60*1000, APP_TIMER_PRESCALER) /**< Battery level measurement interval (ticks). */
 #define VBAT_MAX_IN_MV                  3300
 
 #define SEC_PARAM_BOND                  1                                           /**< Perform bonding. */
