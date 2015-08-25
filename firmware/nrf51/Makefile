@@ -127,7 +127,7 @@ CFLAGS += -DBLE_STACK_SUPPORT_REQD
 CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs --std=gnu99
-CFLAGS += -Wall -Werror -O3
+CFLAGS += -Wall -Werror -O0 -g3
 #CFLAGS += -Wno-unused-variable
 CFLAGS += -Wno-pointer-sign
 CFLAGS += -mfloat-abi=soft
