@@ -14,9 +14,19 @@
 #include "rtt.h"
 #include "app_error.h"
 
+
+
+#define MEM_BLOCK_SIZE                  54                                          /**< Maximum length (an example) for write long, according to https://devzone.nordicsemi.com/documentation/nrf51/5.1.0/html/a01222.html */
+static uint8_t                          m_mem_queue[MEM_BLOCK_SIZE];                /**< Memory block for p_mem_block */
+
+
+void ExtractMemBlockData(ble_user_mem_block_t * p_mem_block,uint8_t* Buf,uint8_t *len);
+
+
 // ====================
 // = Bluetooth Events =
 // ====================
+
 
 /**@brief Function for handling the Connect event.
  *
@@ -48,16 +58,36 @@ static void on_disconnect(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_b
  * @param[in]   p_ble_evt       Event received from the BLE stack.
  */
 static void on_write(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_ble_evt, 
-                     ble_user_mem_block_t * m_mem_block)
+                     ble_user_mem_block_t * p_mem_block)
 {
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
-    rtt_print(0, "%son_write: %shandler=%X-%X (len:%d [4]:%X [8]:%X offset:%X) / %X/%X-%X\n", RTT_CTRL_TEXT_GREEN, RTT_CTRL_TEXT_BRIGHT_GREEN, p_evt_write->handle, *((uint16_t *)m_mem_block->p_mem), p_ble_evt->header.evt_len, *(&p_evt_write->data[4]), *(&p_evt_write->data[8]), p_evt_write->offset, p_buttonservice->button_status_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.cccd_handle);
+    rtt_print(0, "%son_write: %shandler=%X-%X (len:%d [4]:%X [8]:%X offset:%X) / %X/%X-%X\n", RTT_CTRL_TEXT_GREEN, RTT_CTRL_TEXT_BRIGHT_GREEN, p_evt_write->handle, *((uint16_t *)p_mem_block->p_mem), p_ble_evt->header.evt_len, *(&p_evt_write->data[4]), *(&p_evt_write->data[8]), p_evt_write->offset, p_buttonservice->button_status_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.value_handle, p_buttonservice->firmware_nickname_char_handles.cccd_handle);
     
-    if (p_evt_write->handle == p_buttonservice->button_status_char_handles.value_handle) {
+    if (p_evt_write->handle == p_buttonservice->button_status_char_handles.value_handle)
+    {
         rtt_print(0, "on_write, button status");        
-    } else if (((p_evt_write->handle == p_buttonservice->firmware_nickname_char_handles.value_handle) ||
+    }
+    else if (p_evt_write->handle == p_buttonservice->firmware_nickname_char_handles.value_handle)
+    {
+    	rtt_print(0, "on_write short:\r");
+		SEGGER_RTT_Write(0,p_evt_write->data,p_evt_write->len);
+		SEGGER_RTT_printf(0, "\r");
+		p_buttonservice->firmware_nickname_write_handler(p_buttonservice, p_evt_write->data,p_evt_write->len);
+    }
+    else if(p_evt_write->op == BLE_GATTS_OP_EXEC_WRITE_REQ_NOW)
+    {
+    	rtt_print(0, "on_write long:\r ");
+        if(*((uint16_t *)p_mem_block->p_mem) == p_buttonservice->firmware_nickname_char_handles.value_handle)
+        {
+        	uint8_t buf[MEM_BLOCK_SIZE];
+        	uint8_t length;
+        	ExtractMemBlockData(p_mem_block,buf,&length);
+        	p_buttonservice->firmware_nickname_write_handler(p_buttonservice, buf,length);
+        }
+    }
+    /*else if (((p_evt_write->handle == p_buttonservice->firmware_nickname_char_handles.value_handle) ||
                 (p_ble_evt->header.evt_id == BLE_EVT_USER_MEM_RELEASE && 
-                 *((uint16_t *)m_mem_block->p_mem) == p_buttonservice->firmware_nickname_char_handles.value_handle)) &&
+                 *((uint16_t *)p_mem_block->p_mem) == p_buttonservice->firmware_nickname_char_handles.value_handle)) &&
                (p_buttonservice->firmware_nickname_write_handler != NULL)) {
         rtt_print(0, "on_write, firmware: %X(%d) / %X\n", p_evt_write->handle, *p_evt_write->data,
                  p_buttonservice->firmware_nickname_char_handles.value_handle);
@@ -65,12 +95,42 @@ static void on_write(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_ble_ev
 				SEGGER_RTT_Write(0,p_evt_write->data,p_evt_write->len);
 				SEGGER_RTT_printf(0, "\n");
         p_buttonservice->firmware_nickname_write_handler(p_buttonservice, p_evt_write->data);
-    }
+    }*/
+}
+
+//
+// mem block layout
+// http://developer.nordicsemi.com/nRF51_SDK/nRF51_SDK_v7.x.x/doc/7.0.1/s110/html/a01075.html
+//
+void ExtractMemBlockData(ble_user_mem_block_t * p_mem_block,uint8_t* Buf,uint8_t *len)
+{
+	uint16_t Handle;
+	uint16_t Offset;
+	uint16_t Length;
+	uint8_t *p;
+
+	p=p_mem_block->p_mem;
+
+	Handle = *(uint16_t*)p;
+	*len=0;
+	while(Handle !=BLE_GATT_HANDLE_INVALID)
+	{
+		Handle = *(uint16_t*)p;
+		Offset = *(uint16_t*)(p+2);
+		Length = *(uint16_t*)(p+4);
+		p+=6;
+		*len+=Length;
+		for(int i=0;i<Length;i++)
+		{
+			Buf[Offset+i]=*p++;
+		}
+	}
 }
 
 void ble_buttonstatus_on_ble_evt(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_ble_evt, 
-                                 ble_user_mem_block_t * m_mem_block)
+                                 ble_user_mem_block_t * p_mem_block)
 {
+	uint32_t err_code;
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GAP_EVT_CONNECTED:
@@ -82,25 +142,33 @@ void ble_buttonstatus_on_ble_evt(ble_buttonservice_t * p_buttonservice, ble_evt_
             break;
             
         case BLE_GATTS_EVT_WRITE:
-            on_write(p_buttonservice, p_ble_evt, m_mem_block);
+            on_write(p_buttonservice, p_ble_evt, p_mem_block);
             break;
         
         case BLE_GAP_EVT_CONN_PARAM_UPDATE:
-        case BLE_EVT_USER_MEM_REQUEST:
         case BLE_EVT_TX_COMPLETE:
             break;
 
+        case BLE_EVT_USER_MEM_REQUEST:
+        	rtt_print(0, "service -> BLE_EVT_USER_MEM_REQUEST\r");
+        	p_mem_block->p_mem = &m_mem_queue[0];
+			p_mem_block->len = MEM_BLOCK_SIZE;
+			err_code = sd_ble_user_mem_reply(p_ble_evt->evt.gap_evt.conn_handle, p_mem_block);
+			APP_ERROR_CHECK(err_code);
+        	break;
+
         case BLE_EVT_USER_MEM_RELEASE:
-            on_write(p_buttonservice, p_ble_evt, m_mem_block);
+        	rtt_print(0, "service -> BLE_EVT_USER_MEM_RELEASE\r");
+            //on_write(p_buttonservice, p_ble_evt, p_mem_block);
             break;
             
         case BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST:
-            on_write(p_buttonservice, p_ble_evt, m_mem_block);
+            on_write(p_buttonservice, p_ble_evt, p_mem_block);
             break;
             
         default:
             // No implementation needed.
-            rtt_print(0, "%sUnhandled ble buttonstatus ble event: %s%X\n", RTT_CTRL_TEXT_YELLOW, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id);
+            rtt_print(0, "%sUnhandled ble buttonstatus ble event: %s%X\r", RTT_CTRL_TEXT_YELLOW, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id);
             break;
     }
 }
