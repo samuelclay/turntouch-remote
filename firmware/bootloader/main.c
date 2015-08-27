@@ -223,7 +223,7 @@ int main(void)
         APP_ERROR_CHECK(err_code);
 
         nrf_gpio_pin_set(UPDATE_IN_PROGRESS_LED);
-        // nrf_gpio_pin_set(BSP_LED_2);
+        nrf_gpio_pin_set(BSP_LED_2);
     }
     else
     {
@@ -246,16 +246,21 @@ int main(void)
 
         nrf_gpio_pin_set(UPDATE_IN_PROGRESS_LED);
         nrf_gpio_pin_set(BSP_LED_2);
+    } else {
+        nrf_gpio_pin_set(BSP_LED_1);        
     }
 
     if (bootloader_app_is_valid(DFU_BANK_0_REGION_START) && !bootloader_dfu_sd_in_progress())
     {
         nrf_gpio_pin_clear(UPDATE_IN_PROGRESS_LED);
+        nrf_gpio_pin_set(UPDATE_IN_PROGRESS_LED);
         nrf_gpio_pin_set(BSP_LED_2);
         
         // Select a bank region to use as application region.
         // @note: Only applications running from DFU_BANK_0_REGION_START is supported.
         bootloader_app_start(DFU_BANK_0_REGION_START);
+    } else {
+        nrf_gpio_pin_set(BSP_LED_1);        
     }
     
     NVIC_SystemReset();
