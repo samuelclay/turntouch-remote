@@ -13,7 +13,6 @@
 *.la
 *.a
 *.elf
-*.hex
 .DS_Store
 
 build
