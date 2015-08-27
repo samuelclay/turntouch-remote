@@ -119,21 +119,42 @@ static void ser_sd_transport_rx_packet_handler(uint8_t * p_data, uint16_t length
  */
 static void ser_sd_transport_hal_handler(ser_hal_transport_evt_t event)
 {
-    if (event.evt_type == SER_HAL_TRANSP_EVT_RX_PKT_RECEIVED)
+    switch (event.evt_type)
     {
+    case SER_HAL_TRANSP_EVT_RX_PKT_RECEIVED:
         ser_sd_transport_rx_packet_handler(event.evt_params.rx_pkt_received.p_buffer,
                                            event.evt_params.rx_pkt_received.num_of_bytes);
-    }
-    else if ((event.evt_type == SER_HAL_TRANSP_EVT_RX_PKT_RECEIVING) && m_rx_notify_handler)
-    {
-        m_rx_notify_handler();
-    }
-    else if (event.evt_type == SER_HAL_TRANSP_EVT_TX_PKT_SENT)
-    {
+        break;
+    case SER_HAL_TRANSP_EVT_RX_PKT_RECEIVING:
+        if (m_rx_notify_handler)
+        {
+            m_rx_notify_handler();
+        }
+        break;
+    case SER_HAL_TRANSP_EVT_TX_PKT_SENT:
         if(ser_app_power_system_off_get() == true)
         {
             ser_app_power_system_off_enter();
         }
+        break;
+    case SER_HAL_TRANSP_EVT_PHY_ERROR:
+
+        if (m_rsp_wait)
+        {
+            m_return_value = NRF_ERROR_INTERNAL;
+
+            /* Reset response flag - cmd_write function is pending on it.*/
+            m_rsp_wait = false;
+
+            /* If os handler is set, signal os that response has arrived.*/
+            if (m_os_rsp_set_handler)
+            {
+                m_os_rsp_set_handler();
+            }
+        }
+        break;
+    default:
+        break;
     }
 }
 

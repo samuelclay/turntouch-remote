@@ -23,25 +23,39 @@
 #define SENSE_FIELD_POS           (6)
 #define SENSE_FIELD_MASK          (0xC0)
 
+/**
+ * @brief Macro for conveting task-event index to an address of an event register.
+ *
+ * Macro utilizes the fact that registers are grouped together in ascending order.
+ */
+#define TE_IDX_TO_EVENT_ADDR(idx)   (nrf_gpiote_events_t)((uint32_t)NRF_GPIOTE_EVENTS_IN_0+(sizeof(uint32_t)*(idx)))
+
+/**
+ * @brief Macro for conveting task-event index to an address of a task register.
+ *
+ * Macro utilizes the fact that registers are grouped together in ascending order.
+ */
+#define TE_IDX_TO_TASK_ADDR(idx)   (nrf_gpiote_tasks_t)((uint32_t)NRF_GPIOTE_TASKS_OUT_0+(sizeof(uint32_t)*(idx)))
+
 //lint -save -e661
 typedef struct
 {
-    nrf_drv_state_t              state;
     nrf_drv_gpiote_evt_handler_t handlers[NUMBER_OF_GPIO_TE+GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS];
     int8_t                       pin_assignments[NUMBER_OF_PINS];
-    int8_t                       handlers_to_pins[GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS];
+    int8_t                       port_handlers_pins[GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS];
+    nrf_drv_state_t              state;
 } control_block_t;
 
 static control_block_t m_cb;
 
 __STATIC_INLINE bool pin_in_use(uint32_t pin)
 {
-    return (m_cb.pin_assignments[pin] != PIN_NOT_USED) ? true : false;
+    return (m_cb.pin_assignments[pin] != PIN_NOT_USED);
 }
 
 __STATIC_INLINE bool pin_in_use_as_non_task_out(uint32_t pin)
 {
-    return (m_cb.pin_assignments[pin] == PIN_USED) ? true : false;
+    return (m_cb.pin_assignments[pin] == PIN_USED);
 }
 
 __STATIC_INLINE bool pin_in_use_by_te(uint32_t pin)
@@ -51,12 +65,12 @@ __STATIC_INLINE bool pin_in_use_by_te(uint32_t pin)
 
 __STATIC_INLINE bool pin_in_use_by_port(uint32_t pin)
 {
-    return (m_cb.pin_assignments[pin] >= NUMBER_OF_GPIO_TE) ? true : false;
+    return (m_cb.pin_assignments[pin] >= NUMBER_OF_GPIO_TE);
 }
 
 __STATIC_INLINE bool pin_in_use_by_gpiote(uint32_t pin)
 {
-    return (m_cb.pin_assignments[pin] >= 0) ? true : false;
+    return (m_cb.pin_assignments[pin] >= 0);
 }
 
 __STATIC_INLINE void pin_in_use_by_te_set(uint32_t pin,
@@ -68,7 +82,7 @@ __STATIC_INLINE void pin_in_use_by_te_set(uint32_t pin,
     m_cb.handlers[channel_id] = handler;
     if (!is_channel)
     {
-        m_cb.handlers_to_pins[channel_id-NUMBER_OF_GPIO_TE] = (int8_t)pin;
+        m_cb.port_handlers_pins[channel_id-NUMBER_OF_GPIO_TE] = (int8_t)pin;
     }
 }
 
@@ -85,11 +99,6 @@ __STATIC_INLINE void pin_in_use_clear(uint32_t pin)
 __STATIC_INLINE int8_t channel_port_get(uint32_t pin)
 {
     return m_cb.pin_assignments[pin];
-}
-
-__STATIC_INLINE uint8_t pin_from_port_get(uint32_t port_channel)
-{
-    return m_cb.handlers_to_pins[port_channel];
 }
 
 __STATIC_INLINE nrf_drv_gpiote_evt_handler_t channel_handler_get(uint32_t channel)
@@ -124,7 +133,7 @@ static void channel_free(uint8_t channel_id)
     m_cb.handlers[channel_id] = FORBIDDEN_HANDLER_ADDRESS;
     if (channel_id >= NUMBER_OF_GPIO_TE)
     {
-        m_cb.handlers_to_pins[channel_id-NUMBER_OF_GPIO_TE] = (int8_t)-1;
+        m_cb.port_handlers_pins[channel_id-NUMBER_OF_GPIO_TE] = (int8_t)PIN_NOT_USED;
     }
 }
 
@@ -179,7 +188,8 @@ void nrf_drv_gpiote_uninit(void)
     m_cb.state = NRF_DRV_STATE_UNINITIALIZED;
 }
 
-ret_code_t nrf_drv_gpiote_out_init(nrf_drv_gpiote_pin_t pin, nrf_drv_gpiote_out_config_t * p_config)
+ret_code_t nrf_drv_gpiote_out_init(nrf_drv_gpiote_pin_t pin, 
+                                   nrf_drv_gpiote_out_config_t const * p_config)
 {
     ASSERT(pin < NUMBER_OF_PINS);
     ASSERT(m_cb.state == NRF_DRV_STATE_INITIALIZED);
@@ -292,8 +302,8 @@ uint32_t nrf_drv_gpiote_out_task_addr_get(nrf_drv_gpiote_pin_t pin)
 {
     ASSERT(pin < NUMBER_OF_PINS);
     ASSERT(pin_in_use_by_te(pin));
-
-    nrf_gpiote_tasks_t task = (nrf_gpiote_tasks_t)((uint32_t)NRF_GPIOTE_TASKS_OUT_0+(4*channel_port_get(pin)));
+    
+    nrf_gpiote_tasks_t task = TE_IDX_TO_TASK_ADDR(channel_port_get(pin));
     return nrf_gpiote_task_addr_get(task);
 }
 
@@ -312,13 +322,13 @@ void nrf_drv_gpiote_out_task_trigger(nrf_drv_gpiote_pin_t pin)
     ASSERT(pin < NUMBER_OF_PINS);
     ASSERT(pin_in_use(pin));
     ASSERT(pin_in_use_by_te(pin));
-    
-    nrf_gpiote_tasks_t task = (nrf_gpiote_tasks_t)((uint32_t)NRF_GPIOTE_TASKS_OUT_0+(4*channel_port_get(pin)));
+
+    nrf_gpiote_tasks_t task = TE_IDX_TO_TASK_ADDR(channel_port_get(pin));;
     nrf_gpiote_task_set(task);
 }
 
 ret_code_t nrf_drv_gpiote_in_init(nrf_drv_gpiote_pin_t pin,
-                                  nrf_drv_gpiote_in_config_t * p_config,
+                                  nrf_drv_gpiote_in_config_t const * p_config,
                                   nrf_drv_gpiote_evt_handler_t evt_handler)
 {
     ASSERT(pin < NUMBER_OF_PINS);
@@ -348,7 +358,7 @@ ret_code_t nrf_drv_gpiote_in_init(nrf_drv_gpiote_pin_t pin,
             }
             else
             {
-                m_cb.handlers_to_pins[channel-NUMBER_OF_GPIO_TE] |= (p_config->sense)<< SENSE_FIELD_POS;
+                m_cb.port_handlers_pins[channel-NUMBER_OF_GPIO_TE] |= (p_config->sense)<< SENSE_FIELD_POS;
             }
         }
         else
@@ -365,7 +375,7 @@ void nrf_drv_gpiote_in_event_enable(nrf_drv_gpiote_pin_t pin, bool int_enable)
     ASSERT(pin_in_use_by_gpiote(pin));
     if (pin_in_use_by_port(pin))
     {
-        uint8_t pin_and_sense = pin_from_port_get(channel_port_get(pin)-NUMBER_OF_GPIO_TE);
+        uint8_t pin_and_sense = m_cb.port_handlers_pins[channel_port_get(pin)-NUMBER_OF_GPIO_TE];
         nrf_gpiote_polarity_t polarity = (nrf_gpiote_polarity_t)(pin_and_sense >> SENSE_FIELD_POS);
         nrf_gpio_pin_sense_t sense;
         if (polarity == NRF_GPIOTE_POLARITY_TOGGLE)
@@ -384,13 +394,19 @@ void nrf_drv_gpiote_in_event_enable(nrf_drv_gpiote_pin_t pin, bool int_enable)
     else if(pin_in_use_by_te(pin))
     {
         int32_t channel = (int32_t)channel_port_get(pin);
-        nrf_gpiote_events_t event = (nrf_gpiote_events_t)((uint32_t)NRF_GPIOTE_EVENTS_IN_0+4*channel);
+        nrf_gpiote_events_t event = TE_IDX_TO_EVENT_ADDR(channel);
+       
         nrf_gpiote_event_enable(channel);
 
         nrf_gpiote_event_clear(event);
         if (int_enable)
         {
-            nrf_gpiote_int_enable(1 << channel);
+            nrf_drv_gpiote_evt_handler_t handler = channel_handler_get(channel_port_get(pin));
+            // Enable the interrupt only if event handler was provided.
+            if (handler)
+            {
+                nrf_gpiote_int_enable(1 << channel);
+            }
         }
     }
 }
@@ -435,8 +451,8 @@ uint32_t nrf_drv_gpiote_in_event_addr_get(nrf_drv_gpiote_pin_t pin)
 {
     ASSERT(pin < NUMBER_OF_PINS);
     ASSERT(pin_in_use_by_te(pin));
-
-    nrf_gpiote_events_t event = (nrf_gpiote_events_t)((uint32_t)NRF_GPIOTE_EVENTS_IN_0+(4*channel_port_get(pin)));
+    
+    nrf_gpiote_events_t event = TE_IDX_TO_EVENT_ADDR(channel_port_get(pin));
     return nrf_gpiote_event_addr_get(event);
 }
 
@@ -452,13 +468,15 @@ void GPIOTE_IRQHandler(void)
     uint32_t mask = (uint32_t)NRF_GPIOTE_INT_IN0_MASK;
     for (i = 0; i < NUMBER_OF_GPIO_TE; i++)
     {
-        if (nrf_gpiote_event_is_set(event) && nrf_gpiote_int_is_enabled(1 << i))
+        if (nrf_gpiote_event_is_set(event) && nrf_gpiote_int_is_enabled(mask))
         {
             nrf_gpiote_event_clear(event);
             status |= mask;
         }
         mask <<= 1;
-        event = (nrf_gpiote_events_t)((uint32_t)event + 4);
+        /* Incrementing to next event, utilizing the fact that events are grouped together
+         * in ascending order. */
+        event = (nrf_gpiote_events_t)((uint32_t)event + sizeof(uint32_t));
     }
 
     /* collect PORT status event, if event is set read pins state. Processing is postponed to the
@@ -473,7 +491,7 @@ void GPIOTE_IRQHandler(void)
     /* Process pin events. */
     if (status & NRF_GPIOTE_INT_IN_MASK)
     {
-        mask = 1;
+        mask = (uint32_t)NRF_GPIOTE_INT_IN0_MASK;
         for (i = 0; i < NUMBER_OF_GPIO_TE; i++)
         {
             if (mask & status)
@@ -492,16 +510,16 @@ void GPIOTE_IRQHandler(void)
         /* Process port event. */
         for (i = 0; i < GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS; i++)
         {
-            uint8_t pin_and_sense = pin_from_port_get(i);
-            nrf_drv_gpiote_pin_t pin = (pin_and_sense & ~SENSE_FIELD_MASK);
-            nrf_gpiote_polarity_t polarity =
-                    (nrf_gpiote_polarity_t)((pin_and_sense & SENSE_FIELD_MASK) >> SENSE_FIELD_POS);
-            mask = 1 << pin;
-            if (pin_in_use_by_port(pin))
+            if (m_cb.port_handlers_pins[i] != PIN_NOT_USED)
             {
+                uint8_t pin_and_sense = m_cb.port_handlers_pins[i];
+                nrf_drv_gpiote_pin_t pin = (pin_and_sense & ~SENSE_FIELD_MASK);
                 nrf_drv_gpiote_evt_handler_t handler = channel_handler_get(channel_port_get(pin));
                 if (handler)
                 {
+                    nrf_gpiote_polarity_t polarity =
+                            (nrf_gpiote_polarity_t)((pin_and_sense & SENSE_FIELD_MASK) >> SENSE_FIELD_POS);
+                    mask = 1 << pin;
                     nrf_gpio_pin_sense_t sense = nrf_gpio_pin_sense_get(pin);
                     if (((mask & input) && (sense==NRF_GPIO_PIN_SENSE_HIGH)) ||
                        (!(mask & input) && (sense==NRF_GPIO_PIN_SENSE_LOW))  )

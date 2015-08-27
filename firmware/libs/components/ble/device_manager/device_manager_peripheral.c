@@ -14,7 +14,6 @@
 #include "pstorage.h"
 #include "ble_hci.h"
 #include "app_error.h"
-#include "rtt.h"
 
 #if defined ( __CC_ARM )
     #ifndef __ALIGN
@@ -142,13 +141,13 @@ typedef enum
  * @note That if ENABLE_DEBUG_LOG_SUPPORT is disabled, having DM_DISABLE_LOGS has no effect.
  * @{
  */
-#define DM_DISABLE_LOGS        /**< Enable this macro to disable any logs from this module. */
+#define nDM_DISABLE_LOGS        /**< Enable this macro to disable any logs from this module. */
 
 #ifndef DM_DISABLE_LOGS
-#define DM_LOG  rtt_log  /**< Used for logging details. */
-#define DM_ERR  rtt_log  /**< Used for logging errors in the module. */
-#define DM_TRC  rtt_log  /**< Used for getting trace of execution in the module. */
-#define DM_DUMP(...) /**< Used for dumping octet information to get details of bond information etc. */
+#define DM_LOG  app_trace_log  /**< Used for logging details. */
+#define DM_ERR  app_trace_log  /**< Used for logging errors in the module. */
+#define DM_TRC  app_trace_log  /**< Used for getting trace of execution in the module. */
+#define DM_DUMP app_trace_dump /**< Used for dumping octet information to get details of bond information etc. */
 #else //DM_DISABLE_LOGS
 #define DM_DUMP(...)           /**< Disables dumping of octet streams. */
 #define DM_LOG(...)            /**< Disables detailed logs. */
@@ -1760,20 +1759,17 @@ ret_code_t dm_register(dm_application_instance_t    * p_appl_instance,
 
     DM_MUTEX_LOCK();
 
-    // DM_LOG("[DM]: >>> dm_register.\r\n");
+    DM_LOG("[DM]: >> dm_register.\r\n");
 
     uint32_t err_code;
 
     //Verify if an application instance is available. Currently only one instance is supported.
     if (m_application_table[0].ntf_cb == NULL)
     {
-        // DM_LOG("[DM]: -0\r\n");
-        // DM_LOG("[DM]: Application Instance allocated.\r\n");
+        DM_LOG("[DM]: Application Instance allocated.\r\n");
 
         //Mark instance as allocated.
-        // DM_LOG("[DM]: 0\r\n");
         m_application_table[0].ntf_cb    = p_appl_param->evt_handler;
-        // DM_LOG("[DM]: 1\r\n");
         m_application_table[0].sec_param = p_appl_param->sec_param;
         m_application_table[0].service   = p_appl_param->service_type;
 
@@ -1786,7 +1782,6 @@ ret_code_t dm_register(dm_application_instance_t    * p_appl_instance,
         //Populate application's instance variable with the assigned allocation instance.
         *p_appl_instance = 0;
         err_code         = NRF_SUCCESS;
-        // DM_LOG("[DM]: Successfully allocated app instance.\r\n");
     }
     else
     {
@@ -1795,7 +1790,7 @@ ret_code_t dm_register(dm_application_instance_t    * p_appl_instance,
 
     DM_MUTEX_UNLOCK();
 
-    // DM_TRC("[DM]: << dm_register.\r\n");
+    DM_TRC("[DM]: << dm_register.\r\n");
 
     return err_code;
 }

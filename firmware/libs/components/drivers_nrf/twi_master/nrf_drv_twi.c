@@ -286,10 +286,6 @@ static void txrx_shorts_set_task_start(volatile nrf_drv_twi_t const * const p_in
 
         state_machine(p_instance, TO_STOP);
     }
-    else if ((p_transfer->count + 1) == p_transfer->length)
-    {
-         short_mask = 0;
-    }
     else
     {
         short_mask = NRF_TWI_SHORTS_BB_SUSPEND_MASK;
@@ -307,6 +303,7 @@ static void address_req(volatile nrf_drv_twi_t const * const p_instance)
     volatile transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
     nrf_twi_address_set(p_instance->p_reg, p_transfer->address);
 
+    nrf_twi_task_set(p_instance->p_reg, NRF_TWI_TASKS_RESUME);
     p_transfer->task = NRF_TWI_TASKS_STARTTX;
     p_transfer->end_event = NRF_TWI_EVENTS_TXDSENT;
     nrf_twi_event_clear(p_instance->p_reg, p_transfer->end_event);
@@ -327,6 +324,7 @@ static void rx_address_req(volatile nrf_drv_twi_t const * const p_instance)
     volatile transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
 
     nrf_twi_address_set(p_instance->p_reg, p_transfer->address);
+    nrf_twi_task_set(p_instance->p_reg, NRF_TWI_TASKS_RESUME);
     p_transfer->task = NRF_TWI_TASKS_STARTRX;
     p_transfer->end_event = NRF_TWI_EVENTS_RXDREADY;
     nrf_twi_event_clear(p_instance->p_reg, p_transfer->end_event);

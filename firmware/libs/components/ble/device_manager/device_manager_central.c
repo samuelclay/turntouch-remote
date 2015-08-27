@@ -1709,16 +1709,12 @@ ret_code_t dm_register(dm_application_instance_t    * p_appl_instance,
 
         //Mark instance as allocated.
         m_application_table[0].ntf_cb    = p_appl_param->evt_handler;
-        DM_LOG("[DM]: 1\r\n");
         m_application_table[0].sec_param = p_appl_param->sec_param;
-        DM_LOG("[DM]: 2\r\n");
         m_application_table[0].service   = p_appl_param->service_type;
-        DM_LOG("[DM]: 3\r\n");
 
         //Populate application's instance variable with the assigned allocation instance.
         *p_appl_instance = 0;
         err_code         = NRF_SUCCESS;
-        DM_LOG("[DM]: Successfully allocated app instance.\r\n");
     }
     else
     {

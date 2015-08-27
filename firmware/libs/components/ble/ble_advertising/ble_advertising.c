@@ -17,6 +17,7 @@
 #include "nordic_common.h"
 #include "pstorage.h"
 
+
 #define LOG app_trace_log
 
 static bool                            m_advertising_start_pending = false; /**< Flag to keep track of ongoing operations on persistent memory. */
@@ -28,7 +29,6 @@ static ble_advertising_evt_handler_t   m_evt_handler;      /**< Handler for the 
 static ble_advertising_error_handler_t m_error_handler;    /**< Handler for the advertising error events. */
 
 static ble_adv_mode_t                  m_adv_mode_current; /**< Variable to keep track of the current advertising mode. */
-static uint8_t                         m_direct_adv_cnt;   /**< Counter of direct advertising retries. */
 static ble_adv_modes_config_t          m_adv_modes_config; /**< Struct to keep track of disabled and enabled advertising modes, as well as time-outs and intervals.*/
 
 static ble_gap_whitelist_t             m_whitelist;                                         /**< Struct that points to whitelisted addresses. */
@@ -99,16 +99,6 @@ uint32_t ble_advertising_init(ble_advdata_t const                 * p_advdata,
     m_evt_handler      = evt_handler;
     m_error_handler    = error_handler;
     m_adv_modes_config = *p_config;
-
-    // If interval or timeout is 0, disable the mode.
-    if (m_adv_modes_config.ble_adv_fast_interval == 0 || m_adv_modes_config.ble_adv_fast_timeout == 0)
-    {
-        m_adv_modes_config.ble_adv_fast_enabled = false;
-    }
-    if (m_adv_modes_config.ble_adv_slow_interval == 0 || m_adv_modes_config.ble_adv_slow_timeout == 0)
-    {
-        m_adv_modes_config.ble_adv_slow_enabled = false;
-    }
 
     ble_advertising_peer_address_clear();
 
@@ -212,8 +202,10 @@ uint32_t ble_advertising_start(ble_adv_mode_t advertising_mode)
 
     // Fetch the peer address.
     ble_advertising_peer_address_clear();
-    if (   (m_adv_modes_config.ble_adv_directed_enabled)
+    if (  ((m_adv_modes_config.ble_adv_directed_enabled)
            && m_adv_mode_current == BLE_ADV_MODE_DIRECTED)
+        ||((m_adv_modes_config.ble_adv_directed_slow_enabled)
+           && m_adv_mode_current == BLE_ADV_MODE_DIRECTED_SLOW))
     {
         if (m_evt_handler != NULL)
         {
@@ -229,6 +221,11 @@ uint32_t ble_advertising_start(ble_adv_mode_t advertising_mode)
     // If a mode is disabled, continue to the next mode. I.e fast instead of direct, slow instead of fast, idle instead of slow.
     if (  (m_adv_mode_current == BLE_ADV_MODE_DIRECTED)
         &&(!m_adv_modes_config.ble_adv_directed_enabled || !peer_address_exists(m_peer_address.addr)))
+    {
+        m_adv_mode_current = BLE_ADV_MODE_DIRECTED_SLOW;
+    }
+    if (  (m_adv_mode_current == BLE_ADV_MODE_DIRECTED_SLOW)
+        &&(!m_adv_modes_config.ble_adv_directed_slow_enabled || !peer_address_exists(m_peer_address.addr)))
     {
         m_adv_mode_current = BLE_ADV_MODE_FAST;
     }
@@ -271,9 +268,18 @@ uint32_t ble_advertising_start(ble_adv_mode_t advertising_mode)
             LOG("[ADV]: Starting direct advertisement.\r\n");
             adv_params.p_peer_addr = &m_peer_address; // Directed advertising.
             adv_params.type        = BLE_GAP_ADV_TYPE_ADV_DIRECT_IND;
-            adv_params.timeout     = 0;               // High dutycycle.
-            adv_params.interval    = 0;               // High dutycycle.
+            adv_params.timeout     = 0;
+            adv_params.interval    = 0;
             m_adv_evt              = BLE_ADV_EVT_DIRECTED;
+            break;
+
+        case BLE_ADV_MODE_DIRECTED_SLOW:
+            LOG("[ADV]: Starting direct advertisement.\r\n");
+            adv_params.p_peer_addr = &m_peer_address; // Directed advertising.
+            adv_params.type        = BLE_GAP_ADV_TYPE_ADV_DIRECT_IND;
+            adv_params.timeout     = m_adv_modes_config.ble_adv_directed_slow_timeout;
+            adv_params.interval    = m_adv_modes_config.ble_adv_directed_slow_interval;
+            m_adv_evt              = BLE_ADV_EVT_DIRECTED_SLOW;
             break;
 
         case BLE_ADV_MODE_FAST:
@@ -373,9 +379,6 @@ void ble_advertising_on_ble_evt(ble_evt_t const * p_ble_evt)
             uint32_t err_code;
             m_whitelist_temporarily_disabled = false;
 
-
-            m_direct_adv_cnt = m_adv_modes_config.ble_adv_directed_timeout;
-
             if (p_ble_evt->evt.gap_evt.conn_handle == current_slave_link_conn_handle)
             {
                err_code = ble_advertising_start(BLE_ADV_MODE_DIRECTED);
@@ -394,20 +397,17 @@ void ble_advertising_on_ble_evt(ble_evt_t const * p_ble_evt)
                 {
                     case BLE_ADV_MODE_DIRECTED:
                         LOG("[ADV]: Timed out from directed advertising.\r\n");
-                        if ((m_direct_adv_cnt > 0) && peer_address_exists(m_peer_address.addr))
                         {
                             uint32_t err_code;
-
-                            m_direct_adv_cnt--;
-                            LOG("[ADV]: Remaining direct advertising attempts: %d\r\n",
-                                m_direct_adv_cnt);
-                            err_code = ble_advertising_start(BLE_ADV_MODE_DIRECTED);
+                            err_code = ble_advertising_start(BLE_ADV_MODE_DIRECTED_SLOW);
                             if ((err_code != NRF_SUCCESS) && (m_error_handler != NULL))
                             {
                                 m_error_handler(err_code);
                             }
                         }
-                        else
+                        break;
+                    case BLE_ADV_MODE_DIRECTED_SLOW:
+                        LOG("[ADV]: Timed out from directed slow advertising.\r\n");
                         {
                             uint32_t err_code;
                             err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
@@ -417,7 +417,6 @@ void ble_advertising_on_ble_evt(ble_evt_t const * p_ble_evt)
                             }
                         }
                         break;
-
                     case BLE_ADV_MODE_FAST:
                     {
                         uint32_t err_code;

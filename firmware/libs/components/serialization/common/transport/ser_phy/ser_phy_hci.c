@@ -25,8 +25,6 @@
 
 #include "ser_config.h"
 #include "ser_phy_debug_comm.h"
-
-
 // hide globals for release version, expose for debug version
 #if defined(SER_PHY_HCI_DEBUG_ENABLE)
 #define _static
@@ -620,7 +618,6 @@ static uint16_t link_control_packet_decode(const uint8_t * p_buffer, uint32_t le
 static void ack_transmit(void)
 {
     uint32_t err_code;
-
     // TX ACK packet format:
     // - Unreliable Packet type
     // - Payload Length set to 0
@@ -709,6 +706,7 @@ static void error_callback(void)
     DEBUG_EVT_HCI_PHY_EVT_TX_ERROR(0);
 
     event.evt_type = SER_PHY_EVT_HW_ERROR;
+    event.evt_params.hw_error.p_buffer = m_p_tx_payload;
     ser_phy_event_callback(event);
 }
 
@@ -926,7 +924,6 @@ static void hci_process_orphaned_ack(hci_evt_t * p_event)
     return;
 }
 
-
 /* main tx fsm   */
 static void hci_tx_fsm_event_process(hci_evt_t * p_event)
 {
@@ -1002,7 +999,6 @@ static void hci_tx_fsm_event_process(hci_evt_t * p_event)
             else if (p_event->evt_source == HCI_TIMER_EVT)
             {
                 m_tx_retry_count--;
-
                 // m_tx_retx_counter++; // global retransmissions counter
                 if (m_tx_retry_count)
                 {
@@ -1133,11 +1129,25 @@ static void hci_rx_fsm_event_process(hci_evt_t * p_event)
                 }
                 m_hci_rx_fsm_state = HCI_RX_STATE_RECEIVE;
             }
+            else if ((p_event->evt_source == HCI_SLIP_EVT) &&
+                    (p_event->evt.ser_phy_slip_evt.evt_type == SER_PHY_HCI_SLIP_EVT_PKT_RECEIVED))
+            {
+                (void) ser_phy_hci_slip_rx_buf_free(p_event->evt.ser_phy_slip_evt.evt_params.received_pkt.p_buffer);
+            }
             break;
 
         case HCI_RX_STATE_WAIT_FOR_SLIP_NACK_END:
-            m_hci_rx_fsm_state = HCI_RX_STATE_RECEIVE;
+            if ((p_event->evt_source == HCI_SLIP_EVT) &&
+               (p_event->evt.ser_phy_slip_evt.evt_type == SER_PHY_HCI_SLIP_EVT_ACK_SENT))
+            {
+               m_hci_rx_fsm_state = HCI_RX_STATE_RECEIVE;
+            }
+            else
+            {
+               (void) ser_phy_hci_slip_rx_buf_free(p_event->evt.ser_phy_slip_evt.evt_params.received_pkt.p_buffer);
+            }
             break;
+
 
 #ifdef HCI_LINK_CONTROL
         case HCI_RX_STATE_DISABLE:
@@ -1448,7 +1458,6 @@ void ser_phy_interrupts_enable(void)
     {
         hci_signal_timeout_event();
     }
-    ser_phy_hci_slip_interrupts_enable();
 
     return;
 }
@@ -1457,7 +1466,6 @@ void ser_phy_interrupts_enable(void)
 /* ser_phy API function */
 void ser_phy_interrupts_disable(void)
 {
-    ser_phy_hci_slip_interrupts_disable();
     CRITICAL_REGION_ENTER();
     m_hci_timer_enabled_flag = false;
     // transport calls PHY API with ser_phy_interrupts_disabled

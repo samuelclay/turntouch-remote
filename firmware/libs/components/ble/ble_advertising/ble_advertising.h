@@ -43,10 +43,11 @@
 */
 typedef enum
 {
-    BLE_ADV_MODE_IDLE,     /**< Idle; no connectable advertising is ongoing.*/
-    BLE_ADV_MODE_DIRECTED, /**< Directed advertising attempts to connect to the most recently disconnected peer. */
-    BLE_ADV_MODE_FAST,     /**< Fast advertising will connect to any peer device, or filter with a whitelist if one exists. */
-    BLE_ADV_MODE_SLOW,     /**< Slow advertising is similar to fast advertising. By default, it uses a longer advertising interval and time-out than fast advertising. However, these options are defined by the user. */
+    BLE_ADV_MODE_IDLE,          /**< Idle; no connectable advertising is ongoing.*/
+    BLE_ADV_MODE_DIRECTED,      /**< Directed advertising attempts to connect to the most recently disconnected peer. */
+    BLE_ADV_MODE_DIRECTED_SLOW, /**< Directed advertising (low duty cycle) attempts to connect to the most recently disconnected peer. */
+    BLE_ADV_MODE_FAST,          /**< Fast advertising will connect to any peer device, or filter with a whitelist if one exists. */
+    BLE_ADV_MODE_SLOW,          /**< Slow advertising is similar to fast advertising. By default, it uses a longer advertising interval and time-out than fast advertising. However, these options are defined by the user. */
 } ble_adv_mode_t;
 
 /**@brief Advertising events.
@@ -60,6 +61,7 @@ typedef enum
 {
     BLE_ADV_EVT_IDLE,                /**< Idle; no connectable advertising is ongoing.*/
     BLE_ADV_EVT_DIRECTED,            /**< Direct advertising mode has started. */
+    BLE_ADV_EVT_DIRECTED_SLOW,       /**< Directed advertising (low duty cycle) has started. */
     BLE_ADV_EVT_FAST,                /**< Fast advertising mode has started. */
     BLE_ADV_EVT_SLOW,                /**< Slow advertising mode has started.*/
     BLE_ADV_EVT_FAST_WHITELIST,      /**< Fast advertising mode using the whitelist has started. */
@@ -75,15 +77,17 @@ typedef enum
  */
 typedef struct
 {
-    bool     ble_adv_whitelist_enabled; /**< Enable or disable use of the whitelist. */
-    bool     ble_adv_directed_enabled;  /**< Enable or disable direct advertising mode. */
-    uint32_t ble_adv_directed_timeout;  /**< Time-out (number of tries) for direct advertising. */
-    bool     ble_adv_fast_enabled;      /**< Enable or disable fast advertising mode. */
-    uint32_t ble_adv_fast_interval;     /**< Advertising interval for fast advertising. */
-    uint32_t ble_adv_fast_timeout;      /**< Time-out (in seconds) for fast advertising. */
-    bool     ble_adv_slow_enabled;      /**< Enable or disable slow advertising mode. */
-    uint32_t ble_adv_slow_interval;     /**< Advertising interval for slow advertising. */
-    uint32_t ble_adv_slow_timeout;      /**< Time-out (in seconds) for slow advertising. */
+    bool     ble_adv_whitelist_enabled;       /**< Enable or disable use of the whitelist. */
+    bool     ble_adv_directed_enabled;        /**< Enable or disable direct advertising mode. */
+    bool     ble_adv_directed_slow_enabled;   /**< Enable or disable direct advertising mode. */
+    uint32_t ble_adv_directed_slow_interval;  /**< Advertising interval for directed advertising. */
+    uint32_t ble_adv_directed_slow_timeout;   /**< Time-out (number of tries) for direct advertising. */
+    bool     ble_adv_fast_enabled;            /**< Enable or disable fast advertising mode. */
+    uint32_t ble_adv_fast_interval;           /**< Advertising interval for fast advertising. */
+    uint32_t ble_adv_fast_timeout;            /**< Time-out (in seconds) for fast advertising. */
+    bool     ble_adv_slow_enabled;            /**< Enable or disable slow advertising mode. */
+    uint32_t ble_adv_slow_interval;           /**< Advertising interval for slow advertising. */
+    uint32_t ble_adv_slow_timeout;            /**< Time-out (in seconds) for slow advertising. */
 }ble_adv_modes_config_t;
 
 
@@ -104,17 +108,20 @@ typedef struct
 
 
 /* Defines to make the mode options easier to set during advertising init.*/
-#define BLE_ADV_DIRECTED_ENABLED   true
-#define BLE_ADV_DIRECTED_DISABLED  false
+#define BLE_ADV_DIRECTED_ENABLED       true
+#define BLE_ADV_DIRECTED_DISABLED      false
 
-#define BLE_ADV_FAST_ENABLED       true
-#define BLE_ADV_FAST_DISABLED      false
+#define BLE_ADV_DIRECTED_SLOW_ENABLED  true
+#define BLE_ADV_DIRECTED_SLOW_DISABLED false
+
+#define BLE_ADV_FAST_ENABLED           true
+#define BLE_ADV_FAST_DISABLED          false
     
-#define BLE_ADV_SLOW_ENABLED       true
-#define BLE_ADV_SLOW_DISABLED      false
+#define BLE_ADV_SLOW_ENABLED           true
+#define BLE_ADV_SLOW_DISABLED          false
 
-#define BLE_ADV_WHITELIST_ENABLED  true
-#define BLE_ADV_WHITELIST_DISABLED false
+#define BLE_ADV_WHITELIST_ENABLED      true
+#define BLE_ADV_WHITELIST_DISABLED     false
 
 
 /**@brief Function for handling BLE events.

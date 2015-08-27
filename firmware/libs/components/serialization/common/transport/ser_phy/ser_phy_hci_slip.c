@@ -52,7 +52,6 @@
 #endif /* SER_CONNECTIVITY */
 
 #include "ser_config.h"
-
 #define APP_SLIP_END     0xC0 /**< SLIP code for identifying the beginning and end of a packet frame.. */
 #define APP_SLIP_ESC     0xDB /**< SLIP escape code. This code is used to specify that the following character is specially encoded. */
 #define APP_SLIP_ESC_END 0xDC /**< SLIP special code. When this code follows 0xDB, this character is interpreted as payload data 0xC0.. */
@@ -109,7 +108,7 @@ static bool     slip_decode(uint8_t * p_received_byte);
 static void     ser_phi_hci_rx_byte(uint8_t rx_byte);
 // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static __INLINE void callback_hw_error(uint32_t error_src)
+__STATIC_INLINE void callback_hw_error(uint32_t error_src)
 {
     m_ser_phy_hci_slip_event.evt_type = SER_PHY_HCI_SLIP_EVT_HW_ERROR;
 
@@ -119,7 +118,7 @@ static __INLINE void callback_hw_error(uint32_t error_src)
 }
 
 
-static __INLINE void slip_encode(void)
+__STATIC_INLINE void slip_encode(void)
 {
     switch (mp_data->p_buffer[m_tx_index])
     {
@@ -141,7 +140,7 @@ static __INLINE void slip_encode(void)
 }
 
 
-static __INLINE bool check_pending_tx()
+__STATIC_INLINE bool check_pending_tx()
 {
     bool tx_continue = false;
 
@@ -513,12 +512,8 @@ static void ser_phi_hci_rx_byte(uint8_t rx_byte)
     {
         /* Both buffers are not available - cannot continue reception*/
         rx_sync = false;
-
-        /* Block RXRDY interrupts at this point*/
-        NRF_UART0->INTENCLR = (UART_INTENCLR_RXDRDY_Clear << UART_INTENCLR_RXDRDY_Pos);
         return;
     }
-
 }
 
 
@@ -555,12 +550,6 @@ uint32_t ser_phy_hci_slip_rx_buf_free(uint8_t * p_buffer)
         }
     }
 
-    if (err_code == NRF_SUCCESS)
-    {
-        /* Unblock RXRDY interrupts at this point*/
-        NRF_UART0->INTENSET = (UART_INTENSET_RXDRDY_Set << UART_INTENSET_RXDRDY_Pos);
-    }
-
     return err_code;
 }
 
@@ -595,7 +584,6 @@ static void ser_phy_uart_evt_callback(app_uart_evt_t * uart_evt)
             // of the other side
             if (!m_other_side_active)
             {
-                nrf_gpio_cfg_input(comm_params.rx_pin_no, NRF_GPIO_PIN_NOPULL);
                 m_other_side_active = true;
             }
 
@@ -645,17 +633,4 @@ void ser_phy_hci_slip_close(void)
     m_ser_phy_hci_slip_event_handler = NULL;
     (void)app_uart_close(uart_id);
 }
-
-
-void ser_phy_hci_slip_interrupts_enable(void)
-{
-    NVIC_EnableIRQ(UART0_IRQn);
-}
-
-
-void ser_phy_hci_slip_interrupts_disable(void)
-{
-    NVIC_DisableIRQ(UART0_IRQn);
-}
-
 

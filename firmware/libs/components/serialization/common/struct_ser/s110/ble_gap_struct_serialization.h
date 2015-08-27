@@ -236,7 +236,7 @@ uint32_t ble_gap_opt_scan_req_report_t_enc(void const * const p_void_scan_req_re
                                            uint32_t           buf_len,
                                            uint32_t * const   p_index);
 
-uint32_t ble_gap_opt_scan_req_report_t_dec(void const * const p_buf,
+uint32_t ble_gap_opt_scan_req_report_t_dec(uint8_t const * const p_buf,
                                            uint32_t           buf_len,
                                            uint32_t * const   p_index,
                                            void * const       p_void_scan_req_report);

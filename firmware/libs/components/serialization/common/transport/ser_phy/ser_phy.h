@@ -136,6 +136,7 @@ typedef struct
 typedef struct
 {
     uint32_t error_code; /**< Hardware error code - specific for any microcontroller. */
+    uint8_t * p_buffer;  /**< Pointer to the buffer that was processed when error occured. */
 } ser_phy_evt_hw_error_params_t;
 
 

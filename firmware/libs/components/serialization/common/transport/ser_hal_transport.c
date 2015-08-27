@@ -230,7 +230,21 @@ static void phy_events_handler(ser_phy_evt_t phy_event)
                 SER_HAL_TRANSP_PHY_ERROR_HW_ERROR;
             hal_transp_event.evt_params.phy_error.hw_error_code =
                 phy_event.evt_params.hw_error.error_code;
+            if (HAL_TRANSP_TX_STATE_TRANSMITTING == m_tx_state)
+            {
+                m_tx_state = HAL_TRANSP_TX_STATE_TRANSMITTED;
+                err_code   = ser_hal_transport_tx_pkt_free(phy_event.evt_params.hw_error.p_buffer);
+                APP_ERROR_CHECK(err_code);
+                /* An event to an upper layer that a packet has been transmitted. */
+            }
+            else if (HAL_TRANSP_RX_STATE_RECEIVING == m_rx_state)
+            {
+                m_rx_state = HAL_TRANSP_RX_STATE_RECEIVED;
+                err_code   = ser_hal_transport_rx_pkt_free(phy_event.evt_params.hw_error.p_buffer);
+                APP_ERROR_CHECK(err_code);
+            }
             m_events_handler(hal_transp_event);
+
             break;
         }
 

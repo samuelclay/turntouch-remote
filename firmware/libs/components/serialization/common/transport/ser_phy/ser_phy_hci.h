@@ -143,19 +143,5 @@ uint32_t ser_phy_hci_slip_rx_buf_free(uint8_t * p_buffer);
  */
 void ser_phy_hci_slip_close(void);
 
-
-/**@brief A function for enabling a PHY HCI module interrupts.
- *
- * @note  The function enables all interrupts that are used by a PHY HCI module (and only those).
- */
-void ser_phy_hci_slip_interrupts_enable(void);
-
-
-/**@brief A function for disabling a PHY HCI module interrupts.
- *
- * @note  The function disables all interrupts that are used by a PHY HCI module (and only those).
- */
-void ser_phy_hci_slip_interrupts_disable(void);
-
 #endif /* SER_PHY_HCI_H__ */
 /** @} */

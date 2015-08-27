@@ -162,7 +162,8 @@ void nrf_drv_gpiote_uninit(void);
  * @retval NRF_ERROR_INVALID_STATE If the driver is not initialized or the pin is already used.
  * @retval NRF_ERROR_NO_MEM        If no GPIOTE channel is available.
  */
-ret_code_t nrf_drv_gpiote_out_init(nrf_drv_gpiote_pin_t pin, nrf_drv_gpiote_out_config_t * p_config);
+ret_code_t nrf_drv_gpiote_out_init(nrf_drv_gpiote_pin_t pin,
+                                   nrf_drv_gpiote_out_config_t const * p_config);
 
 /**
  * @brief Function for uninitializing a GPIOTE output pin.
@@ -233,7 +234,9 @@ uint32_t nrf_drv_gpiote_out_task_addr_get(nrf_drv_gpiote_pin_t pin);
  * @retval NRF_ERROR_INVALID_STATE If the driver is not initialized or the pin is already used.
  * @retval NRF_ERROR_NO_MEM        If no GPIOTE channel is available.
  */
-ret_code_t nrf_drv_gpiote_in_init(nrf_drv_gpiote_pin_t pin, nrf_drv_gpiote_in_config_t * p_config, nrf_drv_gpiote_evt_handler_t evt_handler);
+ret_code_t nrf_drv_gpiote_in_init(nrf_drv_gpiote_pin_t pin, 
+                                  nrf_drv_gpiote_in_config_t const * p_config,
+                                  nrf_drv_gpiote_evt_handler_t evt_handler);
 
 /**
  * @brief Function for uninitializing a GPIOTE input pin.

@@ -38,7 +38,14 @@
  */
 
 #define INVALID_OPCODE              0x00    /**< Invalid op code identifier. */
-#define SOC_MAX_WRITE_SIZE          1024    /**< Maximum write size allowed for a single call to \ref sd_flash_write as specified in the SoC API. */
+
+#ifdef NRF51
+#define SOC_MAX_WRITE_SIZE          1024    /**< Maximum write size allowed for a single call to \ref sd_flash_write as specified in the SoC API on the nRF51. */
+#elif NRF52
+#define SOC_MAX_WRITE_SIZE          4096    /**< Maximum write size allowed for a single call to \ref sd_flash_write as specified in the SoC API on the nRF52. */
+#else
+#error No target defined
+#endif
 
 
 /**
@@ -87,7 +94,7 @@ typedef struct
 }cmd_queue_t;
 
 static cmd_queue_t             m_cmd_queue;                             /**< Flash operation request queue. */
-static pstorage_module_table_t m_app_table[PSTORAGE_MAX_APPLICATIONS];  /**< Registered application information table. */
+static pstorage_module_table_t m_app_table[PSTORAGE_NUM_OF_PAGES];      /**< Registered application information table. */
 static pstorage_size_t         m_next_app_instance;                     /**< Points to the application module instance that can be allocated next */
 static pstorage_size_t         m_round_val;                             /**< Round value for multiple round operations. For erase operations, the round value will contain current round counter which is identical to number of pages erased. For store operations, the round value contains current round of operation * SOC_MAX_WRITE_SIZE to ensure each store to the SoC Flash API is within the SoC limit. */
 
@@ -128,7 +135,7 @@ static void cmd_queue_element_init(uint32_t index)
     // Internal function and checks on range of index can be avoided
     m_cmd_queue.cmd[index].op_code                = INVALID_OPCODE;
     m_cmd_queue.cmd[index].size                   = 0;
-    m_cmd_queue.cmd[index].storage_addr.module_id = PSTORAGE_MAX_APPLICATIONS;
+    m_cmd_queue.cmd[index].storage_addr.module_id = PSTORAGE_NUM_OF_PAGES;
     m_cmd_queue.cmd[index].storage_addr.block_id  = 0;
     m_cmd_queue.cmd[index].p_data_addr            = NULL;
     m_cmd_queue.cmd[index].offset                 = 0;
@@ -406,7 +413,7 @@ uint32_t pstorage_init(void)
     m_next_app_instance = 0;
     m_round_val         = 0;
 
-    for(unsigned int index = 0; index < PSTORAGE_MAX_APPLICATIONS; index++)
+    for(unsigned int index = 0; index < PSTORAGE_NUM_OF_PAGES; index++)
     {
         m_app_table[index].cb          = NULL;
     }
@@ -418,7 +425,7 @@ uint32_t pstorage_init(void)
 uint32_t pstorage_register(pstorage_module_param_t * p_module_param,
                            pstorage_handle_t       * p_block_id)
 {
-    if (m_next_app_instance == PSTORAGE_MAX_APPLICATIONS)
+    if (m_next_app_instance == PSTORAGE_NUM_OF_PAGES)
     {
         return NRF_ERROR_NO_MEM;
     }

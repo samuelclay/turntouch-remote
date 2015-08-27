@@ -186,7 +186,7 @@ static void hci_slip_event_handler(ser_phy_hci_slip_evt_t * p_event)
 void ser_phy_interrupts_enable(void)
 {
 
-    ser_phy_hci_slip_interrupts_enable();
+    NVIC_EnableIRQ(UART0_IRQn);
     return;
 }
 
@@ -194,7 +194,7 @@ void ser_phy_interrupts_enable(void)
 /* ser_phy API function */
 void ser_phy_interrupts_disable(void)
 {
-    ser_phy_hci_slip_interrupts_disable();
+    NVIC_DisableIRQ(UART0_IRQn);
     return;
 }
 

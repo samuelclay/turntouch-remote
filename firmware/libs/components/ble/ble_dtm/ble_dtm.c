@@ -180,7 +180,7 @@ static uint32_t radio_init(void)
         NRF_RADIO->OVERRIDE1 = NRF_FICR->BLE_1MBIT[1];
         NRF_RADIO->OVERRIDE2 = NRF_FICR->BLE_1MBIT[2];
         NRF_RADIO->OVERRIDE3 = NRF_FICR->BLE_1MBIT[3];
-        NRF_RADIO->OVERRIDE4 = NRF_FICR->BLE_1MBIT[4]| (RADIO_OVERRIDE4_ENABLE_Pos << RADIO_OVERRIDE4_ENABLE_Enabled);
+        NRF_RADIO->OVERRIDE4 = NRF_FICR->BLE_1MBIT[4];
     }
 
     // Initializing code below is quite generic - for BLE, the values are fixed, and expressions

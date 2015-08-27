@@ -20,6 +20,7 @@
 #include "ser_config.h"
 #include "nrf_soc.h"
 
+
 #define SD_BLE_EVT_MAILBOX_QUEUE_SIZE 5 /**< Size of mailbox queue. */
 
 /** @brief Structure used to pass packet details through mailbox.
@@ -36,6 +37,16 @@ typedef struct
 APP_MAILBOX_DEF(sd_ble_evt_mailbox, SD_BLE_EVT_MAILBOX_QUEUE_SIZE, ser_sd_handler_evt_data_t);
 
 static app_mailbox_id_t m_ble_evt_mailbox_id; /**< mailbox identifier. */
+
+/**
+ * @brief Function to be replaced by user implementation if needed.
+ *
+ * Weak function - user can add different implementation of this function if application needs it.
+ */
+__WEAK void os_rsp_set_handler(void)
+{
+
+}
 
 static void connectivity_reset_low(void)
 {
@@ -145,7 +156,7 @@ uint32_t sd_softdevice_enable(nrf_clock_lfclksrc_t           clock_source,
         {
             err_code = ser_sd_transport_open(ser_softdevice_evt_handler,
                                              ser_sd_rsp_wait,
-                                             NULL,
+                                             os_rsp_set_handler,
                                              NULL);
             if (err_code == NRF_SUCCESS)
             {

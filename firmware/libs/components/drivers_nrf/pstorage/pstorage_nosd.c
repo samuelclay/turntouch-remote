@@ -43,7 +43,7 @@
  *        range.
  */
 #define MODULE_ID_RANGE_CHECK(ID)                                                                 \
-        if ((PSTORAGE_MAX_APPLICATIONS <= ((ID)->module_id)) ||                                   \
+        if ((PSTORAGE_NUM_OF_PAGES <= ((ID)->module_id)) ||                                       \
             (m_app_table[(ID)->module_id].cb == NULL))                                            \
         {                                                                                         \
             return NRF_ERROR_INVALID_PARAM;                                                       \
@@ -146,7 +146,7 @@ typedef struct ps_module_table
     uint16_t               no_of_pages;    /**< Variable to remember how many pages have been allocated for this module. This information is used for clearing of block, so that application does not need to have knowledge of number of pages its using. */
 } pstorage_module_table_t;
 
-static pstorage_module_table_t m_app_table[PSTORAGE_MAX_APPLICATIONS];    /**< Registered application information table. */
+static pstorage_module_table_t m_app_table[PSTORAGE_NUM_OF_PAGES];        /**< Registered application information table. */
 
 static uint32_t m_next_app_instance;                                      /**< Points to the application module instance that can be allocated next */
 static uint32_t m_next_page_addr;                                         /**< Points to the flash address that can be allocated to a module next, this is needed as blocks of a module can span across flash pages. */
@@ -206,7 +206,7 @@ uint32_t pstorage_register(pstorage_module_param_t * p_module_param,
 #endif
 
 
-    if (m_next_app_instance == PSTORAGE_MAX_APPLICATIONS)
+    if (m_next_app_instance == PSTORAGE_NUM_OF_PAGES)
     {
         return NRF_ERROR_NO_MEM;
     }

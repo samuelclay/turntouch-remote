@@ -38,7 +38,7 @@
 #include "nrf_delay.h"
 
 #define DFU_REV_MAJOR                        0x00                                                    /** DFU Major revision number to be exposed. */
-#define DFU_REV_MINOR                        0x06                                                    /** DFU Minor revision number to be exposed. */
+#define DFU_REV_MINOR                        0x08                                                    /** DFU Minor revision number to be exposed. */
 #define DFU_REVISION                         ((DFU_REV_MAJOR << 8) | DFU_REV_MINOR)                  /** DFU Revision number to be exposed. Combined of major and minor versions. */
 #define ADVERTISING_LED_PIN_NO               BSP_LED_0                                               /**< Is on when device is advertising. */
 #define CONNECTED_LED_PIN_NO                 BSP_LED_1                                               /**< Is on when device has connected. */
@@ -423,6 +423,7 @@ static void app_data_process(ble_dfu_t * p_dfu, ble_dfu_evt_t * p_evt)
     }
 
     uint8_t * p_data_packet = p_evt->evt.ble_dfu_pkt_write.p_data;
+    
     memcpy(mp_rx_buffer, p_data_packet, length);
 
     err_code = hci_mem_pool_rx_data_size_set(length);

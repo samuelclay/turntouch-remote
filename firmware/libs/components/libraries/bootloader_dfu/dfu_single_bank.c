@@ -691,7 +691,7 @@ uint32_t dfu_sd_image_swap(void)
         uint32_t img_block_start = boot_settings.sd_image_start + 2 * block_size;
         uint32_t sd_block_start  = sd_start + 2 * block_size;
         
-        if (SOFTDEVICE_INFORMATION->softdevice_size < boot_settings.sd_image_size)
+        if (SD_SIZE_GET(MBR_SIZE) < boot_settings.sd_image_size)
         {
             // This will clear a page thus ensuring the old image is invalidated before swapping.
             err_code = dfu_copy_sd((uint32_t *)(sd_start + block_size), 
@@ -799,7 +799,7 @@ uint32_t dfu_sd_image_validate(void)
         uint32_t img_block_start = bootloader_settings.sd_image_start + 2 * block_size;
         uint32_t sd_block_start  = sd_start + 2 * block_size;
 
-        if (SOFTDEVICE_INFORMATION->softdevice_size < bootloader_settings.sd_image_size)
+        if (SD_SIZE_GET(MBR_SIZE) < bootloader_settings.sd_image_size)
         {
             return NRF_ERROR_NULL;
         }
