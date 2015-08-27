@@ -38,6 +38,7 @@ typedef enum
     BANK_VALID_BOOT  = 0xAA,
     BANK_ERASED      = 0xFE,
     BANK_INVALID_APP = 0xFF,
+    DUMMY_FOR_GCC = 0x7FFFFFFF /* Joe: Required to force gcc using 32 bit enum */ 
 } bootloader_bank_code_t;
 
 /**@brief Structure holding bootloader settings for application and bank data.
@@ -46,6 +47,7 @@ typedef struct
 {
     bootloader_bank_code_t bank_0;          /**< Variable to store if bank 0 contains a valid application. */
     uint16_t               bank_0_crc;      /**< If bank is valid, this field will contain a valid CRC of the total image. */
+    uint16_t reserved; /**< Padding word */ 
     bootloader_bank_code_t bank_1;          /**< Variable to store if bank 1 has been erased/prepared for new image. Bank 1 is only used in Banked Update scenario. */
     uint32_t               bank_0_size;     /**< Size of active image in bank0 if present, otherwise 0. */
     uint32_t               sd_image_size;   /**< Size of SoftDevice image in bank0 if bank_0 code is BANK_VALID_SD. */
