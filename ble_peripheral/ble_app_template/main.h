@@ -4,12 +4,9 @@
  */
 
 #define APP_TIMER_PRESCALER      0                           /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_MAX_TIMERS     (3 + BSP_APP_TIMERS_NUMBER) /**< Maximum number of simultaneously created timers. */
+#define APP_TIMER_MAX_TIMERS     (4 + BSP_APP_TIMERS_NUMBER) /**< Maximum number of simultaneously created timers. */
 #define APP_TIMER_OP_QUEUE_SIZE  4                           /**< Size of timer operation queues. */
 #define APP_FEATURE_NOT_SUPPORTED            BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2                    /**< Reply when unsupported features are requested. */
-#define BOARD_PCA10028 1
-#define BUTTONS_NUMBER 4
-#define NRF51 1
 
 // #define BUTTON_PREV_ID           0                           /**< Button used to switch the state. */
 // #define BUTTON_NEXT_ID           1                           /**< Button used to switch the state. */
@@ -26,7 +23,6 @@
 // #ifndef PIN_OUT
 //     #error "Please indicate output pin"
 // #endif
-
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 1                                           /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
 
