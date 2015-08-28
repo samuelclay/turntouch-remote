@@ -12,6 +12,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include "app_error.h"
 #include "app_scheduler.h"
 #include "app_timer.h"
@@ -900,12 +901,12 @@ static void reset_prepare(void)
 static void firmware_nickname_write_handler(ble_buttonservice_t *p_buttonservice, uint8_t* nickname,uint8_t length) {
      uint32_t err_code;
 
-	//rtt_print(0, "New nickname : %s\n", nickname);
+    rtt_print(0, "New nickname : %s\n", nickname);
 	memset(m_nickname_storage,0,FIRMWARE_NICKNAME_MAX_LENGTH);
     memcpy(m_nickname_storage, nickname, length);
 
 	// flash must be cleared before saving new data to it
-	err_code = pstorage_clear(&m_flash_handle,PSTORAGE_MAX_BLOCK_SIZE);
+	err_code = pstorage_clear(&m_flash_handle, 32);
 
 	APP_ERROR_CHECK(err_code);
 
@@ -920,9 +921,6 @@ static void pstorage_callback_handler(pstorage_handle_t * handle,
 		
 		switch(op_code)
     {
-        case PSTORAGE_ERROR_OP_CODE:
-						
-            break;
         case PSTORAGE_STORE_OP_CODE: 
             if (reason != NRF_SUCCESS)
 						{
