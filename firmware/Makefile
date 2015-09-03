@@ -242,8 +242,6 @@ cleanobj:
 	$(RM) $(BUILD_DIRECTORIES)/*.o
 
 flash: $(MAKECMDGOALS)
-	# @echo Assembling: $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
-	# nrfjprog --reset --program $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 
@@ -253,7 +251,7 @@ erase:
 flashsd:
 	nrfjprog --flash-softdevice $(SOFTDEVICE_HEX)
 
-sdapp:
+flashsdapp:
 	srec_cat $(SOFTDEVICE_HEX) -intel $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -intel --line-length=44 -o $(OUTPUT_BINARY_DIRECTORY)/sd_app.hex -intel
 	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/sd_app.hex
 

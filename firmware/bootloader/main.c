@@ -95,6 +95,8 @@ static void leds_init(void)
 {
     nrf_gpio_cfg_output(UPDATE_IN_PROGRESS_LED);
     nrf_gpio_pin_set(UPDATE_IN_PROGRESS_LED);
+    nrf_gpio_cfg_output(BSP_LED_3);
+    nrf_gpio_pin_set(BSP_LED_3);
 }
 
 
@@ -209,6 +211,7 @@ int main(void)
     if (bootloader_dfu_sd_in_progress())
     {
         nrf_gpio_pin_clear(UPDATE_IN_PROGRESS_LED);
+        nrf_gpio_pin_clear(BSP_LED_3);
 
         err_code = bootloader_dfu_sd_update_continue();
         APP_ERROR_CHECK(err_code);
@@ -223,9 +226,14 @@ int main(void)
     }
     else
     {
+        nrf_gpio_pin_clear(UPDATE_IN_PROGRESS_LED);
+        nrf_gpio_pin_clear(BSP_LED_3);
+
         // If stack is present then continue initialization of bootloader.
         ble_stack_init(!app_reset);
         scheduler_init();
+
+        nrf_gpio_pin_set(BSP_LED_3);
     }
 
     dfu_start  = app_reset;
@@ -234,12 +242,14 @@ int main(void)
     if (dfu_start || (!bootloader_app_is_valid(DFU_BANK_0_REGION_START)))
     {
         nrf_gpio_pin_clear(UPDATE_IN_PROGRESS_LED);
+        nrf_gpio_pin_clear(BSP_LED_3);
 
         // Initiate an update of the firmware.
         err_code = bootloader_dfu_start();
         APP_ERROR_CHECK(err_code);
 
         nrf_gpio_pin_set(UPDATE_IN_PROGRESS_LED);
+        nrf_gpio_pin_set(BSP_LED_3);
     }
 
     if (bootloader_app_is_valid(DFU_BANK_0_REGION_START) && !bootloader_dfu_sd_in_progress())

@@ -67,6 +67,7 @@ isr_abort
 #elif defined ( __GNUC__ )
 static inline void bootloader_util_reset(uint32_t start_addr)
 {
+/*
     __asm volatile(
         "ldr   r0, [%0]\t\n"            // Get App initial MSP for bootloader.
         "msr   msp, r0\t\n"             // Set the main stack pointer to the applications MSP.
@@ -103,6 +104,37 @@ static inline void bootloader_util_reset(uint32_t start_addr)
         :: "r" (start_addr)             // Argument list for the gcc assembly. start_addr is %0.
         :  "r0", "r4", "r5", "r6", "r7" // List of register maintained manually.
     );
+    */
+    __asm volatile(
+        ".equ MASK_ONES, 0xFFFFFFFF\n\t"
+        ".equ   MASK_ZEROS, 0x00000000\n\t"
+        ".equ   xPSR_RESET, 0x21000000\n\t"
+        ".equ   EXC_RETURN_CMD, 0xFFFFFFF9\n\t"
+        "LDR   R5, [R0]\n\t"
+        "MSR   MSP, R5\n\t"
+        "LDR   R6, [R0, #0x04]\n\t"
+        "LDR   R2, =MASK_ZEROS\n\t"
+        "MRS   R3, IPSR\n\t"
+        "CMP   R2, R3\n\t"
+        "MOV   R0, R6\n\t"
+        "BNE   isr_abort\n\t"
+        "LDR   R4, =MASK_ONES\n\t"
+        "MOV   LR, R4\n\t"
+        "BX    R6\n\t"
+        "isr_abort:\n\t"
+        "LDR   R4,=MASK_ONES\n\t"
+        "LDR   R5,=MASK_ONES\n\t"
+        "MOV   R6, R0\n\t"
+        "LDR   R7,=xPSR_RESET\n\t"
+        "PUSH  {r4-r7}\n\t"
+        "LDR   R4,=MASK_ZEROS\n\t"
+        "LDR   R5,=MASK_ZEROS\n\t"
+        "LDR   R6,=MASK_ZEROS\n\t"
+        "LDR   R7,=MASK_ZEROS\n\t"
+        "PUSH  {r4-r7}\n\t"
+        "LDR   R0,=EXC_RETURN_CMD\n\t"
+        "BX    R0\n\t"
+        ".ALIGN\n\t");
 }
 #elif defined ( __ICCARM__ )
 static inline void bootloader_util_reset(uint32_t start_addr)
