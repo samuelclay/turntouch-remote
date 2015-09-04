@@ -218,6 +218,6 @@ cleanobj:
 
 flash: $(MAKECMDGOALS)
 	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
-	nrfjprog --reset --flash $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
+	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 
 ## Flash softdevice

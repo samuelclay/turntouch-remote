@@ -1,1 +1,1 @@
-exclude = "{$exclude,build,_build,enclosure,{remote eagle/*.lbr}}"
+exclude = "{$exclude,{_build,build}/*.{htm,map},enclosure,{remote eagle/*.lbr}}"
