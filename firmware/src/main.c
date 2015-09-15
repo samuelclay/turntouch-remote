@@ -132,6 +132,9 @@ void bsp_evt_handler(bsp_event_t evt) {
             if (err_code == BLE_ERROR_GATTS_SYS_ATTR_MISSING) {
                 // Can ignore this error, just means that bluetooth is connected but nobody's listening yet
                 rtt_print(0, "BLE_ERROR_GATTS_SYS_ATTR_MISSING\n");
+            } else if (err_code == BLE_ERROR_NO_TX_BUFFERS) {
+                // Can ignore this error, just means buffer capacity exceeded (too many button pushes)
+                rtt_print(0, "BLE_ERROR_NO_TX_BUFFERS\n");
             } else {
                 APP_ERROR_CHECK(err_code);
             }
