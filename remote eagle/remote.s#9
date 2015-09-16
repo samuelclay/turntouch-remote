@@ -8749,10 +8749,11 @@ Source: Epson Toyocom FC-12M.pdf</description>
 <part name="GND7" library="supply1" deviceset="GND" device=""/>
 <part name="GND8" library="supply1" deviceset="GND" device=""/>
 <part name="GND9" library="supply1" deviceset="GND" device=""/>
-<part name="C3" library="SparkFun-Capacitors" deviceset="0.1UF-25V(+80/-20%)(0603)" device="" value="12pF"/>
-<part name="C4" library="SparkFun-Capacitors" deviceset="0.1UF-25V(+80/-20%)(0603)" device="" value="12pF"/>
-<part name="C2" library="SparkFun-Capacitors" deviceset="0.1UF-25V(+80/-20%)(0603)" device="" value="1uF"/>
+<part name="C3" library="SparkFun-Capacitors" deviceset="0.1UF-25V(+80/-20%)(0603)" device="" value="12.5pF"/>
+<part name="C4" library="SparkFun-Capacitors" deviceset="0.1UF-25V(+80/-20%)(0603)" device="" value="12.5pF"/>
+<part name="C2" library="SparkFun-Capacitors" deviceset="0.1UF-25V(+80/-20%)(0603)" device="" value=".1uF"/>
 <part name="Q1" library="crystal" deviceset="FC-12M" device=""/>
+<part name="GND10" library="supply1" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -8768,7 +8769,7 @@ Source: Epson Toyocom FC-12M.pdf</description>
 <instance part="U$2" gate="G$1" x="170.18" y="20.32"/>
 <instance part="U$3" gate="G$1" x="170.18" y="27.94"/>
 <instance part="U$4" gate="G$1" x="170.18" y="35.56"/>
-<instance part="P+1" gate="G$1" x="22.86" y="187.96"/>
+<instance part="P+1" gate="G$1" x="30.48" y="187.96"/>
 <instance part="P+2" gate="G$1" x="22.86" y="99.06"/>
 <instance part="GND1" gate="1" x="5.08" y="10.16"/>
 <instance part="GND5" gate="1" x="152.4" y="10.16"/>
@@ -8787,6 +8788,7 @@ Source: Epson Toyocom FC-12M.pdf</description>
 <instance part="C4" gate="G$1" x="45.72" y="137.16"/>
 <instance part="C2" gate="G$1" x="30.48" y="137.16"/>
 <instance part="Q1" gate="G$1" x="43.18" y="144.78"/>
+<instance part="GND10" gate="1" x="96.52" y="121.92"/>
 </instances>
 <busses>
 </busses>
@@ -8879,6 +8881,16 @@ Source: Epson Toyocom FC-12M.pdf</description>
 <junction x="45.72" y="127"/>
 <pinref part="C2" gate="G$1" pin="2"/>
 <wire x1="30.48" y1="134.62" x2="30.48" y2="127" width="0.1524" layer="91"/>
+<pinref part="U$5" gate="G$1" pin="VDD"/>
+<wire x1="68.58" y1="129.54" x2="68.58" y2="116.84" width="0.1524" layer="91"/>
+<wire x1="68.58" y1="116.84" x2="30.48" y2="116.84" width="0.1524" layer="91"/>
+<wire x1="30.48" y1="116.84" x2="30.48" y2="127" width="0.1524" layer="91"/>
+<junction x="30.48" y="127"/>
+</segment>
+<segment>
+<pinref part="U$5" gate="G$1" pin="GND@4"/>
+<wire x1="96.52" y1="129.54" x2="96.52" y2="124.46" width="0.1524" layer="91"/>
+<pinref part="GND10" gate="1" pin="GND"/>
 </segment>
 </net>
 <net name="3.3V" class="1">
@@ -8897,6 +8909,15 @@ Source: Epson Toyocom FC-12M.pdf</description>
 <wire x1="154.94" y1="88.9" x2="152.4" y2="88.9" width="0.1524" layer="91"/>
 <wire x1="152.4" y1="88.9" x2="152.4" y2="99.06" width="0.1524" layer="91"/>
 <pinref part="P+3" gate="G$1" pin="3.3V"/>
+</segment>
+<segment>
+<pinref part="U$5" gate="G$1" pin="AVDD"/>
+<wire x1="53.34" y1="165.1" x2="30.48" y2="165.1" width="0.1524" layer="91"/>
+<wire x1="30.48" y1="165.1" x2="30.48" y2="142.24" width="0.1524" layer="91"/>
+<pinref part="C2" gate="G$1" pin="1"/>
+<pinref part="P+1" gate="G$1" pin="3.3V"/>
+<wire x1="30.48" y1="165.1" x2="30.48" y2="187.96" width="0.1524" layer="91"/>
+<junction x="30.48" y="165.1"/>
 </segment>
 </net>
 <net name="BLE_SWCLK" class="0">
@@ -9143,18 +9164,6 @@ Source: Epson Toyocom FC-12M.pdf</description>
 <label x="119.38" y="162.56" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="N$9" class="0">
-<segment>
-<pinref part="U$5" gate="G$1" pin="GND@4"/>
-<wire x1="96.52" y1="129.54" x2="96.52" y2="121.92" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$11" class="0">
-<segment>
-<pinref part="U$5" gate="G$1" pin="VDD"/>
-<wire x1="68.58" y1="129.54" x2="68.58" y2="121.92" width="0.1524" layer="91"/>
-</segment>
-</net>
 <net name="C5" class="0">
 <segment>
 <pinref part="U$5" gate="G$1" pin="XL1"/>
@@ -9175,14 +9184,6 @@ Source: Epson Toyocom FC-12M.pdf</description>
 <pinref part="Q1" gate="G$1" pin="1"/>
 <wire x1="40.64" y1="144.78" x2="40.64" y2="142.24" width="0.1524" layer="91"/>
 <junction x="40.64" y="144.78"/>
-</segment>
-</net>
-<net name="C2" class="0">
-<segment>
-<pinref part="U$5" gate="G$1" pin="AVDD"/>
-<wire x1="53.34" y1="165.1" x2="30.48" y2="165.1" width="0.1524" layer="91"/>
-<wire x1="30.48" y1="165.1" x2="30.48" y2="142.24" width="0.1524" layer="91"/>
-<pinref part="C2" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="N$5" class="1">

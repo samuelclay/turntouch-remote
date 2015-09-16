@@ -7919,7 +7919,7 @@ Source: Epson Toyocom FC-12M.pdf</description>
 <segment>
 <pinref part="J1" gate="G$1" pin="SWDCLK"/>
 <wire x1="180.34" y1="86.36" x2="187.96" y2="86.36" width="0.1524" layer="91"/>
-<label x="193.04" y="86.36" size="1.016" layer="95"/>
+<label x="193.04" y="86.36" size="1.778" layer="95"/>
 <wire x1="187.96" y1="86.36" x2="187.96" y2="83.82" width="0.1524" layer="91"/>
 <junction x="187.96" y="86.36"/>
 <wire x1="187.96" y1="86.36" x2="193.04" y2="86.36" width="0.1524" layer="91"/>
@@ -7934,7 +7934,7 @@ Source: Epson Toyocom FC-12M.pdf</description>
 <net name="BLE_SWDIO" class="0">
 <segment>
 <pinref part="J1" gate="G$1" pin="SWDIO"/>
-<label x="193.04" y="88.9" size="1.016" layer="95"/>
+<label x="193.04" y="88.9" size="1.778" layer="95"/>
 <wire x1="180.34" y1="88.9" x2="193.04" y2="88.9" width="0.1524" layer="91"/>
 </segment>
 <segment>
@@ -7947,28 +7947,28 @@ Source: Epson Toyocom FC-12M.pdf</description>
 <segment>
 <pinref part="U$1" gate="G$1" pin="B"/>
 <wire x1="175.26" y1="12.7" x2="187.96" y2="12.7" width="0.1524" layer="91"/>
-<label x="187.96" y="12.7" size="1.27" layer="95" xref="yes"/>
+<label x="187.96" y="12.7" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="P0.06" class="0">
 <segment>
 <pinref part="U$2" gate="G$1" pin="B"/>
 <wire x1="175.26" y1="20.32" x2="187.96" y2="20.32" width="0.1524" layer="91"/>
-<label x="187.96" y="20.32" size="1.27" layer="95" xref="yes"/>
+<label x="187.96" y="20.32" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="P0.07" class="0">
 <segment>
 <pinref part="U$3" gate="G$1" pin="B"/>
 <wire x1="175.26" y1="27.94" x2="187.96" y2="27.94" width="0.1524" layer="91"/>
-<label x="187.96" y="27.94" size="1.27" layer="95" xref="yes"/>
+<label x="187.96" y="27.94" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="P0.08" class="0">
 <segment>
 <pinref part="U$4" gate="G$1" pin="B"/>
 <wire x1="175.26" y1="35.56" x2="187.96" y2="35.56" width="0.1524" layer="91"/>
-<label x="187.96" y="35.56" size="1.27" layer="95" xref="yes"/>
+<label x="187.96" y="35.56" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="P0.17" class="0">
