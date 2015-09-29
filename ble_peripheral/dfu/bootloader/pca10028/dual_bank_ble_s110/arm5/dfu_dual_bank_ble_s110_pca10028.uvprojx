@@ -916,6 +916,14 @@
           <targetInfo name="nrf51422_xxac"/>
         </targetInfos>
       </file>
+      <file attr="config" category="source" name="bootloader_dfu\bootloader_settings.c">
+        <instance index="0">RTE\nRF_Libraries\nRF51422_xxAC\bootloader_settings.c</instance>
+        <component Cclass="nRF_Libraries" Cgroup="DFU" Csub="dfu_bootloader_settings" Cvendor="NordicSemiconductor" Cversion="3.0.1" condition="dfu_bootloader_settings"/>
+        <package name="nRF_Libraries" schemaVersion="1.2" supportContact="http://www.nordicsemi.com/About-us/Contact-us" url="http://developer.nordicsemi.com/nRF51_SDK/pieces/nRF_Libraries/" vendor="NordicSemiconductor" version="3.0.1"/>
+        <targetInfos>
+          <targetInfo name="nrf51422_xxac"/>
+        </targetInfos>
+      </file>
       <file attr="config" category="header" name="bootloader_dfu\bootloader_settings.h" version="3.0.1">
         <instance index="0">RTE\nRF_Libraries\nRF51422_xxAC\bootloader_settings.h</instance>
         <component Cclass="nRF_Libraries" Cgroup="DFU" Csub="dfu_bootloader_settings" Cvendor="NordicSemiconductor" Cversion="3.0.1" condition="dfu_bootloader_settings"/>

@@ -158,7 +158,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>\vmware-host\Shared Folders\remote\ble_peripheral\ble_app_template\main.c</Filename>
+          <Filename>\\vmware-host\Shared Folders\vmware-host\Shared Folders\remote\ble_peripheral\ble_app_template\main.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\nrf51422_xxac_s110\../../../main.c\1125</Expression>
         </Bp>
