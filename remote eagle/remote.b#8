@@ -1874,10 +1874,10 @@ design rules under a new name.</description>
 <element name="J1" library="connector" package="TC2030-IDC-NL" value="TC2030-JLINK-NL" x="12.954" y="33.02" smashed="yes">
 <attribute name="NAME" x="17.526" y="33.782" size="0.762" layer="25" font="vector" ratio="12" align="bottom-center"/>
 </element>
-<element name="R1" library="SparkFun-Resistors" package="0603" value="10k" x="7.112" y="33.274" smashed="yes">
-<attribute name="NAME" x="4.445" y="32.893" size="0.762" layer="25"/>
-<attribute name="PROD_ID" value="RES-08609" x="7.112" y="33.274" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" value="0" x="7.112" y="33.274" size="1.778" layer="27" display="off"/>
+<element name="R1" library="SparkFun-Resistors" package="0603" value="10k" x="6.858" y="33.274" smashed="yes">
+<attribute name="NAME" x="4.191" y="32.893" size="0.762" layer="25"/>
+<attribute name="PROD_ID" value="RES-08609" x="6.858" y="33.274" size="1.778" layer="27" display="off"/>
+<attribute name="VALUE" value="0" x="6.858" y="33.274" size="1.778" layer="27" display="off"/>
 </element>
 <element name="U$5" library="MDBT40" package="MDBT40" value="MDBT40SMD" x="24.511" y="27.305" smashed="yes" rot="R45">
 <attribute name="VALUE" x="30.874959375" y="18.112609375" size="0.8128" layer="27" rot="R45"/>
@@ -1977,7 +1977,7 @@ design rules under a new name.</description>
 <wire x1="9.31" y1="26.25" x2="9.398" y2="26.162" width="0.254" layer="1"/>
 <wire x1="8.382" y1="30.48" x2="6.35" y2="32.512" width="0.254" layer="1"/>
 <wire x1="6.35" y1="32.512" x2="6.35" y2="33.186" width="0.254" layer="1"/>
-<wire x1="6.35" y1="33.186" x2="6.262" y2="33.274" width="0.254" layer="1"/>
+<wire x1="6.35" y1="33.186" x2="6.008" y2="33.274" width="0.254" layer="1"/>
 <wire x1="15.494" y1="29.972" x2="15.494" y2="29.250928125" width="0.254" layer="1"/>
 <wire x1="15.494" y1="29.250928125" x2="18.1470375" y2="26.597890625" width="0.254" layer="1"/>
 <wire x1="18.6420125" y1="26.102915625" x2="18.6420125" y2="24.7380125" width="0.1524" layer="1"/>
@@ -2061,9 +2061,9 @@ design rules under a new name.</description>
 <wire x1="26.162" y1="33.528" x2="28.194" y2="33.528" width="0.1524" layer="16"/>
 <wire x1="28.194" y1="33.528" x2="29.972" y2="31.75" width="0.1524" layer="16"/>
 <via x="29.972" y="31.75" extent="1-16" drill="0.3302"/>
-<wire x1="7.962" y1="33.274" x2="9.144" y2="33.274" width="0.1524" layer="1"/>
-<via x="9.144" y="33.274" extent="1-16" drill="0.3302"/>
-<wire x1="9.144" y1="33.274" x2="9.144" y2="32.411809375" width="0.1524" layer="16"/>
+<wire x1="7.708" y1="33.274" x2="8.89" y2="33.274" width="0.1524" layer="1"/>
+<via x="8.89" y="33.274" extent="1-16" drill="0.3302"/>
+<wire x1="8.89" y1="33.274" x2="9.144" y2="32.411809375" width="0.1524" layer="16"/>
 <wire x1="9.144" y1="32.411809375" x2="9.805809375" y2="31.75" width="0.1524" layer="16"/>
 <wire x1="9.805809375" y1="31.75" x2="12.065" y2="31.75" width="0.1524" layer="16"/>
 <wire x1="12.065" y1="31.75" x2="12.954" y2="32.639" width="0.1524" layer="16"/>
