@@ -3,6 +3,18 @@
 *.lo
 *.d
 *.o
+*.crf
+*.iex
+*.map
+*.lnp
+*.dep
+*._2i
+*.sct
+*sct.Bak
+*.fed
+*.lst
+*.l2p
+*xxac.htm
 
 # Compiled Dynamic libraries
 *.so
@@ -15,8 +27,7 @@
 *.elf
 .DS_Store
 
-build
-_build
+*build_log.htm
 JLinkLog.txt
 OldVersions
 lockfile.lck
