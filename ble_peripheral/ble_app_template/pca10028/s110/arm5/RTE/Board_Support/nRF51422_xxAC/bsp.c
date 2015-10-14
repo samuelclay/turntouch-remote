@@ -15,9 +15,11 @@
 #include <stdio.h>
 #include "nordic_common.h"
 #include "nrf.h"
-#include "nrf_gpio.h"
+#include "nrf_delay.h"
 #include "nrf_error.h"
+#include "nrf_gpio.h"
 #include "nrf51.h"
+#include <rtt.h>
 #ifndef BSP_SIMPLE
 #include "app_timer.h"
 #include "app_button.h"
@@ -540,12 +542,14 @@ uint32_t bsp_init(uint32_t type, uint32_t ticks_per_100ms, bsp_event_callback_t 
     if (type & BSP_INIT_BUTTONS)
     {
         uint32_t num;
-
+				uint32_t event_key;
+			
         for (num = 0; ((num < BUTTONS_NUMBER) && (err_code == NRF_SUCCESS)); num++)
         {
             err_code = bsp_event_to_button_action_assign(num, BSP_BUTTON_ACTION_PUSH, BSP_EVENT_DEFAULT);
-            err_code = bsp_event_to_button_action_assign(num, BSP_BUTTON_ACTION_LONG_PUSH, BSP_EVENT_KEY_4+num);
-            err_code = bsp_event_to_button_action_assign(num, BSP_BUTTON_ACTION_RELEASE, BSP_EVENT_KEY_0+num);
+						err_code = bsp_event_to_button_action_assign(num, BSP_BUTTON_ACTION_LONG_PUSH, (uint32_t)BSP_EVENT_KEY_4+num);
+            event_key = BSP_EVENT_KEY_0;
+            err_code = bsp_event_to_button_action_assign(num, BSP_BUTTON_ACTION_RELEASE, event_key+num);
         }
 
         if (err_code == NRF_SUCCESS)

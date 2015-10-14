@@ -313,8 +313,8 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x3a000</StartAddress>
-                <Size>0x5c00</Size>
+                <StartAddress>0x3c000</StartAddress>
+                <Size>0x3c00</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -339,11 +339,11 @@
               <OCR_RVCT9>
                 <Type>0</Type>
                 <StartAddress>0x20002c00</StartAddress>
-                <Size>0x5380</Size>
+                <Size>0x1380</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
-                <StartAddress>0x20007f80</StartAddress>
+                <StartAddress>0x20003f80</StartAddress>
                 <Size>0x80</Size>
               </OCR_RVCT10>
             </OnChipMemories>
@@ -351,7 +351,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
+            <Optim>3</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>0</OneElfS>

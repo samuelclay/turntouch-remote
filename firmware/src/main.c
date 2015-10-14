@@ -652,10 +652,10 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
     rtt_print(0, "%sBluetooth event: %s%X%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, RTT_CTRL_RESET);
 
+    ble_dfu_on_ble_evt(&m_dfus, p_ble_evt);
     dm_ble_evt_handler(p_ble_evt);
     ble_conn_params_on_ble_evt(p_ble_evt);
     ble_bas_on_ble_evt(&m_bas, p_ble_evt);
-    ble_dfu_on_ble_evt(&m_dfus, p_ble_evt);
     on_ble_evt(p_ble_evt);
     ble_advertising_on_ble_evt(p_ble_evt);
 

@@ -15,10 +15,11 @@
 #include <stdio.h>
 #include "nordic_common.h"
 #include "nrf.h"
-#include "nrf_gpio.h"
+#include "nrf_delay.h"
 #include "nrf_error.h"
-#include "rtt.h"
-
+#include "nrf_gpio.h"
+#include "nrf51.h"
+#include <rtt.h>
 #ifndef BSP_SIMPLE
 #include "app_timer.h"
 #include "app_button.h"
@@ -61,6 +62,7 @@ static bsp_button_event_cfg_t m_events_list[BUTTONS_NUMBER] = {{BSP_EVENT_NOTHIN
 
 static app_timer_id_t   m_button_timer_id;
 static void bsp_button_event_handler(uint8_t pin_no, uint8_t button_action);
+static uint32_t button_timer_Start_ticks = 0;
 #endif // BSP_SIMPLE
 
 static const uint32_t m_buttons_list[BUTTONS_NUMBER] = BUTTONS_LIST;
@@ -176,32 +178,50 @@ static void bsp_button_event_handler(uint8_t pin_no, uint8_t button_action)
         switch(button_action)
         {
             case APP_BUTTON_PUSH:
+								SEGGER_RTT_printf(0,"------------------------button push------------------------\n");
                 event = m_events_list[button].push_event;
                 if (m_events_list[button].long_push_event != BSP_EVENT_NOTHING)
                 {
+										button_timer_Start_ticks=NRF_RTC1->COUNTER;
                     err_code = app_timer_start(m_button_timer_id, BSP_MS_TO_TICK(BSP_LONG_PUSH_TIMEOUT_MS), (void*)&current_long_push_pin_no);
                     if (err_code == NRF_SUCCESS)
                     {
                         current_long_push_pin_no = pin_no;
                     }
+										rtt_print(0,"timer start %x\n",err_code);
                 }
                 release_event_at_push[button] = m_events_list[button].release_event;
                 break;
             case APP_BUTTON_RELEASE:
-                (void)app_timer_stop(m_button_timer_id);
+								SEGGER_RTT_printf(0,"------------------------button release------------------------\n");
+                err_code = app_timer_stop(m_button_timer_id);
+								rtt_print(0,"timer stop %x\n",err_code);
                 if (release_event_at_push[button] == m_events_list[button].release_event)
                 {
                     event = m_events_list[button].release_event;
                 }
                 break;
             case BSP_BUTTON_ACTION_LONG_PUSH:
-                event = m_events_list[button].long_push_event;
+								// double check that the BSP_LONG_PUSH_TIMEOUT_MS has elapsed
+								// before setting the event
+								SEGGER_RTT_printf(0,"long push \n\tRTC1:%d\n\t Tstart:%d\n\tdiff:%d\n",NRF_RTC1->COUNTER,button_timer_Start_ticks,BSP_MS_TO_TICK(BSP_LONG_PUSH_TIMEOUT_MS));
+								while((NRF_RTC1->COUNTER - button_timer_Start_ticks) < BSP_MS_TO_TICK(BSP_LONG_PUSH_TIMEOUT_MS))
+								{
+									bool pressed = false;
+									app_button_is_pushed(button, &pressed);
+									SEGGER_RTT_printf(0,"button %x\tbutton state %x\n",button,pressed);
+									if(pressed==false)
+										return;
+									nrf_delay_ms(50);
+									
+								}
+								SEGGER_RTT_printf(0,"------------------------button hold event------------------------\n");
+								event = m_events_list[button].long_push_event;
         }
     }
 
     if ((event != BSP_EVENT_NOTHING) && (m_registered_callback != NULL))
     {
-        rtt_print(0, "BSP event: pin: %d, button_action: %X\n", pin_no, button_action);
         m_registered_callback(event);
     }
 }
@@ -212,8 +232,8 @@ static void bsp_button_event_handler(uint8_t pin_no, uint8_t button_action)
  */
 static void button_timer_handler(void * p_context)
 {
-    rtt_print(0, "%sbutton_timer_handler\n", RTT_CTRL_TEXT_BLUE);
-    bsp_button_event_handler(*(uint8_t *)p_context, BSP_BUTTON_ACTION_LONG_PUSH);
+		rtt_print(0,"timer handler  %x \n",NRF_RTC1->COUNTER);
+		bsp_button_event_handler(*(uint8_t *)p_context, BSP_BUTTON_ACTION_LONG_PUSH);
 }
 
 
@@ -525,16 +545,8 @@ uint32_t bsp_init(uint32_t type, uint32_t ticks_per_100ms, bsp_event_callback_t 
 
         for (num = 0; ((num < BUTTONS_NUMBER) && (err_code == NRF_SUCCESS)); num++)
         {
-            err_code = bsp_event_to_button_action_assign(num, BSP_BUTTON_ACTION_PUSH, BSP_EVENT_KEY_0+num);
-        }
-
-        for (num = 0; ((num < BUTTONS_NUMBER) && (err_code == NRF_SUCCESS)); num++)
-        {
+            err_code = bsp_event_to_button_action_assign(num, BSP_BUTTON_ACTION_PUSH, BSP_EVENT_DEFAULT);
             err_code = bsp_event_to_button_action_assign(num, BSP_BUTTON_ACTION_LONG_PUSH, BSP_EVENT_KEY_4+num);
-        }
-
-        for (num = 0; ((num < BUTTONS_NUMBER) && (err_code == NRF_SUCCESS)); num++)
-        {
             err_code = bsp_event_to_button_action_assign(num, BSP_BUTTON_ACTION_RELEASE, BSP_EVENT_KEY_0+num);
         }
 
@@ -607,12 +619,11 @@ uint32_t bsp_event_to_button_action_assign(uint32_t button, bsp_button_action_t 
 #if BUTTONS_NUMBER > 0
     if (button < BUTTONS_NUMBER)
     {
-        // if (event == BSP_EVENT_DEFAULT)
-        // {
-        //     // Setting default action: BSP_EVENT_KEY_x for PUSH actions, BSP_EVENT_NOTHING for RELEASE and LONG_PUSH actions.
-        //     rtt_print(0, "%sEvent is default%s\n", RTT_CTRL_TEXT_RED, RTT_CTRL_RESET);
-        //
-        // }
+        if (event == BSP_EVENT_DEFAULT)
+        {
+            // Setting default action: BSP_EVENT_KEY_x for PUSH actions, BSP_EVENT_NOTHING for RELEASE and LONG_PUSH actions.
+            event = (action == BSP_BUTTON_ACTION_PUSH) ? (bsp_event_t)(BSP_EVENT_KEY_0 + button) : BSP_EVENT_NOTHING;
+        }
         switch (action)
         {
             case BSP_BUTTON_ACTION_PUSH:
