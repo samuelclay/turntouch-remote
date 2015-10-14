@@ -11,6 +11,7 @@
 *._2i
 *.sct
 *sct.Bak
+*.hex.bak
 *.fed
 *.lst
 *.l2p
