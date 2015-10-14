@@ -129,14 +129,18 @@ void bsp_evt_handler(bsp_event_t evt) {
     
         if (m_conn_handle != BLE_CONN_HANDLE_INVALID) {
             err_code = ble_buttonstatus_on_button_change(&m_buttonservice, button_state);
-            if (err_code == BLE_ERROR_GATTS_SYS_ATTR_MISSING) {
+            if ((err_code != NRF_SUCCESS) &&
+                (err_code != BLE_ERROR_INVALID_CONN_HANDLE) &&
+                (err_code != NRF_ERROR_INVALID_STATE) &&
+                (err_code != BLE_ERROR_NO_TX_BUFFERS) &&
+                (err_code != NRF_ERROR_BUSY) &&
+                (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING))
+            {
                 // Can ignore this error, just means that bluetooth is connected but nobody's listening yet
-                rtt_print(0, "BLE_ERROR_GATTS_SYS_ATTR_MISSING\n");
-            } else if (err_code == BLE_ERROR_NO_TX_BUFFERS) {
+                rtt_print(0, "BLE_ERROR_GATTS_SYS_ATTR_MISSING (or similar)\n");
                 // Can ignore this error, just means buffer capacity exceeded (too many button pushes)
-                rtt_print(0, "BLE_ERROR_NO_TX_BUFFERS\n");
-            } else {
-                APP_ERROR_CHECK(err_code);
+                // rtt_print(0, "BLE_ERROR_NO_TX_BUFFERS\n");
+                APP_ERROR_HANDLER(err_code);
             }
         } else {
             rtt_print(0, "%sIgnoring button, not connected: %s%X/%X\n", RTT_CTRL_TEXT_BRIGHT_BLACK, RTT_CTRL_TEXT_BLUE, m_conn_handle, BLE_GAP_EVT_CONNECTED);
@@ -650,15 +654,14 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
  */
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
-    rtt_print(0, "%sBluetooth event: %s%X%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, RTT_CTRL_RESET);
+	rtt_print(0, "%sBluetooth (conn: %X) event: %s%X%s\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gap_evt.conn_handle, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, RTT_CTRL_RESET);
 
-    ble_dfu_on_ble_evt(&m_dfus, p_ble_evt);
     dm_ble_evt_handler(p_ble_evt);
     ble_conn_params_on_ble_evt(p_ble_evt);
+    ble_dfu_on_ble_evt(&m_dfus, p_ble_evt);
     ble_bas_on_ble_evt(&m_bas, p_ble_evt);
     on_ble_evt(p_ble_evt);
     ble_advertising_on_ble_evt(p_ble_evt);
-
     ble_buttonstatus_on_ble_evt(&m_buttonservice, p_ble_evt, &m_mem_block);
 }
 
@@ -708,8 +711,8 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             /* YOUR_JOB: Uncomment this part if you are using the app_button module to handle button
                          events. This should be done to save power when not connected
                          to a peer. */
-            // err_code = app_button_disable();
-            // APP_ERROR_CHECK(err_code);
+            err_code = app_button_disable();
+            APP_ERROR_CHECK(err_code);
             
             rtt_print(0, "%s%sBluetooth %sdisconnected.%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
             break;
@@ -935,7 +938,7 @@ static void pstorage_callback_handler(pstorage_handle_t * handle,
 										SEGGER_RTT_printf(0,"%02X ", p_data[i]);
 								}
 								SEGGER_RTT_printf(0,"\n");
-								SEGGER_RTT_Write(0,p_data,param_len);
+								SEGGER_RTT_Write(0,(const char *)p_data,param_len);
 								SEGGER_RTT_printf(0,"\n");
 						}        
             break;
@@ -950,7 +953,7 @@ static void pstorage_callback_handler(pstorage_handle_t * handle,
 										SEGGER_RTT_printf(0,"%02X ", p_data[i]);
 								}
 								SEGGER_RTT_printf(0,"\n\r");
-								SEGGER_RTT_Write(0,p_data,param_len);
+								SEGGER_RTT_Write(0,(const char *)p_data,param_len);
 								SEGGER_RTT_printf(0,"\n\r");
 						}
             break;
@@ -1036,8 +1039,8 @@ static void services_init(void)
     // Initialize the Device Firmware Update Service.
     memset(&dfus_init, 0, sizeof(dfus_init));
 
-    dfus_init.evt_handler   = dfu_app_on_dfu_evt;
-    dfus_init.error_handler = NULL;
+    dfus_init.evt_handler   = dfu_event_handler;
+    dfus_init.error_handler = dfu_error_handler;
     dfus_init.revision      = DFU_REVISION;
 
     err_code = ble_dfu_init(&m_dfus, &dfus_init);
@@ -1045,6 +1048,29 @@ static void services_init(void)
 
     dfu_app_reset_prepare_set(reset_prepare);
     dfu_app_dm_appl_instance_set(m_app_handle);
+}
+
+void dfu_event_handler(ble_dfu_t * p_dfu, ble_dfu_evt_t * p_evt) {
+    rtt_print(0, "DFU event: %X\n", p_evt->ble_dfu_evt_type);
+    dfu_app_on_dfu_evt(p_dfu, p_evt);
+}
+
+void dfu_error_handler(uint32_t nrf_error) {
+    rtt_print(0, "\nDFU error event: %X\n", nrf_error);
+    if ((nrf_error != NRF_SUCCESS) &&
+        (nrf_error != BLE_ERROR_INVALID_CONN_HANDLE) &&
+        (nrf_error != NRF_ERROR_INVALID_STATE) &&
+        (nrf_error != BLE_ERROR_NO_TX_BUFFERS) &&
+        (nrf_error != NRF_ERROR_BUSY) &&
+        (nrf_error != BLE_ERROR_GATTS_SYS_ATTR_MISSING))
+    {
+        rtt_print(0, "Real BLE error!");
+        // Can ignore this error, just means that bluetooth is connected but nobody's listening yet
+        // rtt_print(0, "BLE_ERROR_GATTS_SYS_ATTR_MISSING (or similar)\n");
+        // Can ignore this error, just means buffer capacity exceeded (too many button pushes)
+        // rtt_print(0, "BLE_ERROR_NO_TX_BUFFERS\n");
+        APP_ERROR_HANDLER(nrf_error);
+    }
 }
 
 // =========

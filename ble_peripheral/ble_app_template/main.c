@@ -1051,7 +1051,7 @@ static void services_init(void)
 }
 
 void dfu_event_handler(ble_dfu_t * p_dfu, ble_dfu_evt_t * p_evt) {
-    rtt_print(0, "\nDFU event: %X\n", p_evt->ble_dfu_evt_type);
+    rtt_print(0, "DFU event: %X\n", p_evt->ble_dfu_evt_type);
     dfu_app_on_dfu_evt(p_dfu, p_evt);
 }
 

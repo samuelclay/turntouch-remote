@@ -266,6 +266,6 @@ flashall:
 # to ignore the CRC check.
 # See "E. How do I program the original application via programmer (JLINK), not by DFU" at
 # https://devzone.nordicsemi.com/blogs/685/common-faq-on-dfu/
-	sed -i.bak 's/10FC000000000000000000000000000000000000F4/10FC00000100000000000000FE000000FFFFFFFFF9/' build/sd_app_bootloader.hex
+	sed -i.bak 's/10FC00000100000000000000FE00000000000000F5/10FC00000100000000000000FE000000FFFFFFFFF9/' build/sd_app_bootloader.hex
 	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/sd_app_bootloader.hex
 

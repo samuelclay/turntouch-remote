@@ -4,7 +4,7 @@
  */
 
 #define APP_TIMER_PRESCALER      0                           /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_MAX_TIMERS     (3 + BSP_APP_TIMERS_NUMBER) /**< Maximum number of simultaneously created timers. */
+#define APP_TIMER_MAX_TIMERS     (4 + BSP_APP_TIMERS_NUMBER) /**< Maximum number of simultaneously created timers. */
 #define APP_TIMER_OP_QUEUE_SIZE  4                           /**< Size of timer operation queues. */
 #define APP_FEATURE_NOT_SUPPORTED            BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2                    /**< Reply when unsupported features are requested. */
 
@@ -23,7 +23,6 @@
 // #ifndef PIN_OUT
 //     #error "Please indicate output pin"
 // #endif
-
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 1                                           /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
 
@@ -85,3 +84,5 @@ static void sleep_mode_enter(void);
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt);
 static void on_ble_evt(ble_evt_t * p_ble_evt);
 static void app_context_load(dm_handle_t const * p_handle);
+static void dfu_event_handler(ble_dfu_t * p_dfu, ble_dfu_evt_t * p_evt);
+static void dfu_error_handler(uint32_t nrf_error);
