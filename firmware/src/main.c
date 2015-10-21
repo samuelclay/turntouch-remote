@@ -711,8 +711,8 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             /* YOUR_JOB: Uncomment this part if you are using the app_button module to handle button
                          events. This should be done to save power when not connected
                          to a peer. */
-            err_code = app_button_disable();
-            APP_ERROR_CHECK(err_code);
+            // err_code = app_button_disable();
+            // APP_ERROR_CHECK(err_code);
             
             rtt_print(0, "%s%sBluetooth %sdisconnected.%s\n", RTT_CTRL_BG_BLUE, RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_TEXT_BRIGHT_RED, RTT_CTRL_RESET);
             break;
