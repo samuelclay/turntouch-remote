@@ -761,8 +761,10 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             break;
 
         case BLE_GAP_EVT_CONN_PARAM_UPDATE:
-            rtt_print(0, "%sConnection params update\n", RTT_CTRL_TEXT_BLUE);
-            break;
+						rtt_print(0, "%sConnection params update: %dms (0x%X)\n", RTT_CTRL_TEXT_BLUE, 
+											p_ble_evt->evt.gap_evt.params.conn_param_update.conn_params.min_conn_interval,
+											p_ble_evt->evt.gap_evt.params.conn_param_update.conn_params.min_conn_interval);            
+						break;
             
         case BLE_GATTS_EVT_WRITE:
             //p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
