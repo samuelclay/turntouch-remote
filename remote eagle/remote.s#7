@@ -5521,7 +5521,7 @@ We've spent an enormous amount of time creating and checking these footprints an
 <instance part="U$5" gate="G$1" x="83.82" y="71.12"/>
 <instance part="GND7" gate="1" x="48.26" y="86.36"/>
 <instance part="GND8" gate="1" x="134.62" y="88.9"/>
-<instance part="GND9" gate="1" x="45.72" y="25.4"/>
+<instance part="GND9" gate="1" x="43.18" y="25.4"/>
 <instance part="C3" gate="G$1" x="43.18" y="48.26"/>
 <instance part="C4" gate="G$1" x="48.26" y="48.26"/>
 <instance part="C2" gate="G$1" x="58.42" y="33.02" rot="R270"/>
@@ -5590,20 +5590,19 @@ We've spent an enormous amount of time creating and checking these footprints an
 <pinref part="U$5" gate="G$1" pin="GND@3"/>
 <wire x1="68.58" y1="40.64" x2="68.58" y2="38.1" width="0.1524" layer="91"/>
 <wire x1="68.58" y1="38.1" x2="48.26" y2="38.1" width="0.1524" layer="91"/>
-<wire x1="48.26" y1="38.1" x2="45.72" y2="38.1" width="0.1524" layer="91"/>
-<wire x1="45.72" y1="38.1" x2="45.72" y2="33.02" width="0.1524" layer="91"/>
+<wire x1="48.26" y1="38.1" x2="43.18" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="43.18" y1="38.1" x2="43.18" y2="33.02" width="0.1524" layer="91"/>
 <pinref part="GND9" gate="1" pin="GND"/>
-<wire x1="45.72" y1="33.02" x2="45.72" y2="27.94" width="0.1524" layer="91"/>
-<wire x1="45.72" y1="38.1" x2="43.18" y2="38.1" width="0.1524" layer="91"/>
-<junction x="45.72" y="38.1"/>
+<wire x1="43.18" y1="33.02" x2="43.18" y2="27.94" width="0.1524" layer="91"/>
+<junction x="43.18" y="38.1"/>
 <pinref part="C3" gate="G$1" pin="2"/>
 <wire x1="43.18" y1="45.72" x2="43.18" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="C4" gate="G$1" pin="2"/>
 <wire x1="48.26" y1="45.72" x2="48.26" y2="38.1" width="0.1524" layer="91"/>
 <junction x="48.26" y="38.1"/>
 <pinref part="C2" gate="G$1" pin="2"/>
-<wire x1="55.88" y1="33.02" x2="45.72" y2="33.02" width="0.1524" layer="91"/>
-<junction x="45.72" y="33.02"/>
+<wire x1="55.88" y1="33.02" x2="43.18" y2="33.02" width="0.1524" layer="91"/>
+<junction x="43.18" y="33.02"/>
 </segment>
 <segment>
 <pinref part="U$5" gate="G$1" pin="GND@4"/>

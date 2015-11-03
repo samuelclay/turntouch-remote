@@ -806,11 +806,11 @@ design rules under a new name.</description>
 <contactref element="U$5" pad="1"/>
 <contactref element="U$5" pad="2"/>
 <contactref element="U$5" pad="42"/>
-<contactref element="U$5" pad="13"/>
-<contactref element="C3" pad="2"/>
-<contactref element="C4" pad="2"/>
 <contactref element="U$5" pad="25"/>
 <contactref element="C1" pad="2"/>
+<contactref element="C3" pad="2"/>
+<contactref element="U$5" pad="13"/>
+<contactref element="C4" pad="2"/>
 <contactref element="C2" pad="2"/>
 <wire x1="27.372915625" y1="34.443984375" x2="27.867890625" y2="34.938959375" width="0" layer="19" extent="1-1"/>
 <wire x1="20.74" y1="33.02" x2="27.372915625" y2="34.443984375" width="0" layer="19" extent="1-1"/>

@@ -151,8 +151,8 @@
 </layers>
 <board>
 <plain>
-<text x="9.398" y="18.161" size="0.85" layer="26" font="vector" rot="SMR0" align="top-center">15 Sept 2015
-Rev. 28</text>
+<text x="9.398" y="18.161" size="0.85" layer="26" font="vector" rot="SMR0" align="top-center">Nov 1 2015
+Rev. 30</text>
 <text x="9.398" y="20.574" size="1.27" layer="26" font="vector" rot="SMR0" align="top-center">TURN TOUCH</text>
 <hole x="3.302" y="34.036" drill="2.032"/>
 <hole x="34.036" y="3.302" drill="2.032"/>
