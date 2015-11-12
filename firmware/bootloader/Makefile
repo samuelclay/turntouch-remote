@@ -54,6 +54,7 @@ C_SOURCE_FILES += \
 ../libs/components/drivers_nrf/pstorage/pstorage_raw.c \
 ./dfu_ble_svc.c \
 ./main.c \
+../src/rtt.c \
 ../libs/components/ble/common/ble_advdata.c \
 ../libs/components/ble/common/ble_conn_params.c \
 ../libs/components/ble/ble_services/ble_dfu/ble_dfu.c \
@@ -61,6 +62,8 @@ C_SOURCE_FILES += \
 ../libs/components/toolchain/system_nrf51.c \
 ../libs/components/softdevice/common/softdevice_handler/softdevice_handler.c \
 ../libs/components/softdevice/common/softdevice_handler/softdevice_handler_appsh.c \
+../libs/RTT/SEGGER_RTT.c \
+../libs/RTT/SEGGER_RTT_printf.c \
 
 #assembly files common to all targets
 ASM_SOURCE_FILES  = ../libs/components/toolchain/gcc/gcc_startup_nrf51.s
@@ -75,6 +78,8 @@ INC_PATHS += -I../libs/components/libraries/bootloader_dfu
 INC_PATHS += -I../libs/components/libraries/scheduler
 INC_PATHS += -I../libs/components/softdevice/s110/headers
 INC_PATHS += -I../libs/bsp
+INC_PATHS += -I../libs/RTT
+INC_PATHS += -I../src
 INC_PATHS += -I../libs/components/drivers_nrf/pstorage
 INC_PATHS += -I../libs/components/toolchain/gcc
 INC_PATHS += -I../libs/components/libraries/bootloader_dfu/ble_transport

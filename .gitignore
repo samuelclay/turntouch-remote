@@ -15,6 +15,8 @@
 *.fed
 *.lst
 *.l2p
+*.hex
+*.out
 *xxac.htm
 
 # Compiled Dynamic libraries

@@ -36,3 +36,13 @@ To use gcc, you will need to download:
     $ make flash
     $ ./bin/nrfjprog.sh --rtt
 
+
+# Build on Windows
+
+## Build DFU package
+C:\Keil_v5\ARM\ARMCC\bin\fromelf.exe --bin --output Z:\remote\ble_peripheral\ble_app_template\pca10028\s110\arm5\_build\nrf51422_xxac_s110.bin Z:\remote\ble_peripheral\ble_app_template\pca10028\s110\arm5\_build\nrf51422_xxac_s110.axf
+
+& 'C:\Program Files (x86)\Nordic Semiconductor\Master Control Panel\3.10.0.14\nrf\nrfutil.exe' dfu genpkg --sd-req 0xfffe --application Z:\remote\ble_peripheral\ble_app_template\pca10028\s110\arm5\_build\nrf51422_xxac_s110.bin --application-version 0x01 --dev-revision 0x01 Z:\remote\ble_peripheral\nrf51_01.zip
+
+## Build flash hex
+mergehex -m Z:/remote/firmware/libs/components/softdevice/s110/hex/s110_softdevice.hex Z:/remote/ble_peripheral/dfu/bootloader/pca10028/dual_bank_ble_s110/arm5/_build/nrf51422_xxac.hex Z:/remote/ble_peripheral/ble_app_template/pca10028/s110/arm5/_build/nrf51422_xxac_s110.hex -o Z:/remote/ble_peripheral/nrf51_sd_bootloader_app.hex

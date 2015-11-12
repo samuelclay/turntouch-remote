@@ -128,6 +128,8 @@ static void bootloader_start(uint16_t conn_handle)
                                          m_peer_data.sys_serv_attr,
                                          &sys_serv_attr_len,
                                          BLE_GATTS_SYS_ATTR_FLAG_SYS_SRVCS);
+    APP_ERROR_CHECK(err_code);
+
     if (err_code != NRF_SUCCESS)
     {
         // Any error at this stage means the system service attributes could not be fetched.

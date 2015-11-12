@@ -240,16 +240,6 @@ static void scheduler_init(void)
 // = Battery Level =
 // =================
 
-
-/**@brief Macro to convert the result of ADC conversion in millivolts.
- *
- * @param[in]  ADC_VALUE   ADC result.
- * @retval     Result converted to millivolts.
- */
-#define ADC_RESULT_IN_MILLI_VOLTS(ADC_VALUE)\
-        ((((ADC_VALUE) * ADC_REF_VOLTAGE_IN_MILLIVOLTS) / 255) * ADC_PRE_SCALING_COMPENSATION)
-
-
 /**@brief ADC interrupt handler.
  * @details  This function will fetch the conversion result from the ADC, convert the value into
  *           percentage and send it to peer.
@@ -676,7 +666,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
  */
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
-	rtt_print(0, "%sBluetooth (conn: %X) event: %s%X%s\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gap_evt.conn_handle, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, RTT_CTRL_RESET);
+	rtt_print(0, "%sBluetooth (conn: %X) event: %s0x%X%s\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gap_evt.conn_handle, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, RTT_CTRL_RESET);
 
     dm_ble_evt_handler(p_ble_evt);
     ble_conn_params_on_ble_evt(p_ble_evt);
@@ -1080,7 +1070,7 @@ void dfu_event_handler(ble_dfu_t * p_dfu, ble_dfu_evt_t * p_evt) {
 }
 
 void dfu_error_handler(uint32_t nrf_error) {
-    rtt_print(0, "\nDFU error event: %X\n", nrf_error);
+    rtt_print(0, "\nDFU error event: 0x%X\n", nrf_error);
     if ((nrf_error != NRF_SUCCESS) &&
         (nrf_error != BLE_ERROR_INVALID_CONN_HANDLE) &&
         (nrf_error != NRF_ERROR_INVALID_STATE) &&
