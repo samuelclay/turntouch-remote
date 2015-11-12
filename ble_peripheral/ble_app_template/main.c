@@ -158,10 +158,12 @@ void bsp_evt_handler(bsp_event_t evt) {
  */
 void clock_initialization()
 {
+    // https://devzone.nordicsemi.com/question/953/what-low-frequency-clock-sources-can-i-use/
     NRF_CLOCK->LFCLKSRC            = (CLOCK_LFCLKSRC_SRC_Xtal << CLOCK_LFCLKSRC_SRC_Pos);
     NRF_CLOCK->EVENTS_LFCLKSTARTED = 0;
     NRF_CLOCK->TASKS_LFCLKSTART    = 1;
 
+    // Wait for the low frequency clock to start
     while (NRF_CLOCK->EVENTS_LFCLKSTARTED == 0)
     {
         // Do nothing.
@@ -238,9 +240,45 @@ static void scheduler_init(void)
 // = Battery Level =
 // =================
 
-uint8_t battery_level_get(void)
+/**@brief ADC interrupt handler.
+ * @details  This function will fetch the conversion result from the ADC, convert the value into
+ *           percentage and send it to peer.
+ */
+void ADC_IRQHandler(void)
 {
+    if (NRF_ADC->EVENTS_END != 0)
+    {
+        uint8_t     adc_result;
+        uint16_t    batt_lvl_in_milli_volts;
+        uint8_t     percentage_batt_lvl;
+        uint32_t    err_code;
+
+        NRF_ADC->EVENTS_END     = 0;
+        adc_result              = NRF_ADC->RESULT;
+        NRF_ADC->TASKS_STOP     = 1;
+
+        batt_lvl_in_milli_volts = ADC_RESULT_IN_MILLI_VOLTS(adc_result) ;//+ DIODE_FWD_VOLT_DROP_MILLIVOLTS;
+        percentage_batt_lvl     = battery_level_in_percent(batt_lvl_in_milli_volts);
+
+        err_code = ble_bas_battery_level_update(&m_bas, percentage_batt_lvl);
+        if ((err_code != NRF_SUCCESS)
+            &&
+            (err_code != NRF_ERROR_INVALID_STATE)
+            &&
+            (err_code != BLE_ERROR_NO_TX_BUFFERS)
+            &&
+            (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING)) {
+            APP_ERROR_HANDLER(err_code);
+        }
+    }
+}
+
+void battery_level_update(void)
+{
+    uint32_t err_code;
+
     // Configure ADC
+    NRF_ADC->INTENSET   = ADC_INTENSET_END_Msk;
     NRF_ADC->CONFIG     = (ADC_CONFIG_RES_8bit                        << ADC_CONFIG_RES_Pos)     |
                           (ADC_CONFIG_INPSEL_SupplyOneThirdPrescaling << ADC_CONFIG_INPSEL_Pos)  |
                           (ADC_CONFIG_REFSEL_VBG                      << ADC_CONFIG_REFSEL_Pos)  |
@@ -249,21 +287,18 @@ uint8_t battery_level_get(void)
     NRF_ADC->EVENTS_END = 0;
     NRF_ADC->ENABLE     = ADC_ENABLE_ENABLE_Enabled;
 
+    // Enable ADC interrupt
+    err_code = sd_nvic_ClearPendingIRQ(ADC_IRQn);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = sd_nvic_SetPriority(ADC_IRQn, NRF_APP_PRIORITY_LOW);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = sd_nvic_EnableIRQ(ADC_IRQn);
+    APP_ERROR_CHECK(err_code);
+
     NRF_ADC->EVENTS_END  = 0;    // Stop any running conversions.
     NRF_ADC->TASKS_START = 1;
-    
-    while (!NRF_ADC->EVENTS_END)
-    {
-    }
-    
-    uint16_t vbg_in_mv = 1200;
-    uint8_t adc_max = 255;
-    uint16_t vbat_current_in_mv = (NRF_ADC->RESULT * 3 * vbg_in_mv) / adc_max;
-    
-    NRF_ADC->EVENTS_END     = 0;
-    NRF_ADC->TASKS_STOP     = 1;
-    
-    return (uint8_t) ((vbat_current_in_mv * 100) / VBAT_MAX_IN_MV);
 }
 
 uint32_t temperature_data_get(void)
@@ -278,29 +313,6 @@ uint32_t temperature_data_get(void)
     
     int8_t exponent = -2;
     return ((exponent & 0xFF) << 24) | (temp & 0x00FFFFFF);
-}
-
-/**@brief Function for performing battery measurement and updating the Battery Level characteristic
- *        in Battery Service.
- */
-static void battery_level_update(void)
-{
-    uint32_t err_code;
-    uint8_t  battery_level;
-
-    // battery_level = (uint8_t)sensorsim_measure(&m_battery_sim_state, &m_battery_sim_cfg);
-    battery_level = (uint8_t)battery_level_get();
-    rtt_print(0, "%sBattery level: %s%d%%\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_TEXT_BRIGHT_MAGENTA, battery_level);
-    
-    err_code = ble_bas_battery_level_update(&m_bas, battery_level);
-    if ((err_code != NRF_SUCCESS) &&
-        (err_code != NRF_ERROR_INVALID_STATE) &&
-        (err_code != BLE_ERROR_NO_TX_BUFFERS) &&
-        (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING)
-        )
-    {
-        APP_ERROR_HANDLER(err_code);
-    }
 }
 
 /**@brief Function for handling the Battery measurement timer timeout.
@@ -375,8 +387,8 @@ static void ble_stack_init(void)
     uint32_t err_code;
 
     // Initialize the SoftDevice handler module.
-    // SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, NULL);
-    SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_RC_250_PPM_4000MS_CALIBRATION, NULL);
+    SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, NULL);
+    // SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_RC_250_PPM_4000MS_CALIBRATION, NULL);
 
     // Enable BLE stack 
     ble_enable_params_t ble_enable_params;
@@ -761,10 +773,10 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             break;
 
         case BLE_GAP_EVT_CONN_PARAM_UPDATE:
-						rtt_print(0, "%sConnection params update: %dms (0x%X)\n", RTT_CTRL_TEXT_BLUE, 
-											p_ble_evt->evt.gap_evt.params.conn_param_update.conn_params.min_conn_interval,
-											p_ble_evt->evt.gap_evt.params.conn_param_update.conn_params.min_conn_interval);            
-						break;
+            rtt_print(0, "%sConnection params update: %dms (0x%X)\n", RTT_CTRL_TEXT_BLUE, 
+                         p_ble_evt->evt.gap_evt.params.conn_param_update.conn_params.min_conn_interval,
+                         p_ble_evt->evt.gap_evt.params.conn_param_update.conn_params.min_conn_interval);   
+            break;
             
         case BLE_GATTS_EVT_WRITE:
             //p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
@@ -1164,6 +1176,7 @@ int main(void)
     services_init();
     conn_params_init();
     sec_params_init();
+    battery_level_update();
 
     // Start execution
     gpio_start();
