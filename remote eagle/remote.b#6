@@ -177,7 +177,7 @@ Rev. 30</text>
 <wire x1="30.734" y1="30.734" x2="33.02" y2="33.02" width="1.016" layer="22"/>
 <wire x1="31.242" y1="33.02" x2="33.02" y2="33.02" width="1.016" layer="22"/>
 <wire x1="33.02" y1="33.02" x2="33.02" y2="31.242" width="1.016" layer="22"/>
-<hole x="35.306" y="22.606" drill="2.032"/>
+<hole x="34.036" y="14.986" drill="2.032"/>
 </plain>
 <libraries>
 <library name="remote">
@@ -770,7 +770,7 @@ design rules under a new name.</description>
 <attribute name="NAME" x="24.892" y="33.401" size="0.762" layer="25" font="vector" rot="R180"/>
 </element>
 <element name="Q1" library="abracon" package="ABS07" value="CRYSTAL.ABS07" x="16.002" y="30.988" smashed="yes" rot="R225">
-<attribute name="NAME" x="17.45156875" y="33.143259375" size="0.762" layer="25" rot="R225"/>
+<attribute name="NAME" x="15.16556875" y="32.889259375" size="0.762" layer="25" rot="R225"/>
 </element>
 <element name="C1" library="SparkFun-Capacitors" package="0603-CAP" value="1uF" x="16.002" y="26.162" smashed="yes" rot="R180">
 <attribute name="PROD_ID" value="CAP-00810" x="16.002" y="26.162" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1019,8 +1019,11 @@ design rules under a new name.</description>
 <wire x1="34.544" y1="26.28295" x2="35.306" y2="25.527" width="0.1524" layer="1"/>
 <via x="35.306" y="25.527" extent="1-16" drill="0.3302"/>
 <wire x1="35.306" y1="25.527" x2="33.782" y2="24.003" width="0.1524" layer="16"/>
-<wire x1="33.782" y1="24.003" x2="33.782" y2="9.144" width="0.1524" layer="16"/>
-<wire x1="33.782" y1="9.144" x2="29.21" y2="4.572" width="0.1524" layer="16"/>
+<wire x1="33.782" y1="24.003" x2="33.782" y2="17.78" width="0.1524" layer="16"/>
+<wire x1="33.782" y1="17.78" x2="32.512" y2="16.51" width="0.1524" layer="16"/>
+<wire x1="32.512" y1="16.51" x2="32.512" y2="10.414" width="0.1524" layer="16"/>
+<wire x1="32.512" y1="10.414" x2="32.512" y2="7.874" width="0.1524" layer="16"/>
+<wire x1="32.512" y1="7.874" x2="29.21" y2="4.572" width="0.1524" layer="16"/>
 <wire x1="29.21" y1="4.572" x2="20.828" y2="4.572" width="0.1524" layer="16"/>
 <wire x1="20.828" y1="4.572" x2="14.478" y2="10.922" width="0.1524" layer="16"/>
 <wire x1="14.478" y1="10.922" x2="14.478" y2="13.97" width="0.254" layer="16"/>
