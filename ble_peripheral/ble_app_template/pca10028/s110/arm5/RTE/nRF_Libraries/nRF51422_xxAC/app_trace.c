@@ -24,7 +24,7 @@
 #include "app_error.h"
 
 #ifndef UART_TX_BUF_SIZE
-    #define UART_TX_BUF_SIZE 256                         /**< UART TX buffer size. */
+    #define UART_TX_BUF_SIZE 1024                         /**< UART TX buffer size. */
 #endif
 #ifndef UART_RX_BUF_SIZE
     #define UART_RX_BUF_SIZE 1                           /**< UART RX buffer size. */
@@ -33,7 +33,8 @@ __WEAK void uart_error_handle(app_uart_evt_t * p_event)
 {
     if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR)
     {
-        APP_ERROR_HANDLER(p_event->data.error_communication);
+        //Skipping communication errors, they are only for Rx and app_trace is Tx only.
+        //APP_ERROR_HANDLER(p_event->data.error_communication);
     }
     else if (p_event->evt_type == APP_UART_FIFO_ERROR)
     {

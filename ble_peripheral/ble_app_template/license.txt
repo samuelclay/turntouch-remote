@@ -66,20 +66,52 @@ Without prejudice to any other rights, Nordic may cancel this Agreement if Licen
 
 License #2
 
-This software is subject to the ANT+ Shared Source License www.thisisant.com/swlicenses
-Copyright (c) Dynastream Innovations Inc. 2012
+This software is subject to the ANT+ Shared Source License
+www.thisisant.com/swlicenses
+Copyright (c) Dynastream Innovations, Inc. 2015
 All rights reserved.
 
-Internal use of this software, in source or binary form, without redistribution, is permitted.
+Redistribution and use in source and binary forms, with or
+without modification, are permitted provided that the following
+conditions are met:
 
-Redistribution of this software in binary form, with or without modification, is permitted provided:
+   1) Redistributions of source code must retain the above
+      copyright notice,this list of conditions and the following
+      disclaimer.
 
-(1) the software is used in combination with ANT or ANT+ products only; and
-(2) the above copyright notice and this license is included within the documentation and/or other materials provided with the redistributed software.
+   2) Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials
+      provided with the distribution.
+
+   3) Neither the name of Dynastream nor the names of its
+      contributors may be used to endorse or promote products
+      derived from this software without specific prior
+      written permission.
 
 The following actions are prohibited:
 
-(1) redistribution of this software in source form;
-(2) use of the software in combination with wireless formats other than ANT or ANT+;
-(3) reverse engineering, decompilation, and/or disassembly of software provided in binary form under this license. 
-THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL DYNASTREAM INNOVATIONS INC. AND/OR THE COPYRIGHT OWNER(S) BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   1) Redistribution of source code containing the ANT+ Network
+      Key. The ANT+ Network Key is available to ANT+ Adopters.
+      Please refer to http://thisisant.com to become an ANT+
+      Adopter and access the key. 
+
+   2) Reverse engineering, decompilation, and/or disassembly of
+      software provided in binary form under this license.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE HEREBY
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES(INCLUDING, 
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+SERVICES; DAMAGE TO ANY DEVICE, LOSS OF USE, DATA, OR 
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN 
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
+OF THE POSSIBILITY OF SUCH DAMAGE. SOME STATES DO NOT ALLOW 
+THE EXCLUSION OF INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO THE
+ABOVE LIMITATIONS MAY NOT APPLY TO YOU.

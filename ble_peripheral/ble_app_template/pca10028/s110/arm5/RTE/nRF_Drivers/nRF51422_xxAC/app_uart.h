@@ -34,7 +34,7 @@ typedef enum
 {
     APP_UART_FLOW_CONTROL_DISABLED, /**< UART Hw Flow Control is disabled. */
     APP_UART_FLOW_CONTROL_ENABLED,  /**< Standard UART Hw Flow Control is enabled. */
-    APP_UART_FLOW_CONTROL_LOW_POWER /**< Specialized UART Hw Flow Control is used. The Low Power setting allows the nRF51 to Power Off the UART module when CTS is in-active, and re-enabling the UART when the CTS signal becomes active. This allows the nRF51 to safe power by only using the UART module when it is needed by the remote site. */
+    APP_UART_FLOW_CONTROL_LOW_POWER /**< Specialized UART Hw Flow Control is used. The Low Power setting allows the \nRFXX to Power Off the UART module when CTS is in-active, and re-enabling the UART when the CTS signal becomes active. This allows the \nRFXX to safe power by only using the UART module when it is needed by the remote site. */
 } app_uart_flow_control_t;
 
 /**@brief UART communication structure holding configuration settings for the peripheral.
@@ -60,23 +60,6 @@ typedef struct
     uint32_t  tx_buf_size; /**< Size of the TX buffer. */
 } app_uart_buffers_t;
 
-/**@brief Enumeration describing current state of the UART.
- *
- * @details The connection state can be fetched by the application using the function call
- *          @ref app_uart_get_connection_state.
- *          When hardware flow control is used
- *          - APP_UART_CONNECTED:     Communication is ongoing.
- *          - APP_UART_DISCONNECTED:  No communication is ongoing.
- *
- *          When no hardware flow control is used
- *          - APP_UART_CONNECTED:     Always returned as bytes can always be received/transmitted.
- */
-typedef enum
-{
-    APP_UART_DISCONNECTED, /**< State indicating that the UART is disconnected and cannot receive or transmit bytes. */
-    APP_UART_CONNECTED     /**< State indicating that the UART is connected and ready to receive or transmit bytes. If flow control is disabled, the state will always be connected. */
-} app_uart_connection_state_t;
-
 /**@brief Enumeration which defines events used by the UART module upon data reception or error.
  *
  * @details The event type is used to indicate the type of additional information in the event
@@ -101,7 +84,7 @@ typedef struct
     app_uart_evt_type_t evt_type; /**< Type of event. */
     union
     {
-        uint32_t error_communication; /**< Field used if evt_type is: APP_UART_COMMUNICATION_ERROR. This field contains the value in the ERRORSRC register for the UART peripheral. The UART_ERRORSRC_x defines from nrf51_bitfields.h can be used to parse the error code. See also the nRF51 Series Reference Manual for specification. */
+        uint32_t error_communication; /**< Field used if evt_type is: APP_UART_COMMUNICATION_ERROR. This field contains the value in the ERRORSRC register for the UART peripheral. The UART_ERRORSRC_x defines from nrf5x_bitfields.h can be used to parse the error code. See also the \nRFXX Series Reference Manual for specification. */
         uint32_t error_code;          /**< Field used if evt_type is: NRF_ERROR_x. Additional status/error code if the error event type is APP_UART_FIFO_ERROR. This error code refer to errors defined in nrf_error.h. */
         uint8_t  value;               /**< Field used if evt_type is: NRF_ERROR_x. Additional status/error code if the error event type is APP_UART_FIFO_ERROR. This error code refer to errors defined in nrf_error.h. */
     } data;
@@ -134,7 +117,6 @@ typedef void (* app_uart_event_handler_t) (app_uart_evt_t * p_app_uart_event);
 #define APP_UART_FIFO_INIT(P_COMM_PARAMS, RX_BUF_SIZE, TX_BUF_SIZE, EVT_HANDLER, IRQ_PRIO, ERR_CODE) \
     do                                                                                             \
     {                                                                                              \
-        uint16_t           APP_UART_UID = 0;                                                       \
         app_uart_buffers_t buffers;                                                                \
         static uint8_t     rx_buf[RX_BUF_SIZE];                                                    \
         static uint8_t     tx_buf[TX_BUF_SIZE];                                                    \
@@ -143,7 +125,7 @@ typedef void (* app_uart_event_handler_t) (app_uart_evt_t * p_app_uart_event);
         buffers.rx_buf_size = sizeof (rx_buf);                                                     \
         buffers.tx_buf      = tx_buf;                                                              \
         buffers.tx_buf_size = sizeof (tx_buf);                                                     \
-        ERR_CODE = app_uart_init(P_COMM_PARAMS, &buffers, EVT_HANDLER, IRQ_PRIO, &APP_UART_UID);   \
+        ERR_CODE = app_uart_init(P_COMM_PARAMS, &buffers, EVT_HANDLER, IRQ_PRIO);                  \
     } while (0)
 
 /**@brief Macro for safe initialization of the UART module in a single user instance.
@@ -161,18 +143,14 @@ typedef void (* app_uart_event_handler_t) (app_uart_evt_t * p_app_uart_event);
 #define APP_UART_INIT(P_COMM_PARAMS, EVT_HANDLER, IRQ_PRIO, ERR_CODE)                              \
     do                                                                                             \
     {                                                                                              \
-        uint16_t APP_UART_UID = 0;                                                                 \
-        ERR_CODE = app_uart_init(P_COMM_PARAMS, NULL, EVT_HANDLER, IRQ_PRIO, &APP_UART_UID);       \
+        ERR_CODE = app_uart_init(P_COMM_PARAMS, NULL, EVT_HANDLER, IRQ_PRIO);                      \
     } while (0)
 
 /**@brief Function for initializing the UART module. Use this initialization when several instances of the UART
  *        module are needed.
  *
- * @details This initialization will return a UART user id for the caller. The UART user id must be
- *          used upon re-initialization of the UART or closing of the module for the user.
- *          If single instance usage is needed, the APP_UART_INIT() macro should be used instead.
  *
- * @note Normally single instance initialization should be done using the APP_UART_INIT() or
+ * @note Normally single initialization should be done using the APP_UART_INIT() or
  *       APP_UART_INIT_FIFO() macro depending on whether the FIFO should be used by the UART, as
  *       that will allocate the buffers needed by the UART module (including aligning the buffer
  *       correctly).
@@ -181,11 +159,6 @@ typedef void (* app_uart_event_handler_t) (app_uart_evt_t * p_app_uart_event);
  * @param[in]     p_buffers         RX and TX buffers, NULL is FIFO is not used.
  * @param[in]     error_handler     Function to be called in case of an error.
  * @param[in]     irq_priority      Interrupt priority level.
- * @param[in,out] p_uart_uid        User id for the UART module. The p_uart_uid must be used if
- *                                  re-initialization and/or closing of the UART module is needed.
- *                                  If the value pointed to by p_uart_uid is zero, this is
- *                                  considdered a first time initialization. Otherwise this is
- *                                  considered a re-initialization for the user with id *p_uart_uid.
  *
  * @retval      NRF_SUCCESS               If successful initialization.
  * @retval      NRF_ERROR_INVALID_LENGTH  If a provided buffer is not a power of two.
@@ -204,8 +177,7 @@ typedef void (* app_uart_event_handler_t) (app_uart_evt_t * p_app_uart_event);
 uint32_t app_uart_init(const app_uart_comm_params_t * p_comm_params,
                        app_uart_buffers_t *           p_buffers,
                        app_uart_event_handler_t       error_handler,
-                       app_irq_priority_t             irq_priority,
-                       uint16_t *                     p_uart_uid);
+                       app_irq_priority_t             irq_priority);
 
 /**@brief Function for getting a byte from the UART.
  *
@@ -230,32 +202,9 @@ uint32_t app_uart_get(uint8_t * p_byte);
  * @retval NRF_ERROR_NO_MEM   If no more space is available in the TX buffer.
  *                            NRF_ERROR_NO_MEM may occur if flow control is enabled and CTS signal
  *                            is high for a long period and the buffer fills up.
+ * @retval NRF_ERROR_INTERNAL If UART driver reported error.
  */
 uint32_t app_uart_put(uint8_t byte);
-
-/**@brief Function for getting the current state of the UART.
- *
- * @details If flow control is disabled, the state is assumed to always be APP_UART_CONNECTED.
- *
- *          When using flow control the state will be controlled by the CTS. If CTS is set active
- *          by the remote side, or the app_uart module is in the process of transmitting a byte,
- *          app_uart is in APP_UART_CONNECTED state. If CTS is set inactive by remote side app_uart
- *          will not get into APP_UART_DISCONNECTED state until the last byte in the TXD register
- *          is fully transmitted.
- *
- *          Internal states in the state machine are mapped to the general connected/disconnected
- *          states in the following ways:
- *
- *          - UART_ON    = CONNECTED
- *          - UART_READY = CONNECTED
- *          - UART_WAIT  = CONNECTED
- *          - UART_OFF   = DISCONNECTED.
- *
- * @param[out] p_connection_state    Current connection state of the UART.
- *
- * @retval NRF_SUCCESS  The connection state was successfully retrieved.
- */
-uint32_t app_uart_get_connection_state(app_uart_connection_state_t * p_connection_state);
 
 /**@brief Function for flushing the RX and TX buffers (Only valid if FIFO is used).
  *        This function does nothing if FIFO is not used.
@@ -266,17 +215,11 @@ uint32_t app_uart_flush(void);
 
 /**@brief Function for closing the UART module.
  *
- * @details This function will close any on-going UART transmissions and disable itself in the
- *          GPTIO module.
- *
- * @param[in] app_uart_id  User id for the UART module. The app_uart_uid must be identical to the
- *                          UART id returned on initialization and which is currently in use.
-
  * @retval  NRF_SUCCESS             If successfully closed.
  * @retval  NRF_ERROR_INVALID_PARAM If an invalid user id is provided or the user id differs from
  *                                  the current active user.
  */
-uint32_t app_uart_close(uint16_t app_uart_id);
+uint32_t app_uart_close(void);
 
 
 #endif //APP_UART_H__

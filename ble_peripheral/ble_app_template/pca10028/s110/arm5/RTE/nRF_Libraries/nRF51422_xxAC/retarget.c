@@ -9,7 +9,9 @@
  * the file.
  *
  */
- 
+
+#ifndef NRF_LOG_USES_RTT
+
 #include <stdio.h>
 #include <stdint.h>
 #include "app_uart.h"
@@ -76,3 +78,4 @@ int _read(int file, char * p_char, int len)
 }
 #endif
 
+#endif // #ifndef NRF_LOG_USES_RTT

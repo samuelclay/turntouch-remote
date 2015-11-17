@@ -465,12 +465,12 @@ static void advertising_init(void)
     // Build advertising data struct to pass into @ref ble_advertising_init.
     memset(&advdata, 0, sizeof(advdata));
 
-    advdata.name_type               = BLE_ADVDATA_SHORT_NAME;
-    advdata.include_appearance      = false;
-    advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
+    advdata.name_type               = BLE_ADVDATA_FULL_NAME;
+    advdata.include_appearance      = true;
+    advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE | BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED ;
     advdata.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
     advdata.uuids_complete.p_uuids  = adv_uuids;
-    rtt_print(0, "%sAdvertising: %X.\n", RTT_CTRL_TEXT_MAGENTA, sizeof(adv_uuids) / sizeof(adv_uuids[0]));
+    rtt_print(0, "%sAdvertising: %d services.\n", RTT_CTRL_TEXT_MAGENTA, sizeof(adv_uuids) / sizeof(adv_uuids[0]));
     
     ble_adv_modes_config_t options = {0};
     options.ble_adv_fast_enabled   = BLE_ADV_FAST_ENABLED;
@@ -1107,7 +1107,8 @@ static void timers_init(void)
     uint32_t err_code;
     
     // Initialize timer module, making it use the scheduler
-    APP_TIMER_APPSH_INIT(APP_TIMER_PRESCALER, APP_TIMER_MAX_TIMERS, APP_TIMER_OP_QUEUE_SIZE, true);
+    // APP_TIMER_APPSH_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, true);
+    APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
     
     err_code = app_timer_create(&m_battery_timer_id,
                                 APP_TIMER_MODE_REPEATED,

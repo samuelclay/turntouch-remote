@@ -50,4 +50,4 @@ SECTIONS
   /* other placements follow here... */
 }
 
-INCLUDE "gcc_nrf51_common.ld"
+INCLUDE "nrf51_common.ld"

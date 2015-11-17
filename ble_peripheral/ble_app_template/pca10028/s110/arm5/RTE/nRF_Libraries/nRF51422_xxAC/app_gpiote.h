@@ -46,8 +46,8 @@
 #include "app_error.h"
 #include "app_util.h"
 
-#define GPIOTE_USER_NODE_SIZE   20          /**< Size of app_gpiote.gpiote_user_t (only for use inside APP_GPIOTE_BUF_SIZE()). */
-#define NO_OF_PINS              32          /**< Number of GPIO pins on the nRF51 chip. */
+#define GPIOTE_USER_NODE_SIZE   24          /**< Size of app_gpiote.gpiote_user_t (only for use inside APP_GPIOTE_BUF_SIZE()). */
+#define NO_OF_PINS              32          /**< Number of GPIO pins on the \nRFXX chip. */
 
 /**@brief Compute number of bytes required to hold the GPIOTE data structures.
  *

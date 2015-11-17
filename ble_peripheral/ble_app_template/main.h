@@ -3,8 +3,15 @@
  * Header for Turn Touch Remote
  */
 
+#include "app_timer.h"
+#include "ble_advertising.h"
+#include "ble_bas.h"
+#include "ble_dfu.h"
+#include "button_status.h"
+#include "device_manager.h"
+#include "pstorage.h"
+
 #define APP_TIMER_PRESCALER      0                           /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_MAX_TIMERS     (4 + BSP_APP_TIMERS_NUMBER) /**< Maximum number of simultaneously created timers. */
 #define APP_TIMER_OP_QUEUE_SIZE  4                           /**< Size of timer operation queues. */
 #define APP_FEATURE_NOT_SUPPORTED            BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2                    /**< Reply when unsupported features are requested. */
 
@@ -68,7 +75,7 @@
 #define ADC_PRE_SCALING_COMPENSATION         3                                         /**< The ADC is configured to use VDD with 1/3 prescaling as input. And hence the result of conversion is to be multiplied by 3 to get the actual value of the battery voltage.*/
 #define DIODE_FWD_VOLT_DROP_MILLIVOLTS       270                                       /**< Typical forward voltage drop of the diode (Part no: SD103ATW-7-F) that is connected in series with the voltage supply. This is the voltage drop when the forward current is 1mA. Source: Data sheet of 'SURFACE MOUNT SCHOTTKY BARRIER DIODE ARRAY' available at www.diodes.com. */
 
-STATIC_ASSERT(IS_SRVC_CHANGED_CHARACT_PRESENT);                                     /** When having DFU Service support in application the Service Changed Characteristic should always be present. */
+// STATIC_ASSERT(IS_SRVC_CHANGED_CHARACT_PRESENT);                                     /** When having DFU Service support in application the Service Changed Characteristic should always be present. */
 
 
 /**@brief Macro to convert the result of ADC conversion in millivolts.
@@ -84,13 +91,14 @@ static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;
 static ble_buttonservice_t              m_buttonservice;                            /**< Struct for pressed and held buttons */
 static dm_application_instance_t        m_app_handle;                               /**< Application identifier allocated by device manager. */
 static ble_bas_t                        m_bas;                                      /**< Structure used to identify the battery service. */
-static app_timer_id_t                   m_battery_timer_id;                         /**< Battery timer. */
 static dm_handle_t                      m_bonded_peer_handle;                       /**< Device reference handle to the current bonded central. */
 static ble_user_mem_block_t             m_mem_block;                                /**< Memory block structure, used during a BLE_EVT_USER_MEM_REQUEST event. */
 static ble_gatts_rw_authorize_reply_params_t    m_rw_authorize_reply;               /**< Authorize reply structure, used during BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST event. */
 static uint8_t                          m_nickname_storage[FIRMWARE_NICKNAME_MAX_LENGTH]; /**< Memory block for nickname */
 static pstorage_handle_t                m_flash_handle;                             /**< Handle to pstorage */
 static ble_dfu_t                        m_dfus;                                     /**< Structure used to identify the DFU service. */
+
+APP_TIMER_DEF(m_battery_timer_id);
 
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt);
 static void sleep_mode_enter(void);

@@ -22,7 +22,7 @@
 static app_button_cfg_t *             mp_buttons = NULL;           /**< Button configuration. */
 static uint8_t                        m_button_count;              /**< Number of configured buttons. */
 static uint32_t                       m_detection_delay;           /**< Delay before a button is reported as pushed. */
-static app_timer_id_t                 m_detection_delay_timer_id;  /**< Polling timer id. */
+APP_TIMER_DEF(m_detection_delay_timer_id);  /**< Polling timer id. */
 
 
 static uint32_t m_pin_state;
