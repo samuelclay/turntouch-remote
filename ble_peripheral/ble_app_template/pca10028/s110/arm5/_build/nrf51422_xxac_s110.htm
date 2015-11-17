@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\_build\nrf51422_xxac_s110.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\_build\nrf51422_xxac_s110.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060020: Last Updated: Mon Nov 16 15:27:07 2015
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060020: Last Updated: Tue Nov 17 14:25:01 2015
 <BR><P>
 <H3>Maximum Stack Usage =        896 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -267,14 +267,14 @@ Global Symbols
 <LI><a href="#[69]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_PrintInt
 <LI><a href="#[e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pstorage_clear
 <LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_IRQHandler
-<LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_swap_erase_entry_run
-<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_restore_tail_entry_run
 <LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_data_erase_swap_entry_run
 <LI><a href="#[10e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pstorage_flash_page_end
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;is_page_erase_required
 <LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;head_restore_state_run
 <LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;clear_operation_execute
 <LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_idivmod
+<LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_swap_erase_entry_run
+<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_restore_tail_entry_run
 </UL>
 
 <P><STRONG><a name="[11e]"></a>__aeabi_idiv</STRONG> (Thumb, 0 bytes, Stack size 16 bytes, idiv.o(.text), UNUSED)
@@ -1209,10 +1209,10 @@ Global Symbols
 <P><STRONG><a name="[10f]"></a>pstorage_sys_event_handler</STRONG> (Thumb, 72 bytes, Stack size 8 bytes, pstorage.o(i.pstorage_sys_event_handler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 96<LI>Call Chain = pstorage_sys_event_handler &rArr; flash_operation_success_run &rArr; clear_post_processing_run &rArr; command_end_procedure_run &rArr; sm_state_change &rArr;  cmd_process (Cycle)
 </UL>
-<BR>[Calls]<UL><LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_state_change
-<LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sm_state_change
+<BR>[Calls]<UL><LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sm_state_change
 <LI><a href="#[f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;flash_operation_success_run
 <LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;app_notify_error_state_transit
+<LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_state_change
 </UL>
 <BR>[Called By]<UL><LI><a href="#[29]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sys_evt_dispatch
 </UL>
@@ -1458,7 +1458,7 @@ Local Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> main.o(i.services_init)
 </UL>
-<P><STRONG><a name="[104]"></a>services_init</STRONG> (Thumb, 314 bytes, Stack size 152 bytes, main.o(i.services_init))
+<P><STRONG><a name="[104]"></a>services_init</STRONG> (Thumb, 316 bytes, Stack size 152 bytes, main.o(i.services_init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 864<LI>Call Chain = services_init &rArr; ble_dis_init &rArr; char_add &rArr; app_error_handler &rArr; rtt_print &rArr; SEGGER_RTT_vprintf &rArr; _PrintInt &rArr; _PrintUnsigned &rArr; _StoreChar &rArr; SEGGER_RTT_Write
 </UL>
 <BR>[Calls]<UL><LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;rtt_print
@@ -2009,10 +2009,10 @@ Local Symbols
 <BR>[Calls]<UL><LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sm_state_change
 <LI><a href="#[d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;command_end_procedure_run
 </UL>
-<BR>[Called By]<UL><LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tail_restore_state_run
-<LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;head_restore_state_run
+<BR>[Called By]<UL><LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;head_restore_state_run
 <LI><a href="#[f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;flash_operation_success_run
 <LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;data_page_erase_state_run
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tail_restore_state_run
 </UL>
 
 <P><STRONG><a name="[d7]"></a>cmd_process</STRONG> (Thumb, 46 bytes, Stack size 8 bytes, pstorage.o(i.cmd_process))
@@ -2054,10 +2054,10 @@ Local Symbols
 <P><STRONG><a name="[50]"></a>data_page_erase_state_run</STRONG> (Thumb, 80 bytes, Stack size 8 bytes, pstorage.o(i.data_page_erase_state_run))
 <BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = data_page_erase_state_run &rArr; clear_post_processing_run &rArr; command_end_procedure_run &rArr; sm_state_change &rArr;  cmd_process (Cycle)
 </UL>
-<BR>[Calls]<UL><LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_state_change
-<LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_err_busy_process
-<LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;is_page_erase_required
+<BR>[Calls]<UL><LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;is_page_erase_required
 <LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;clear_post_processing_run
+<LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_state_change
+<LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_err_busy_process
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> pstorage.o(.constdata)
 </UL>
@@ -2081,12 +2081,12 @@ Local Symbols
 <P><STRONG><a name="[f9]"></a>flash_operation_success_run</STRONG> (Thumb, 114 bytes, Stack size 8 bytes, pstorage.o(i.flash_operation_success_run))
 <BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = flash_operation_success_run &rArr; clear_post_processing_run &rArr; command_end_procedure_run &rArr; sm_state_change &rArr;  cmd_process (Cycle)
 </UL>
-<BR>[Calls]<UL><LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;store_cmd_flash_write_execute
-<LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sm_state_change
+<BR>[Calls]<UL><LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sm_state_change
 <LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main_state_err_busy_process
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;is_page_erase_required
 <LI><a href="#[d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;command_end_procedure_run
 <LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;clear_post_processing_run
+<LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;store_cmd_flash_write_execute
 </UL>
 <BR>[Called By]<UL><LI><a href="#[10f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pstorage_sys_event_handler
 </UL>
@@ -2096,9 +2096,9 @@ Local Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;flash_api_err_code_process
 </UL>
-<BR>[Called By]<UL><LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_swap_erase_entry_run
-<LI><a href="#[4b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_erase_data_page_entry_run
+<BR>[Called By]<UL><LI><a href="#[4b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_erase_data_page_entry_run
 <LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sm_state_change
+<LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_swap_erase_entry_run
 </UL>
 
 <P><STRONG><a name="[fd]"></a>flash_write</STRONG> (Thumb, 10 bytes, Stack size 8 bytes, pstorage.o(i.flash_write))
@@ -2106,21 +2106,21 @@ Local Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;flash_api_err_code_process
 </UL>
-<BR>[Called By]<UL><LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;store_cmd_flash_write_execute
+<BR>[Called By]<UL><LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_restore_head_entry_run
+<LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;store_cmd_flash_write_execute
 <LI><a href="#[4a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_write_data_swap_entry_run
 <LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_restore_tail_entry_run
-<LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_restore_head_entry_run
 </UL>
 
 <P><STRONG><a name="[52]"></a>head_restore_state_run</STRONG> (Thumb, 110 bytes, Stack size 16 bytes, pstorage.o(i.head_restore_state_run))
 <BR><BR>[Stack]<UL><LI>Max Depth = 96<LI>Call Chain = head_restore_state_run &rArr; clear_post_processing_run &rArr; command_end_procedure_run &rArr; sm_state_change &rArr;  cmd_process (Cycle)
 </UL>
-<BR>[Calls]<UL><LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_state_change
-<LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_err_busy_process
-<LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pstorage_flash_page_size
+<BR>[Calls]<UL><LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pstorage_flash_page_size
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;is_page_erase_required
 <LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;clear_post_processing_run
 <LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidivmod
+<LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_state_change
+<LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_err_busy_process
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> pstorage.o(.constdata)
 </UL>
@@ -2158,35 +2158,35 @@ Local Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pstorage_register
 <LI><a href="#[e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pstorage_init
+<LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_restore_head_entry_run
 <LI><a href="#[4a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_write_data_swap_entry_run
 <LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_swap_erase_entry_run
 <LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_restore_tail_entry_run
-<LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_restore_head_entry_run
 </UL>
 
 <P><STRONG><a name="[d4]"></a>pstorage_flash_page_size</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, pstorage.o(i.pstorage_flash_page_size))
 <BR><BR>[Called By]<UL><LI><a href="#[f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pstorage_register
 <LI><a href="#[e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pstorage_init
-<LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;store_cmd_flash_write_execute
-<LI><a href="#[4a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_write_data_swap_entry_run
-<LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_swap_erase_entry_run
-<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_restore_tail_entry_run
 <LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_restore_head_entry_run
 <LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_data_erase_swap_entry_run
 <LI><a href="#[10e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pstorage_flash_page_end
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;is_page_erase_required
 <LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;head_restore_state_run
 <LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;clear_operation_execute
+<LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;store_cmd_flash_write_execute
+<LI><a href="#[4a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_write_data_swap_entry_run
+<LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_swap_erase_entry_run
+<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_restore_tail_entry_run
 </UL>
 
 <P><STRONG><a name="[92]"></a>sm_state_change</STRONG> (Thumb, 62 bytes, Stack size 8 bytes, pstorage.o(i.sm_state_change))
 <BR><BR>[Stack]<UL><LI>Max Depth = 64 + In Cycle
 <LI>Call Chain = sm_state_change &rArr;  cmd_process (Cycle)
 </UL>
-<BR>[Calls]<UL><LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;store_cmd_flash_write_execute
-<LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_data_erase_swap_entry_run
+<BR>[Calls]<UL><LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_data_erase_swap_entry_run
 <LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;flash_page_erase
 <LI><a href="#[d7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;cmd_process
+<LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;store_cmd_flash_write_execute
 </UL>
 <BR>[Called By]<UL><LI><a href="#[10f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pstorage_sys_event_handler
 <LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main_state_err_busy_process
@@ -2201,9 +2201,9 @@ Local Symbols
 <P><STRONG><a name="[112]"></a>state_data_erase_swap_entry_run</STRONG> (Thumb, 92 bytes, Stack size 24 bytes, pstorage.o(i.state_data_erase_swap_entry_run))
 <BR><BR>[Stack]<UL><LI>Max Depth = 36<LI>Call Chain = state_data_erase_swap_entry_run &rArr; __aeabi_uidivmod
 </UL>
-<BR>[Calls]<UL><LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_state_change
-<LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pstorage_flash_page_size
+<BR>[Calls]<UL><LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pstorage_flash_page_size
 <LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidivmod
+<LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_state_change
 </UL>
 <BR>[Called By]<UL><LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sm_state_change
 </UL>
@@ -2276,28 +2276,28 @@ Local Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_state_change
 </UL>
-<BR>[Called By]<UL><LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tail_restore_state_run
-<LI><a href="#[4e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_erase_state_run
-<LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;head_restore_state_run
+<BR>[Called By]<UL><LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;head_restore_state_run
 <LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;data_to_swap_write_state_run
 <LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;data_page_erase_state_run
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;tail_restore_state_run
+<LI><a href="#[4e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_erase_state_run
 </UL>
 
 <P><STRONG><a name="[de]"></a>swap_sub_state_state_change</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, pstorage.o(i.swap_sub_state_state_change))
 <BR><BR>[Called By]<UL><LI><a href="#[10f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pstorage_sys_event_handler
-<LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_err_busy_process
-<LI><a href="#[4e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_erase_state_run
 <LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;state_data_erase_swap_entry_run
 <LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;head_restore_state_run
 <LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;data_to_swap_write_state_run
 <LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;data_page_erase_state_run
+<LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_err_busy_process
+<LI><a href="#[4e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_erase_state_run
 </UL>
 
 <P><STRONG><a name="[51]"></a>tail_restore_state_run</STRONG> (Thumb, 22 bytes, Stack size 8 bytes, pstorage.o(i.tail_restore_state_run))
 <BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = tail_restore_state_run &rArr; clear_post_processing_run &rArr; command_end_procedure_run &rArr; sm_state_change &rArr;  cmd_process (Cycle)
 </UL>
-<BR>[Calls]<UL><LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_err_busy_process
-<LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;clear_post_processing_run
+<BR>[Calls]<UL><LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;clear_post_processing_run
+<LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;swap_sub_state_err_busy_process
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> pstorage.o(.constdata)
 </UL>
