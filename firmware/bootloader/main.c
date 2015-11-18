@@ -38,9 +38,8 @@
 #include "nrf_soc.h"
 #include "app_error.h"
 #include "nrf_gpio.h"
-#include "nrf51_bitfields.h"
 #include "ble.h"
-#include "nrf51.h"
+#include "nrf.h"
 #include "ble_hci.h"
 #include "app_scheduler.h"
 #include "app_timer_appsh.h"
@@ -49,7 +48,6 @@
 #include "softdevice_handler_appsh.h"
 #include "pstorage_platform.h"
 #include "nrf_mbr.h"
-#include "rtt.h"
 
 #if BUTTONS_NUMBER < 1
 #error "Not enough buttons on board"
@@ -62,10 +60,9 @@
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 1                                                       /**< Include the service_changed characteristic. For DFU this should normally be the case. */
 
 #define BOOTLOADER_BUTTON               BSP_BUTTON_3                                            /**< Button used to enter SW update mode. */
-#define UPDATE_IN_PROGRESS_LED          BSP_LED_1                                               /**< Led used to indicate that DFU is active. */
+#define UPDATE_IN_PROGRESS_LED          BSP_LED_2                                               /**< Led used to indicate that DFU is active. */
 
 #define APP_TIMER_PRESCALER             0                                                       /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_MAX_TIMERS            3                                                       /**< Maximum number of simultaneously created timers. */
 #define APP_TIMER_OP_QUEUE_SIZE         4                                                       /**< Size of timer operation queues. */
 
 #define SCHED_MAX_EVENT_DATA_SIZE       MAX(APP_TIMER_SCHED_EVT_SIZE, 0)                        /**< Maximum size of scheduler events. */
@@ -94,14 +91,8 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
  */
 static void leds_init(void)
 {
-    nrf_gpio_cfg_output(BSP_LED_0);
-    nrf_gpio_pin_set(BSP_LED_0);
-    nrf_gpio_cfg_output(BSP_LED_1);
-    nrf_gpio_pin_set(BSP_LED_1);
-    nrf_gpio_cfg_output(BSP_LED_2);
-    nrf_gpio_pin_set(BSP_LED_2);
-    nrf_gpio_cfg_output(BSP_LED_3);
-    nrf_gpio_pin_set(BSP_LED_3);
+    nrf_gpio_range_cfg_output(LED_START, LED_STOP);
+    nrf_gpio_pins_set(LEDS_MASK);
 }
 
 
@@ -110,7 +101,7 @@ static void leds_init(void)
 static void timers_init(void)
 {
     // Initialize timer module, making it use the scheduler.
-    APP_TIMER_APPSH_INIT(APP_TIMER_PRESCALER, APP_TIMER_MAX_TIMERS, APP_TIMER_OP_QUEUE_SIZE, true);
+    APP_TIMER_APPSH_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, true);
 }
 
 
@@ -215,11 +206,7 @@ int main(void)
 
     if (bootloader_dfu_sd_in_progress())
     {
-        rtt_print(0, "bootloader_dfu_sd_in_progress()\n");
-        nrf_gpio_pin_clear(BSP_LED_0);
-        nrf_gpio_pin_clear(BSP_LED_1);
-        nrf_gpio_pin_clear(BSP_LED_2);
-        nrf_gpio_pin_clear(BSP_LED_3);
+        nrf_gpio_pin_clear(UPDATE_IN_PROGRESS_LED);
 
         err_code = bootloader_dfu_sd_update_continue();
         APP_ERROR_CHECK(err_code);
@@ -230,21 +217,13 @@ int main(void)
         err_code = bootloader_dfu_sd_update_finalize();
         APP_ERROR_CHECK(err_code);
 
-        nrf_gpio_pin_set(BSP_LED_1);
+        nrf_gpio_pin_set(UPDATE_IN_PROGRESS_LED);
     }
     else
     {
-        rtt_print(0, "!bootloader_dfu_sd_update_finalize: no dfu bootloader in progress\n");
-        nrf_gpio_pin_clear(BSP_LED_0);
-        nrf_gpio_pin_clear(BSP_LED_1);
-        nrf_gpio_pin_clear(BSP_LED_2);
-        nrf_gpio_pin_clear(BSP_LED_3);
-
         // If stack is present then continue initialization of bootloader.
         ble_stack_init(!app_reset);
         scheduler_init();
-
-        nrf_gpio_pin_set(BSP_LED_2);
     }
 
     dfu_start  = app_reset;
@@ -252,27 +231,19 @@ int main(void)
     
     if (dfu_start || (!bootloader_app_is_valid(DFU_BANK_0_REGION_START)))
     {
-        rtt_print(0, "dfu_start\n");
-        nrf_gpio_pin_clear(BSP_LED_0);
-        nrf_gpio_pin_clear(BSP_LED_1);
-        nrf_gpio_pin_clear(BSP_LED_2);
-        nrf_gpio_pin_clear(BSP_LED_3);
+        nrf_gpio_pin_clear(UPDATE_IN_PROGRESS_LED);
 
         // Initiate an update of the firmware.
         err_code = bootloader_dfu_start();
         APP_ERROR_CHECK(err_code);
 
-        nrf_gpio_pin_set(BSP_LED_0);
-        nrf_gpio_pin_set(BSP_LED_1);
-        nrf_gpio_pin_set(BSP_LED_2);
-        nrf_gpio_pin_set(BSP_LED_3);
+        nrf_gpio_pin_set(UPDATE_IN_PROGRESS_LED);
     }
 
     if (bootloader_app_is_valid(DFU_BANK_0_REGION_START) && !bootloader_dfu_sd_in_progress())
     {
         // Select a bank region to use as application region.
         // @note: Only applications running from DFU_BANK_0_REGION_START is supported.
-        rtt_print(0, "Just starting app\n");
         bootloader_app_start(DFU_BANK_0_REGION_START);
     }
     

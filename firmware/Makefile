@@ -37,7 +37,7 @@ SIZE     		:= "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-size"
 #function for removing duplicates in a list
 remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-out $(firstword $1),$1))))
 
-SOFTDEVICE_HEX = ./libs/components/softdevice/s110/hex/s110_softdevice.hex
+SOFTDEVICE_HEX = ./libs/components/softdevice/s110/hex/s110_nrf51_8.0.0_softdevice.hex
 
 #source common to all targets
 C_SOURCE_FILES += \
@@ -258,9 +258,9 @@ flashsdapp:
 
 flashall:
 	srec_cat $(SOFTDEVICE_HEX) -intel $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -intel ./bootloader/build/nrf51822_xxac.hex -intel -exclude 0x3FC00 0x3FC20 -generate 0x3FC00 0x3FC04 \
--l-e-constant 0x01 4 -generate 0x3FC04 0x3FC08 \
--l-e-constant 0x00 4 -generate 0x3FC08 0x3FC0C \
--l-e-constant 0xFE 4 -generate 0x3FC0C 0x3FC20 -constant 0x00 --line-length=44 -o $(OUTPUT_BINARY_DIRECTORY)/sd_app_bootloader.hex -intel 
+-constant-l-e 0x01 4 -generate 0x3FC04 0x3FC08 \
+-constant-l-e 0x00 4 -generate 0x3FC08 0x3FC0C \
+-constant-l-e 0xFE 4 -generate 0x3FC0C 0x3FC20 -constant 0x00 --line-length=44 -o $(OUTPUT_BINARY_DIRECTORY)/sd_app_bootloader.hex -intel 
 # At the address 0x3FC00 the bootloader stores its information. The first byte (0x01) marks that a 
 # valid application exists. The following two bytes are the CRC the application is checked against 
 # to determine its validity. This hex-File writes these values to 0x00 which forces the bootloader 

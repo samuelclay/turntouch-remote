@@ -50,7 +50,7 @@ C_SOURCE_FILES += \
 ../libs/components/libraries/bootloader_dfu/dfu_transport_ble.c \
 ../libs/components/libraries/hci/hci_mem_pool.c \
 ../libs/components/libraries/util/nrf_assert.c \
-../libs/components/drivers_nrf/hal/nrf_delay.c \
+../libs/components/drivers_nrf/delay/nrf_delay.c \
 ../libs/components/drivers_nrf/pstorage/pstorage_raw.c \
 ./dfu_ble_svc.c \
 ./main.c \
@@ -80,6 +80,7 @@ INC_PATHS += -I../libs/components/softdevice/s110/headers
 INC_PATHS += -I../libs/bsp
 INC_PATHS += -I../libs/RTT
 INC_PATHS += -I../src
+INC_PATHS += -I../libs/components/drivers_nrf/delay
 INC_PATHS += -I../libs/components/drivers_nrf/pstorage
 INC_PATHS += -I../libs/components/toolchain/gcc
 INC_PATHS += -I../libs/components/libraries/bootloader_dfu/ble_transport
