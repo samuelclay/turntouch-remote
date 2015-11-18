@@ -522,10 +522,15 @@ uint32_t bsp_init(uint32_t type, uint32_t ticks_per_100ms, bsp_event_callback_t 
     if (type & BSP_INIT_BUTTONS)
     {
         uint32_t num;
+			  uint32_t event_key;
 
         for (num = 0; ((num < BUTTONS_NUMBER) && (err_code == NRF_SUCCESS)); num++)
         {
             err_code = bsp_event_to_button_action_assign(num, BSP_BUTTON_ACTION_PUSH, BSP_EVENT_DEFAULT);
+						event_key = (uint32_t)BSP_EVENT_KEY_4;
+            err_code = bsp_event_to_button_action_assign(num, BSP_BUTTON_ACTION_LONG_PUSH, (bsp_event_t)event_key+num);
+            event_key = (uint32_t)BSP_EVENT_KEY_0;
+            err_code = bsp_event_to_button_action_assign(num, BSP_BUTTON_ACTION_RELEASE, event_key+num);
         }
 
         if (err_code == NRF_SUCCESS)

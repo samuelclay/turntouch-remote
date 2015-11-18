@@ -465,12 +465,12 @@ static void advertising_init(void)
     // Build advertising data struct to pass into @ref ble_advertising_init.
     memset(&advdata, 0, sizeof(advdata));
 
-    advdata.name_type               = BLE_ADVDATA_SHORT_NAME;
-    advdata.include_appearance      = false;
-    advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
+    advdata.name_type               = BLE_ADVDATA_FULL_NAME;
+    advdata.include_appearance      = true;
+    advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE | BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED ;
     advdata.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
     advdata.uuids_complete.p_uuids  = adv_uuids;
-    rtt_print(0, "%sAdvertising: %X.\n", RTT_CTRL_TEXT_MAGENTA, sizeof(adv_uuids) / sizeof(adv_uuids[0]));
+    rtt_print(0, "%sAdvertising: %d services.\n", RTT_CTRL_TEXT_MAGENTA, sizeof(adv_uuids) / sizeof(adv_uuids[0]));
     
     ble_adv_modes_config_t options = {0};
     options.ble_adv_fast_enabled   = BLE_ADV_FAST_ENABLED;
@@ -666,7 +666,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
  */
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
-	rtt_print(0, "%sBluetooth (conn: %X) event: %s0x%X%s\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gap_evt.conn_handle, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, RTT_CTRL_RESET);
+	rtt_print(0, "%sBluetooth (conn: %X) event: %s%X%s\n", RTT_CTRL_TEXT_BLUE, p_ble_evt->evt.gap_evt.conn_handle, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, RTT_CTRL_RESET);
 
     dm_ble_evt_handler(p_ble_evt);
     ble_conn_params_on_ble_evt(p_ble_evt);
@@ -1070,7 +1070,7 @@ void dfu_event_handler(ble_dfu_t * p_dfu, ble_dfu_evt_t * p_evt) {
 }
 
 void dfu_error_handler(uint32_t nrf_error) {
-    rtt_print(0, "\nDFU error event: 0x%X\n", nrf_error);
+    rtt_print(0, "\nDFU error event: %X\n", nrf_error);
     if ((nrf_error != NRF_SUCCESS) &&
         (nrf_error != BLE_ERROR_INVALID_CONN_HANDLE) &&
         (nrf_error != NRF_ERROR_INVALID_STATE) &&
@@ -1107,7 +1107,7 @@ static void timers_init(void)
     uint32_t err_code;
     
     // Initialize timer module, making it use the scheduler
-    // APP_TIMER_APPSH_INIT(APP_TIMER_PRESCALER, APP_TIMER_MAX_TIMERS, APP_TIMER_OP_QUEUE_SIZE, true);
+    // APP_TIMER_APPSH_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, true);
     APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
     
     err_code = app_timer_create(&m_battery_timer_id,

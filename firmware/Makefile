@@ -257,7 +257,7 @@ flashsdapp:
 	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/sd_app.hex
 
 flashall:
-	srec_cat $(SOFTDEVICE_HEX) -intel $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -intel ./bootloader/build/nrf51822_xxac.hex -intel -exclude 0x3FC00 0x3FC20 -generate 0x3FC00 0x3FC04 \
+	srec_cat $(SOFTDEVICE_HEX) -intel $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -intel ../bootloader/build/nrf51822_xxac.hex -intel -exclude 0x3FC00 0x3FC20 -generate 0x3FC00 0x3FC04 \
 -constant-l-e 0x01 4 -generate 0x3FC04 0x3FC08 \
 -constant-l-e 0x00 4 -generate 0x3FC08 0x3FC0C \
 -constant-l-e 0xFE 4 -generate 0x3FC0C 0x3FC20 -constant 0x00 --line-length=44 -o $(OUTPUT_BINARY_DIRECTORY)/sd_app_bootloader.hex -intel 
