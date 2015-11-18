@@ -54,8 +54,8 @@ C_SOURCE_FILES += \
 ./libs/components/ble/ble_services/ble_dis/ble_dis.c \
 ./libs/components/ble/device_manager/device_manager_peripheral.c \
 ./libs/components/drivers_nrf/common/nrf_drv_common.c \
+./libs/components/drivers_nrf/delay/nrf_delay.c \
 ./libs/components/drivers_nrf/gpiote/nrf_drv_gpiote.c \
-./libs/components/drivers_nrf/hal/nrf_delay.c \
 ./libs/components/drivers_nrf/ppi/nrf_drv_ppi.c \
 ./libs/components/drivers_nrf/pstorage/pstorage.c \
 ./libs/components/drivers_nrf/timer/nrf_drv_timer.c \
