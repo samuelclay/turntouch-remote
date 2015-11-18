@@ -37,10 +37,19 @@
 
 #include "sdk_resources.h"
 
-#define NRF_PPI_ALL_APP_CHANNELS_MASK   ((uint32_t)0xFFF0FFFFuL & ~(NRF_PPI_CHANNELS_USED))  /**< All PPI channels available to the application. */
-#define NRF_PPI_PROG_APP_CHANNELS_MASK  ((uint32_t)0x0000FFFFuL & ~(NRF_PPI_CHANNELS_USED))  /**< Programmable PPI channels available to the application. */
-#define NRF_PPI_ALL_APP_GROUPS_MASK     ((uint32_t)0x0000000FuL & ~(NRF_PPI_GROUPS_USED))    /**< All PPI groups available to the application. */
+#ifdef NRF52
 
+    #define NRF_PPI_ALL_APP_CHANNELS_MASK   ((uint32_t)0xFFFFFFFFuL & ~(NRF_PPI_CHANNELS_USED))  /**< All PPI channels available to the application. */
+    #define NRF_PPI_PROG_APP_CHANNELS_MASK  ((uint32_t)0x000FFFFFuL & ~(NRF_PPI_CHANNELS_USED))  /**< Programmable PPI channels available to the application. */
+    #define NRF_PPI_ALL_APP_GROUPS_MASK     ((uint32_t)0x0000003FuL & ~(NRF_PPI_GROUPS_USED))    /**< All PPI groups available to the application. */
+
+#else
+
+    #define NRF_PPI_ALL_APP_CHANNELS_MASK   ((uint32_t)0xFFF0FFFFuL & ~(NRF_PPI_CHANNELS_USED))  /**< All PPI channels available to the application. */
+    #define NRF_PPI_PROG_APP_CHANNELS_MASK  ((uint32_t)0x0000FFFFuL & ~(NRF_PPI_CHANNELS_USED))  /**< Programmable PPI channels available to the application. */
+    #define NRF_PPI_ALL_APP_GROUPS_MASK     ((uint32_t)0x0000000FuL & ~(NRF_PPI_GROUPS_USED))    /**< All PPI groups available to the application. */
+
+#endif
 
 
 /**@brief Function for initializing PPI module.

@@ -106,11 +106,11 @@ All rights reserved.
 #define UPLOAD_CRC_OFFSET_LOW              0x06u                         /**< Upload data CRC offset low. */
 #define UPLOAD_CRC_OFFSET_HIGH             0x07u                         /**< Upload data CRC offset high. */
 
-// Compile switches.
-#define ANTFS_AUTH_TYPE_PAIRING                                          /**< Use pairing and key exchange authentication. */
-#define ANTFS_AUTH_TYPE_PASSKEY                                          /**< Use passkey authentication. */
-#define ANTFS_AUTH_TYPE_PASSTHROUGH                                      /**< Allow host to bypass authentication. */
-#define ANTFS_INCLUDE_UPLOAD                                             /**< Support upload operation. */
+// Below compile switches should be provided by antfs_config.h:
+// - ANTFS_AUTH_TYPE_PAIRING                                          /**< Use pairing and key exchange authentication. */
+// - ANTFS_AUTH_TYPE_PASSKEY                                          /**< Use passkey authentication. */
+// - ANTFS_AUTH_TYPE_PASSTHROUGH                                      /**< Allow host to bypass authentication. */
+// - ANTFS_INCLUDE_UPLOAD                                             /**< Support upload operation. */
 
 // Authentication type. The highest level of authentication available is included in the beacon.
 #if defined (ANTFS_AUTH_TYPE_PASSKEY)
@@ -169,11 +169,11 @@ static uint32_t                    m_active_beacon_frequency;             /**< A
 static antfs_states_t              m_current_state;                       /**< Current state. */
 static friendly_name_t             m_friendly_name;                       /**< Host's friendly name. */
 static ulong_union_t               m_link_host_serial_number;             /**< Host's serial number. */
-static app_timer_id_t              m_timer_id;                            /**< Timer ID used with the timer module. */
 static uint32_t                    m_link_command_in_progress;            /**< ANT-FS command in progress. */
 static uint32_t                    m_authenticate_command_type;           /**< Authenticate command type in progress. */
 static volatile uint8_t            m_burst_wait;                          /**< Polling status flag for data unlock on burst handler input. */
 static uint8_t                     m_retry;                               /**< Retry counter */
+APP_TIMER_DEF(m_timer_id);                                                /**< Timer ID used with the timer module. */
 
 #if defined (ANTFS_AUTH_TYPE_PASSKEY)
    static uint32_t m_passkey_index;                                       /**< Current location of Tx block (auth string). */
@@ -474,7 +474,9 @@ bool antfs_pairing_resp_transmit(bool accept)
 static void event_queue_write(antfs_event_t event_code)
 {
     antfs_event_return_t * p_event = NULL;
+#ifdef LEDDRIVER_ACTIVE
     uint32_t err_code;
+#endif
 
     // Check if there is room in the queue for a new event.
     if (((m_event_queue.head + 1u) & (ANTFS_EVENT_QUEUE_SIZE - 1u)) != m_event_queue.tail)
@@ -1327,8 +1329,9 @@ static void link_layer_transit(void)
 {
     if (m_current_state.state != ANTFS_STATE_OFF)
     {
+        uint32_t err_code;
 #ifdef LEDDRIVER_ACTIVE
-        uint32_t err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+        err_code = bsp_indication_set(BSP_INDICATE_IDLE);
         APP_ERROR_CHECK(err_code);
 #endif // LEDDRIVER_ACTIVE
 
@@ -1979,7 +1982,9 @@ static void transport_layer_transit(void)
 
 void antfs_message_process(uint8_t * p_message)
 {
+#ifdef LEDDRIVER_ACTIVE
     uint32_t err_code;
+#endif
     
     if (p_message != NULL)
     {

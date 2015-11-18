@@ -102,6 +102,11 @@ static void on_write(ble_rscs_t * p_rscs, ble_evt_t * p_ble_evt)
 
 void ble_rscs_on_ble_evt(ble_rscs_t * p_rscs, ble_evt_t * p_ble_evt)
 {
+    if (p_rscs == NULL || p_ble_evt == NULL)
+    {
+        return;
+    }
+        
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GAP_EVT_CONNECTED:
@@ -131,9 +136,9 @@ void ble_rscs_on_ble_evt(ble_rscs_t * p_rscs, ble_evt_t * p_ble_evt)
  *
  * @return      Size of encoded data.
  */
-static uint8_t rsc_measurement_encode(ble_rscs_t      * p_rscs,
-                                      ble_rscs_meas_t * p_rsc_measurement,
-                                      uint8_t         * p_encoded_buffer)
+static uint8_t rsc_measurement_encode(const ble_rscs_t      * p_rscs,
+                                      const ble_rscs_meas_t * p_rsc_measurement,
+                                      uint8_t               * p_encoded_buffer)
 {
     uint8_t flags = 0;
     uint8_t len   = 1;
@@ -193,7 +198,6 @@ static uint32_t rsc_measurement_char_add(ble_rscs_t * p_rscs, const ble_rscs_ini
     ble_gatts_attr_t    attr_char_value;
     ble_uuid_t          ble_uuid;
     ble_gatts_attr_md_t attr_md;
-    ble_rscs_meas_t     initial_rcm;
     uint8_t             encoded_rcm[MAX_RSCM_LEN];
 
     memset(&cccd_md, 0, sizeof(cccd_md));
@@ -225,7 +229,7 @@ static uint32_t rsc_measurement_char_add(ble_rscs_t * p_rscs, const ble_rscs_ini
 
     attr_char_value.p_uuid    = &ble_uuid;
     attr_char_value.p_attr_md = &attr_md;
-    attr_char_value.init_len  = rsc_measurement_encode(p_rscs, &initial_rcm, encoded_rcm);
+    attr_char_value.init_len  = rsc_measurement_encode(p_rscs, &p_rscs_init->initial_rcm, encoded_rcm);
     attr_char_value.init_offs = 0;
     attr_char_value.max_len   = MAX_RSCM_LEN;
     attr_char_value.p_value   = encoded_rcm;
@@ -295,6 +299,11 @@ static uint32_t rsc_feature_char_add(ble_rscs_t * p_rscs, const ble_rscs_init_t 
 
 uint32_t ble_rscs_init(ble_rscs_t * p_rscs, const ble_rscs_init_t * p_rscs_init)
 {
+    if (p_rscs == NULL || p_rscs_init == NULL)
+    {
+        return NRF_ERROR_NULL;
+    }
+    
     uint32_t   err_code;
     ble_uuid_t ble_uuid;
 
@@ -335,6 +344,11 @@ uint32_t ble_rscs_init(ble_rscs_t * p_rscs, const ble_rscs_init_t * p_rscs_init)
 
 uint32_t ble_rscs_measurement_send(ble_rscs_t * p_rscs, ble_rscs_meas_t * p_measurement)
 {
+    if (p_rscs == NULL || p_measurement == NULL)
+    {
+        return NRF_ERROR_NULL;
+    }
+    
     uint32_t err_code;
 
     // Send value if connected and notifying

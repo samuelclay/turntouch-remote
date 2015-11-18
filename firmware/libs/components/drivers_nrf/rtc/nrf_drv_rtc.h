@@ -14,13 +14,11 @@
 #define NRF_DRV_RTC_H
 
 
-#include <stdbool.h>
-#include <stdint.h>
-#include "nrf.h"
+#include "nordic_common.h"
 #include "nrf_drv_config.h"
 #include "nrf_drv_common.h"
-#include "sdk_errors.h"
 #include "nrf_rtc.h"
+#include "sdk_errors.h"
 
 /**
  * @addtogroup nrf_rtc RTC HAL and driver
@@ -61,12 +59,12 @@ typedef struct
 } nrf_drv_rtc_t;
 
 /**@brief Macro for creating RTC driver instance.*/
-#define NRF_DRV_RTC_INSTANCE(id)                                                              \
-        {                                                                                     \
-         .p_reg        = NRF_RTC##id,                                                         \
-         .irq          = RTC##id##_IRQn,                                                      \
-         .instance_id =  RTC##id##_INSTANCE_INDEX                                             \
-        }
+#define NRF_DRV_RTC_INSTANCE(id)                       \
+{                                                      \
+    .p_reg        = CONCAT_2(NRF_RTC, id),             \
+    .irq          = CONCAT_3(RTC, id, _IRQn),          \
+    .instance_id =  CONCAT_3(RTC, id, _INSTANCE_INDEX) \
+}
 
 /**@brief RTC driver instance configuration structure. */
 typedef struct
@@ -78,13 +76,13 @@ typedef struct
 } nrf_drv_rtc_config_t;
 
 /**@brief RTC instance default configuration. */
-#define NRF_DRV_RTC_DEFAULT_CONFIG(id)                                                             \
-        {                                                                                          \
-         .prescaler          = (uint16_t)(RTC_INPUT_FREQ/RTC##id##_CONFIG_FREQUENCY)-1,            \
-         .interrupt_priority = RTC##id##_CONFIG_IRQ_PRIORITY,                                      \
-         .reliable           = RTC##id##_CONFIG_RELIABLE,                                          \
-         .tick_latency       = RTC_US_TO_TICKS(NRF_MAXIMUM_LATENCY_US,RTC##id##_CONFIG_FREQUENCY), \
-        }
+#define NRF_DRV_RTC_DEFAULT_CONFIG(id)                                                                   \
+{                                                                                                        \
+    .prescaler          = (uint16_t)(RTC_INPUT_FREQ / CONCAT_3(RTC, id, _CONFIG_FREQUENCY))-1,           \
+    .interrupt_priority = CONCAT_3(RTC, id, _CONFIG_IRQ_PRIORITY),                                       \
+    .reliable           = CONCAT_3(RTC, id, _CONFIG_RELIABLE),                                           \
+    .tick_latency       = RTC_US_TO_TICKS(NRF_MAXIMUM_LATENCY_US, CONCAT_3(RTC, id, _CONFIG_FREQUENCY)), \
+}
 
 /**@brief RTC driver instance handler type. */
 typedef void (*nrf_drv_rtc_handler_t)(nrf_drv_rtc_int_type_t int_type);

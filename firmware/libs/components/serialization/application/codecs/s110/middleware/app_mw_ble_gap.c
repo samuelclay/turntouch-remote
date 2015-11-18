@@ -44,7 +44,7 @@ typedef struct
 typedef struct
 {
     ble_gap_sec_keyset_t const * p_sec_keyset;  /**< @ref sd_ble_gap_sec_params_reply p_sec_keyset output parameter. */
-    uint16_t *                   p_conn_handle; /**< @ref sd_ble_gap_sec_params_reply p_conn_handle output parameter. */
+    uint16_t                     conn_handle;   /**< @ref sd_ble_gap_sec_params_reply p_conn_handle output parameter. */
 } gap_sec_params_reply_out_params_t;
 
 /**@brief Union containing BLE command output parameters. */
@@ -524,7 +524,7 @@ static uint32_t gap_sec_params_reply_rsp_dec(const uint8_t * p_buffer, uint16_t 
     // If soft device returned error free security context
     if (result_code)
     {
-        err_code = app_ble_gap_sec_context_destroy(*(m_output_params.gap_sec_params_reply_out_params.p_conn_handle));
+        err_code = app_ble_gap_sec_context_destroy(m_output_params.gap_sec_params_reply_out_params.conn_handle);
         SER_ASSERT(err_code == NRF_SUCCESS, err_code);
     }
 
@@ -544,6 +544,7 @@ uint32_t sd_ble_gap_sec_params_reply(uint16_t                     conn_handle,
 
     tx_buf_alloc(&p_buffer, (uint16_t *)&buffer_length);
     m_output_params.gap_sec_params_reply_out_params.p_sec_keyset = p_sec_keyset;
+    m_output_params.gap_sec_params_reply_out_params.conn_handle = conn_handle;
 
     // First allocate security context for serialization
     if (p_sec_keyset)

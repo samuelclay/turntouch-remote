@@ -16,26 +16,49 @@
 #include "boards.h"
 #include "ser_config.h"
 
-#if defined(SPI_MASTER_0_ENABLE)                                    /**< Pin useds by SPI master 0 */
+#if defined(SPI_MASTER_0_ENABLE)
 #define SER_PHY_SPI_MASTER SPI_MASTER_0
+#endif
+#if defined(SPI_MASTER_1_ENABLE)
+#define SER_PHY_SPI_MASTER SPI_MASTER_1
+#endif
+#if defined(SPI_MASTER_2_ENABLE)
+#define SER_PHY_SPI_MASTER SPI_MASTER_2
+#endif
 
+#if (defined(SPI0_ENABLED) && (SPI0_ENABLED == 1)) || defined(SPI_MASTER_0_ENABLE)
+
+#define SER_PHY_SPI_MASTER_INSTANCE             NRF_DRV_SPI_INSTANCE(0)
 #define SER_PHY_SPI_MASTER_PIN_SCK              SER_APP_SPIM0_SCK_PIN
 #define SER_PHY_SPI_MASTER_PIN_MISO             SER_APP_SPIM0_MISO_PIN
 #define SER_PHY_SPI_MASTER_PIN_MOSI             SER_APP_SPIM0_MOSI_PIN
 #define SER_PHY_SPI_MASTER_PIN_SLAVE_SELECT     SER_APP_SPIM0_SS_PIN
 #define SER_PHY_SPI_MASTER_PIN_SLAVE_REQUEST    SER_APP_SPIM0_REQ_PIN
 #define SER_PHY_SPI_MASTER_PIN_SLAVE_READY      SER_APP_SPIM0_RDY_PIN
-    
-#elif defined(SPI_MASTER_1_ENABLE)                                  /**< Pins used by SPI master 1 */
-#define SER_PHY_SPI_MASTER SPI_MASTER_1
 
+#elif (defined(SPI1_ENABLED) && (SPI1_ENABLED == 1)) || defined(SPI_MASTER_1_ENABLE)
+
+#define SER_PHY_SPI_MASTER_INSTANCE             NRF_DRV_SPI_INSTANCE(1)
 #define SER_PHY_SPI_MASTER_PIN_SCK              SER_APP_SPIM1_SCK_PIN
 #define SER_PHY_SPI_MASTER_PIN_MISO             SER_APP_SPIM1_MISO_PIN
 #define SER_PHY_SPI_MASTER_PIN_MOSI             SER_APP_SPIM1_MOSI_PIN
 #define SER_PHY_SPI_MASTER_PIN_SLAVE_SELECT     SER_APP_SPIM1_SS_PIN
+#define SER_PHY_SPI_MASTER_PIN_SLAVE_REQUEST    SER_APP_SPIM1_REQ_PIN
+#define SER_PHY_SPI_MASTER_PIN_SLAVE_READY      SER_APP_SPIM1_RDY_PIN
+
+#elif (defined(SPI2_ENABLED) && (SPI2_ENABLED == 1)) || defined(SPI_MASTER_2_ENABLE)
+
+#define SER_PHY_SPI_MASTER_INSTANCE             NRF_DRV_SPI_INSTANCE(2)
+#define SER_PHY_SPI_MASTER_PIN_SCK              SER_APP_SPIM2_SCK_PIN
+#define SER_PHY_SPI_MASTER_PIN_MISO             SER_APP_SPIM2_MISO_PIN
+#define SER_PHY_SPI_MASTER_PIN_MOSI             SER_APP_SPIM2_MOSI_PIN
+#define SER_PHY_SPI_MASTER_PIN_SLAVE_SELECT     SER_APP_SPIM2_SS_PIN
+#define SER_PHY_SPI_MASTER_PIN_SLAVE_REQUEST    SER_APP_SPIM2_REQ_PIN
+#define SER_PHY_SPI_MASTER_PIN_SLAVE_READY      SER_APP_SPIM2_RDY_PIN
+
 #endif
 
-#define CONN_CHIP_RESET_PIN_NO                  30                  /**< Pin used for reseting the nRF51822. */
+#define CONN_CHIP_RESET_PIN_NO                  SER_CONN_CHIP_RESET_PIN /**< Pin used for reseting the nRF51822. */
 
 /* UART configuration */
 #define UART_IRQ_PRIORITY                       APP_IRQ_PRIORITY_MID

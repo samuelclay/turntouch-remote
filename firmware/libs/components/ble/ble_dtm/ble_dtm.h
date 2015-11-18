@@ -26,7 +26,7 @@
 
 
 /**@brief Configuration parameters. */
-#define DEFAULT_TX_POWER                RADIO_TXPOWER_TXPOWER_Pos4dBm   /**< Default Transmission power using in the DTM module. */
+#define DEFAULT_TX_POWER                RADIO_TXPOWER_TXPOWER_0dBm      /**< Default Transmission power using in the DTM module. */
 #define DEFAULT_TIMER                   NRF_TIMER0                      /**< Default timer used for timing. */
 #define DEFAULT_TIMER_IRQn              TIMER0_IRQn                     /**< IRQ used for timer. NOTE: MUST correspond to DEFAULT_TIMER. */
 

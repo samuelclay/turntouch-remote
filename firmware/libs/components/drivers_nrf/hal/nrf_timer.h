@@ -15,7 +15,7 @@
  * @{
  * @ingroup nrf_timer
  *
- * @brief Hardware abstraction layer for accessing the timer peripheral.
+ * @brief Hardware access layer for accessing the timer peripheral.
  */
 #ifndef NRF_TIMER_H__
 #define NRF_TIMER_H__

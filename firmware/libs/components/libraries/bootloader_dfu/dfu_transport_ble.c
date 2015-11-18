@@ -16,7 +16,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "boards.h"
-#include "nrf51.h"
+#include "nrf.h"
 #include "nrf_sdm.h"
 #include "nrf_gpio.h"
 #include "app_util.h"

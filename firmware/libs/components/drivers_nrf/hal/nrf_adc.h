@@ -22,7 +22,7 @@
  * @defgroup nrf_adc ADC HAL
  * @{
  * @ingroup nrf_drivers
- * @brief Hardware abstraction layer for managing the analog-to-digital converter.
+ * @brief Hardware access layer for managing the analog-to-digital converter.
  */
 
 #include <stdbool.h>
@@ -34,12 +34,14 @@
  * @enum nrf_adc_config_resolution_t
  * @brief Resolution of the analog-to-digital converter.
  */
+#ifndef NRF52
 typedef enum
 {
     NRF_ADC_CONFIG_RES_8BIT  = ADC_CONFIG_RES_8bit,  /**< 8 bit resolution. */
     NRF_ADC_CONFIG_RES_9BIT  = ADC_CONFIG_RES_9bit,  /**< 9 bit resolution. */
     NRF_ADC_CONFIG_RES_10BIT = ADC_CONFIG_RES_10bit, /**< 10 bit resolution. */
 } nrf_adc_config_resolution_t;
+
 
 /**
  * @enum nrf_adc_config_scaling_t
@@ -91,10 +93,12 @@ typedef enum
  * @enum nrf_adc_task_t
  * @brief Analog-to-digital converter tasks.
  */
-typedef enum /*lint -save -e30 -esym(628,__INTADDR__) */
+typedef enum
 {
+    /*lint -save -e30*/
     NRF_ADC_TASK_START = offsetof(NRF_ADC_Type, TASKS_START), /**< ADC start sampling task. */
     NRF_ADC_TASK_STOP  = offsetof(NRF_ADC_Type, TASKS_STOP)   /**< ADC stop sampling task. */
+    /*lint -restore*/
 } nrf_adc_task_t;
 
 /**
@@ -103,7 +107,9 @@ typedef enum /*lint -save -e30 -esym(628,__INTADDR__) */
  */
 typedef enum /*lint -save -e30 -esym(628,__INTADDR__) */
 {
+    /*lint -save -e30*/
     NRF_ADC_EVENT_END = offsetof(NRF_ADC_Type, EVENTS_END) /**< End of conversion event. */
+    /*lint -restore*/
 } nrf_adc_event_t;
 
 /**@brief Analog-to-digital converter configuration. */
@@ -310,7 +316,7 @@ __STATIC_INLINE uint32_t * nrf_adc_event_address_get(nrf_adc_event_t adc_event)
     return (uint32_t *)((uint8_t *)NRF_ADC + adc_event);
 }
 
-
+#endif /* NRF52 */
 /**
  *@}
  **/

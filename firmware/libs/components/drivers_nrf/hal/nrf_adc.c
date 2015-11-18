@@ -17,6 +17,8 @@
 
 #include "nrf_adc.h"
 
+#ifndef NRF52
+
 /**
  * @brief Function for configuring ADC.
  *
@@ -73,4 +75,4 @@ int32_t nrf_adc_convert_single(nrf_adc_config_input_t input)
     nrf_adc_stop();
     return val;
 }
-
+#endif

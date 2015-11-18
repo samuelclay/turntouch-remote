@@ -15,6 +15,14 @@
 
 #include "nrf.h"
 #include <stdint.h>
+#include <stdbool.h>
+
+/**
+ * @brief Offset of event registers in every peripheral instance
+ *
+ * This is the offset where event registers start in the every peripheral.
+ */
+#define NRF_DRV_COMMON_EVREGS_OFFSET 0x100U
 
 /**
  * @enum nrf_drv_state_t
@@ -54,10 +62,85 @@ void nrf_drv_common_irq_enable(IRQn_Type IRQn, uint8_t priority);
  */
 __STATIC_INLINE void nrf_drv_common_irq_disable(IRQn_Type IRQn);
 
+/**
+ * @brief Convert bit position to event code
+ *
+ * Function for converting the bit position in INTEN register to event code
+ * that is equivalent to the offset of the event register from the beginning
+ * of peripheral instance.
+ *
+ * For example the result of this function can be casted directly to
+ * the types like @ref nrf_twis_event_t or @ref nrf_rng_events_t...
+ *
+ * @param bit Bit position in INTEN register
+ * @return Event code to be casted to the right enum type or to be used in functions like
+ * @ref nrf_rng_event_get
+ *
+ * @sa nrf_drv_event_to_bitpos
+ */
+__STATIC_INLINE uint32_t nrf_drv_bitpos_to_event(uint32_t bit);
+
+/**
+ * @brief Convert event code to bit position
+ *
+ * This function can be used to get bit position in INTEN register from event code.
+ *
+ * @param event Event code that may be casted from enum values from types like
+ * @ref nrf_twis_event_t or @ref nrf_rng_events_t
+ * @return Bit position in INTEN register that corresponds to the given code.
+ *
+ * @sa nrf_drv_bitpos_to_event
+ */
+__STATIC_INLINE uint32_t nrf_drv_event_to_bitpos(uint32_t event);
+
+/**
+ * @brief Get interrupt number connected with given instance
+ *
+ * Function returns interrupt number for a given instance of any peripheral.
+ * @param[in] pinst Pointer to peripheral registry
+ * @return Interrupt number
+ */
+__STATIC_INLINE IRQn_Type nrf_drv_get_IRQn(void const * const pinst);
+
+
+/**
+ * @brief Check if given object is in RAM
+ *
+ * Function for analyzing if given location is placed in RAM.
+ * This function is used to determine if we have address that can be supported by EasyDMA.
+ * @param[in] ptr Pointer to the object
+ * @retval true  Object is located in RAM
+ * @retval false Object is not located in RAM
+ */
+__STATIC_INLINE bool nrf_drv_is_in_RAM(void const * const ptr);
+
+
 #ifndef SUPPRESS_INLINE_IMPLEMENTATION
 __STATIC_INLINE void nrf_drv_common_irq_disable(IRQn_Type IRQn)
 {
     NVIC_DisableIRQ(IRQn);
+}
+
+
+__STATIC_INLINE uint32_t nrf_drv_bitpos_to_event(uint32_t bit)
+{
+    return NRF_DRV_COMMON_EVREGS_OFFSET + bit * sizeof(uint32_t);
+}
+
+__STATIC_INLINE uint32_t nrf_drv_event_to_bitpos(uint32_t event)
+{
+    return (event - NRF_DRV_COMMON_EVREGS_OFFSET) / sizeof(uint32_t);
+}
+
+__STATIC_INLINE IRQn_Type nrf_drv_get_IRQn(void const * const pinst)
+{
+    uint8_t ret = (uint8_t)((uint32_t)pinst>>12U);
+    return (IRQn_Type) ret;
+}
+
+__STATIC_INLINE bool nrf_drv_is_in_RAM(void const * const ptr)
+{
+    return ((((uintptr_t)ptr) & 0xE0000000u) == 0x20000000u);
 }
 #endif
 

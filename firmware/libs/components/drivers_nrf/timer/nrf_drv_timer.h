@@ -27,11 +27,10 @@
 #ifndef NRF_DRV_TIMER_H__
 #define NRF_DRV_TIMER_H__
 
-#include <stdbool.h>
+#include "nordic_common.h"
 #include "nrf_drv_config.h"
 #include "nrf_timer.h"
 #include "sdk_errors.h"
-#include "nrf_timer.h"
 
 /**@brief Struct for TIMER instance. */
 typedef struct
@@ -41,11 +40,11 @@ typedef struct
     uint8_t                instance_id;        /**< Instance ID. */
 } nrf_drv_timer_t;
 
-#define NRF_DRV_TIMER_INSTANCE(id)                             \
-    {                                                          \
-        .p_reg              = NRF_TIMER##id,                   \
-        .irq                = TIMER##id##_IRQn,                \
-        .instance_id        = TIMER##id##_INSTANCE_INDEX,      \
+#define NRF_DRV_TIMER_INSTANCE(id)                                  \
+    {                                                               \
+        .p_reg              = CONCAT_2(NRF_TIMER, id),              \
+        .irq                = CONCAT_3(TIMER, id, _IRQn),           \
+        .instance_id        = CONCAT_3(TIMER, id, _INSTANCE_INDEX), \
     }
 
 /**@brief Struct for TIMER instance configuration. */
@@ -58,10 +57,10 @@ typedef struct
     void*                  p_context;          /**< Context passed to interrupt handler */
 } nrf_drv_timer_config_t;
 
-#define TIMER_CONFIG_FREQUENCY(id)    TIMER##id##_CONFIG_FREQUENCY
-#define TIMER_CONFIG_MODE(id)         TIMER##id##_CONFIG_MODE
-#define TIMER_CONFIG_BIT_WIDTH(id)    TIMER##id##_CONFIG_BIT_WIDTH
-#define TIMER_CONFIG_IRQ_PRIORITY(id) TIMER##id##_CONFIG_IRQ_PRIORITY
+#define TIMER_CONFIG_FREQUENCY(id)    CONCAT_3(TIMER, id, _CONFIG_FREQUENCY)
+#define TIMER_CONFIG_MODE(id)         CONCAT_3(TIMER, id, _CONFIG_MODE)
+#define TIMER_CONFIG_BIT_WIDTH(id)    CONCAT_3(TIMER, id, _CONFIG_BIT_WIDTH)
+#define TIMER_CONFIG_IRQ_PRIORITY(id) CONCAT_3(TIMER, id, _CONFIG_IRQ_PRIORITY)
 
 /**@brief TIMER instance default configuration. */
 #define NRF_DRV_TIMER_DEFAULT_CONFIG(id)                                              \

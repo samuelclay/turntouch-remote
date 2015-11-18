@@ -113,7 +113,7 @@ void nrf_drv_clock_lfclk_release(void);
 bool nrf_drv_clock_lfclk_is_running(void);
 
 /**
- * @brief Function for requesting high-accuracy (for NRF51 it is XTAL) source HFCLK. High-accuracy source 
+ * @brief Function for requesting high-accuracy (for \nRFXX it is XTAL) source HFCLK. High-accuracy source 
  *        can be repeatedly requested.
  *
  * @details The @ref nrf_drv_clock_hfclk_is_running() function can be polled to check if it has started.
@@ -129,7 +129,7 @@ void nrf_drv_clock_hfclk_release(void);
 /**
  * @brief Function for checking HFCLK state.
  *
- * @retval true if the HFCLK is running (for NRF51 XTAL source), false if not.
+ * @retval true if the HFCLK is running (for \nRFXX XTAL source), false if not.
  */
 bool nrf_drv_clock_hfclk_is_running(void);
 

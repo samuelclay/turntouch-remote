@@ -9,4 +9,14 @@ MEMORY
   RAM (rwx) :  ORIGIN = 0x20002000, LENGTH = 0x6000
 }
 
-INCLUDE "gcc_nrf51_common.ld"
+SECTIONS
+{
+  .fs_data_out ALIGN(4):
+  {
+    PROVIDE( __start_fs_data = .);
+    KEEP(*(fs_data))
+    PROVIDE( __stop_fs_data = .);
+  } = 0
+}
+
+INCLUDE "nrf5x_common.ld"

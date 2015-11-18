@@ -68,7 +68,7 @@ static uint32_t                        m_packet_transmit_seq_number; /**< Sequen
 static uint8_t *                       mp_tx_buffer;                 /**< Pointer to TX application buffer to be transmitted. */
 static uint32_t                        m_tx_buffer_length;           /**< Length of application TX packet data to be transmitted in bytes. */
 static bool                            m_is_slip_decode_ready;       /**< Boolean to determine has slip decode been completed or not. */
-static app_timer_id_t                  m_app_timer_id;               /**< Application timer id. */
+APP_TIMER_DEF(m_app_timer_id);                                       /**< Application timer id. */
 static uint32_t                        m_tx_retry_counter;           /**< Application packet retransmission counter. */
 static hci_transport_tx_done_result_t  m_tx_done_result_code;        /**< TX done event callback function result code. */
 static uint8_t                         m_rx_ack_buffer[ACK_BUF_SIZE];/**< RX buffer big enough to hold an acknowledgement packet and which is taken in use upon receiving  HCI_SLIP_RX_OVERFLOW event. */

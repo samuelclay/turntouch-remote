@@ -15,8 +15,7 @@
 
 #include <stdint.h>
 
-#include "nrf51.h"
-#include "nrf51_bitfields.h"
+#include "nrf.h"
 
 /***********************************************************************************************//**
  * General parameters configuration.
@@ -59,6 +58,8 @@
  **************************************************************************************************/
 
 #define SER_PHY_HEADER_SIZE             2
+
+#define SER_PHY_SPI_FREQUENCY           NRF_DRV_SPI_FREQ_1M
 
 /** Max transfer unit for SPI MASTER and SPI SLAVE. */
 #define SER_PHY_SPI_MTU_SIZE            255

@@ -13,24 +13,30 @@
 #ifndef NRF_DRV_TWI_H__
 #define NRF_DRV_TWI_H__
 
+#include "nordic_common.h"
 #include "nrf_drv_config.h"
 #include "nrf_drv_common.h"
-#include "sdk_errors.h"
 #include "nrf_twi.h"
-#include <stdint.h>
-#include "app_util.h"
+#include "sdk_errors.h"
+
+#define TWI0_IRQ    SPI0_TWI0_IRQn
+#define TWI1_IRQ    SPI1_TWI1_IRQn
 
 /**
  *
- * @addtogroup nrf_twi TWI HAL and driver
+ * @defgroup nrf_twi Two-wire interface (TWI)
  * @ingroup nrf_drivers
- * @brief TWI APIs.
- * @details The TWI HAL provides basic APIs for accessing the registers of the TWI. 
- * The TWI driver provides APIs on a higher level.
+ * @brief Two-wire interface (TWI) APIs.
  *
- * @defgroup nrf_twi_drv TWI driver
- * @{
+ * @defgroup nrf_twi_master TWI master HAL and driver
  * @ingroup nrf_twi
+ * @brief TWI master APIs.
+ * @details The TWIM HAL provides basic APIs for accessing the registers of the TWI. 
+ * The TWIM master driver provides APIs on a higher level.
+ *
+ * @defgroup nrf_twi_drv TWI master driver
+ * @{
+ * @ingroup nrf_twi_master
  * @brief Driver for managing the TWI.
  */
 
@@ -59,40 +65,35 @@ typedef struct
     uint8_t            instance_id; /**< Instance index. */
 } nrf_drv_twi_t;
 
-
 /**@brief Macro for creating a TWI driver instance.*/
-#define NRF_DRV_TWI_INSTANCE(id)                                                      \
-        {                                                                             \
-         .p_reg       = NRF_TWI##id,                                                  \
-         .irq         = SPI##id##_TWI##id##_IRQn,                                     \
-         .instance_id = TWI##id##_INSTANCE_INDEX                                      \
-        }
+#define NRF_DRV_TWI_INSTANCE(id)                      \
+{                                                     \
+    .p_reg       = CONCAT_2(NRF_TWI, id),             \
+    .irq         = CONCAT_3(TWI, id, _IRQ),           \
+    .instance_id = CONCAT_3(TWI, id, _INSTANCE_INDEX) \
+}
 
 /**@brief Structure for TWI instance configuration. */
 typedef struct 
 {
-    uint32_t scl;                  /**< SCL pin number. */
-    uint32_t sda;                  /**< SDA pin number. */
-    nrf_twi_frequency_t frequency; /**< Frequency. */
-    uint8_t  interrupt_priority;   /**< Interrupt priority. */
+    uint32_t            scl;                /**< SCL pin number. */
+    uint32_t            sda;                /**< SDA pin number. */
+    nrf_twi_frequency_t frequency;          /**< Frequency. */
+    uint8_t             interrupt_priority; /**< Interrupt priority. */
 } nrf_drv_twi_config_t;
 
-#define TWI_CONFIG_FREQUENCY(id)      TWI##id##_CONFIG_FREQUENCY
-#define TWI_CONFIG_SCL(id)            TWI##id##_CONFIG_SCL
-#define TWI_CONFIG_SDA(id)            TWI##id##_CONFIG_SDA
-#define TWI_CONFIG_IRQ_PRIORITY(id)   TWI##id##_CONFIG_IRQ_PRIORITY
-
 /**@brief TWI instance default configuration. */
-#define NRF_DRV_TWI_DEFAULT_CONFIG(id)                                                \
-    {                                                                                 \
-        .frequency          = TWI_CONFIG_FREQUENCY(id),                               \
-        .scl                = TWI_CONFIG_SCL(id),                                     \
-        .sda                = TWI_CONFIG_SDA(id),                                     \
-        .interrupt_priority = TWI_CONFIG_IRQ_PRIORITY(id),                            \
-    }
+#define NRF_DRV_TWI_DEFAULT_CONFIG(id)                            \
+{                                                                 \
+    .frequency          = CONCAT_3(TWI, id, _CONFIG_FREQUENCY),   \
+    .scl                = CONCAT_3(TWI, id, _CONFIG_SCL),         \
+    .sda                = CONCAT_3(TWI, id, _CONFIG_SDA),         \
+    .interrupt_priority = CONCAT_3(TWI, id, _CONFIG_IRQ_PRIORITY) \
+}
 
 /**@brief TWI event handler prototype. */
-typedef void (* nrf_drv_twi_evt_handler_t)(nrf_drv_twi_evt_t * p_event);
+typedef void (* nrf_drv_twi_evt_handler_t)(nrf_drv_twi_evt_t const * p_event,
+                                           void *                    p_context);
 
 /**
  * @brief Function for initializing the TWI instance.
@@ -100,13 +101,15 @@ typedef void (* nrf_drv_twi_evt_handler_t)(nrf_drv_twi_evt_t * p_event);
  * @param[in] p_instance      TWI instance.
  * @param[in] p_config        Initial configuration. If NULL, the default configuration is used.
  * @param[in] event_handler   Event handler provided by the user. If NULL, blocking mode is enabled.
+ * @param[in] p_context       Context pointer, passed to event handler.
  *
  * @retval  NRF_SUCCESS If initialization was successful.
  * @retval  NRF_ERROR_INVALID_STATE If the driver is in invalid state.
  */
 ret_code_t nrf_drv_twi_init(nrf_drv_twi_t const * const  p_instance,
                             nrf_drv_twi_config_t const * p_config,
-                            nrf_drv_twi_evt_handler_t    event_handler);
+                            nrf_drv_twi_evt_handler_t    event_handler,
+                            void *                       p_context);
 
 /**
  * @brief Function for uninitializing the TWI.
@@ -180,7 +183,7 @@ ret_code_t nrf_drv_twi_rx(nrf_drv_twi_t const * const p_instance,
  *
  * @return     Data count.
  */
-uint32_t nrf_data_count_get(nrf_drv_twi_t const * const p_instance);
+uint32_t nrf_drv_twi_data_count_get(nrf_drv_twi_t const * const p_instance);
 
 /**
  * @brief Function for returning the address of a specific TWI task.
@@ -206,13 +209,13 @@ __STATIC_INLINE uint32_t nrf_drv_twi_event_address_get(nrf_drv_twi_t const * con
 
 #ifndef SUPPRESS_INLINE_IMPLEMENTATION
 __STATIC_INLINE uint32_t nrf_drv_twi_task_address_get(nrf_drv_twi_t const * const p_instance,
-                                                      nrf_twi_tasks_t            task)
+                                                      nrf_twi_tasks_t             task)
 {
     return (uint32_t)nrf_twi_task_address_get(p_instance->p_reg, task);
 }
 
 __STATIC_INLINE uint32_t nrf_drv_twi_event_address_get(nrf_drv_twi_t const * const p_instance,
-                                                      nrf_twi_events_t            event)
+                                                       nrf_twi_events_t            event)
 {
     return (uint32_t)nrf_twi_event_address_get(p_instance->p_reg, event);
 }

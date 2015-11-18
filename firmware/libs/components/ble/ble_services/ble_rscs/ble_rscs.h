@@ -60,11 +60,25 @@ typedef struct
     ble_rscs_evt_type_t evt_type;                                           /**< Type of event. */
 } ble_rscs_evt_t;
 
-// Forward declaration of the ble_rsc_t type. 
-typedef struct ble_rscs_s ble_rscs_t;
+// Forward declaration of the ble_rsc types. 
+typedef struct ble_rscs_s      ble_rscs_t;
+typedef struct ble_rscs_meas_s ble_rscs_meas_t;
 
 /**@brief Running Speed and Cadence Service event handler type. */
 typedef void (*ble_rscs_evt_handler_t) (ble_rscs_t * p_rscs, ble_rscs_evt_t * p_evt);
+
+/**@brief Running Speed and Cadence Service measurement structure. This contains a Running Speed and
+ *        Cadence measurement. */
+struct ble_rscs_meas_s
+{
+    bool        is_inst_stride_len_present;                                 /**< True if Instantaneous Stride Length is present in the measurement. */
+    bool        is_total_distance_present;                                  /**< True if Total Distance is present in the measurement. */
+    bool        is_running;                                                 /**< True if running, False if walking. */
+    uint16_t    inst_speed;                                                 /**< Instantaneous Speed. */
+    uint8_t     inst_cadence;                                               /**< Instantaneous Cadence. */
+    uint16_t    inst_stride_length;                                         /**< Instantaneous Stride Length. */
+    uint32_t    total_distance;                                             /**< Total Distance. */
+};
 
 /**@brief Running Speed and Cadence Service init structure. This contains all options and data
  *        needed for initialization of the service. */
@@ -74,6 +88,7 @@ typedef struct
     ble_srv_cccd_security_mode_t rsc_meas_attr_md;                          /**< Initial security level for running speed and cadence measurement attribute */
     ble_srv_security_mode_t      rsc_feature_attr_md;                       /**< Initial security level for feature attribute */
     uint16_t                     feature;                                   /**< Initial value for features of sensor. */
+    ble_rscs_meas_t              initial_rcm;                               /**< Initial Running Speed Cadence Measurement.*/            
 } ble_rscs_init_t;
 
 /**@brief Running Speed and Cadence Service structure. This contains various status information for
@@ -88,18 +103,7 @@ struct ble_rscs_s
     uint16_t                     feature;                                   /**< Bit mask of features available on sensor. */
 };
 
-/**@brief Running Speed and Cadence Service measurement structure. This contains a Running Speed and
- *        Cadence measurement. */
-typedef struct ble_rscs_meas_s
-{
-    bool        is_inst_stride_len_present;                                 /**< True if Instantaneous Stride Length is present in the measurement. */
-    bool        is_total_distance_present;                                  /**< True if Total Distance is present in the measurement. */
-    bool        is_running;                                                 /**< True if running, False if walking. */
-    uint16_t    inst_speed;                                                 /**< Instantaneous Speed. */
-    uint8_t     inst_cadence;                                               /**< Instantaneous Cadence. */
-    uint16_t    inst_stride_length;                                         /**< Instantaneous Stride Length. */
-    uint32_t    total_distance;                                             /**< Total Distance. */
-} ble_rscs_meas_t;
+
 
 /**@brief Function for initializing the Running Speed and Cadence Service.
  *

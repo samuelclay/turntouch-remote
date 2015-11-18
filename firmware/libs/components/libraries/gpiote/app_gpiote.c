@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Nordic Semiconductor. All Rights Reserved.
+/* Copyright (c) 2015 Nordic Semiconductor. All Rights Reserved.
  *
  * The information contained herein is property of Nordic Semiconductor ASA.
  * Terms and conditions of usage are described in detail in NORDIC
@@ -11,14 +11,10 @@
  */
 
 #include "app_gpiote.h"
-#include <stdlib.h>
+#include "nrf_drv_gpiote.h"
+#include <stdbool.h>
+#include <stdint.h>
 #include <string.h>
-#include "app_util.h"
-#include "app_util_platform.h"
-#include "nrf_error.h"
-#include "nrf_gpio.h"
-
-
 /**@brief GPIOTE user type. */
 typedef struct
 {
@@ -27,163 +23,45 @@ typedef struct
     uint32_t                   pins_high_to_low_mask; /**< Mask defining which pins will generate events to this user when toggling high->low. */
     uint32_t                   sense_high_pins;       /**< Mask defining which pins are configured to generate GPIOTE interrupt on transition to high level. */
     app_gpiote_event_handler_t event_handler;         /**< Pointer to function to be executed when an event occurs. */
+    bool                       enabled;               /**< Flag indicating whether user is enabled. */
 } gpiote_user_t;
 
 STATIC_ASSERT(sizeof(gpiote_user_t) <= GPIOTE_USER_NODE_SIZE);
 STATIC_ASSERT(sizeof(gpiote_user_t) % 4 == 0);
 
-static uint32_t        m_enabled_users_mask;          /**< Mask for tracking which users are enabled. */
 static uint8_t         m_user_array_size;             /**< Size of user array. */
 static uint8_t         m_user_count;                  /**< Number of registered users. */
 static gpiote_user_t * mp_users = NULL;               /**< Array of GPIOTE users. */
+static uint32_t        m_pins;                        /**< Mask of initialized pins. */
+static uint32_t        m_last_pins_state;             /**< Most recent state of pins. */
 
-
-/**@brief Function for toggling sense level for specified pins.
- *
- * @param[in]   p_user   Pointer to user structure.
- * @param[in]   pins     Bitmask specifying for which pins the sense level is to be toggled.
- */
-static void sense_level_toggle(gpiote_user_t * p_user, uint32_t pins)
+void gpiote_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
-    uint32_t pin_no;
+    int i;
+    uint32_t pin_mask = 1 << pin;
+    bool hitolo = (m_last_pins_state & pin_mask) ? true : false;
+    m_last_pins_state = nrf_gpio_pins_read();
 
-    for (pin_no = 0; pin_no < NO_OF_PINS; pin_no++)
-    {
-        uint32_t pin_mask = (1 << pin_no);
-
-        if ((pins & pin_mask) != 0)
-        {
-            uint32_t sense;
-
-            // Invert sensing.
-            if ((p_user->sense_high_pins & pin_mask) == 0)
-            {
-                sense                    = GPIO_PIN_CNF_SENSE_High << GPIO_PIN_CNF_SENSE_Pos;
-                p_user->sense_high_pins |= pin_mask;
-            }
-            else
-            {
-                sense                    = GPIO_PIN_CNF_SENSE_Low << GPIO_PIN_CNF_SENSE_Pos;
-                p_user->sense_high_pins &= ~pin_mask;
-            }
-
-            NRF_GPIO->PIN_CNF[pin_no] &= ~GPIO_PIN_CNF_SENSE_Msk;
-            NRF_GPIO->PIN_CNF[pin_no] |= sense;
-        }
-    }
-}
-
-
-static void sense_level_disable(uint32_t pins)
-{
-    uint32_t pin_no;
-
-    for (pin_no = 0; pin_no < 32; pin_no++)
-    {
-        uint32_t pin_mask = (1 << pin_no);
-
-        if ((pins & pin_mask) != 0)
-        {
-            NRF_GPIO->PIN_CNF[pin_no] &= ~GPIO_PIN_CNF_SENSE_Msk;
-            NRF_GPIO->PIN_CNF[pin_no] |= GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos;
-        }
-    }
-}
-
-
-
-/**@brief Function for handling the GPIOTE interrupt.
- */
-void GPIOTE_IRQHandler(void)
-{
-    uint8_t  i;
-    uint32_t pins_changed        = 1;
-    uint32_t pins_sense_enabled  = 0;
-    uint32_t pins_sense_disabled = 0;
-    uint32_t pins_state          = NRF_GPIO->IN;
-
-    // Clear event.
-    NRF_GPIOTE->EVENTS_PORT = 0;
-
-    while (pins_changed)
-    {
-        // Check all users.
-        for (i = 0; i < m_user_count; i++)
-        {
-            gpiote_user_t * p_user = &mp_users[i];
-
-            // Check if user is enabled.
-            if (((1 << i) & m_enabled_users_mask) != 0)
-            {
-                uint32_t transition_pins;
-                uint32_t event_low_to_high = 0;
-                uint32_t event_high_to_low = 0;
-
-                pins_sense_enabled |= (p_user->pins_mask & ~pins_sense_disabled);
-
-                // Find set of pins on which there has been a transition.
-                transition_pins = (pins_state ^ ~p_user->sense_high_pins) & (p_user->pins_mask & ~pins_sense_disabled);
-
-                sense_level_disable(transition_pins);
-                pins_sense_disabled |= transition_pins;
-                pins_sense_enabled  &= ~pins_sense_disabled;
-
-                // Call user event handler if an event has occurred.
-                event_high_to_low |= (~pins_state & p_user->pins_high_to_low_mask) & transition_pins;
-                event_low_to_high |= (pins_state & p_user->pins_low_to_high_mask) & transition_pins;
-
-                if ((event_low_to_high | event_high_to_low) != 0)
-                {
-                    p_user->event_handler(event_low_to_high, event_high_to_low);
-                }
-            }
-        }
-
-        // Second read after setting sense.
-        // Check if any pins with sense enabled have changed while serving this interrupt.
-        pins_changed = (NRF_GPIO->IN ^ pins_state) & pins_sense_enabled;
-        pins_state  ^= pins_changed;
-    }
-
-    // Now re-enabling sense on all pins that have sense disabled.
-    // Note: a new interrupt might fire immediatly.
     for (i = 0; i < m_user_count; i++)
     {
-        gpiote_user_t * p_user = &mp_users[i];
-
-        // Check if user is enabled.
-        if (((1 << i) & m_enabled_users_mask) != 0)
+        if (mp_users[i].enabled && (pin_mask & mp_users[i].pins_mask))
         {
-            if (pins_sense_disabled & p_user->pins_mask)
+            if ((pin_mask & mp_users[i].pins_high_to_low_mask) && hitolo)
             {
-                sense_level_toggle(p_user, pins_sense_disabled & p_user->pins_mask);
+                mp_users[i].event_handler(0,pin_mask);
+            }
+            else if ((pin_mask & mp_users[i].pins_low_to_high_mask) && !hitolo)
+            {
+                mp_users[i].event_handler(pin_mask,0);
             }
         }
     }
 }
-
-
-/**@brief Function for sense disabling for all pins for specified user.
- *
- * @param[in]  user_id   User id.
- */
-static void pins_sense_disable(app_gpiote_user_id_t user_id)
-{
-    uint32_t pin_no;
-
-    for (pin_no = 0; pin_no < 32; pin_no++)
-    {
-        if ((mp_users[user_id].pins_mask & (1 << pin_no)) != 0)
-        {
-            NRF_GPIO->PIN_CNF[pin_no] &= ~GPIO_PIN_CNF_SENSE_Msk;
-            NRF_GPIO->PIN_CNF[pin_no] |= GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos;
-        }
-    }
-}
-
 
 uint32_t app_gpiote_init(uint8_t max_users, void * p_buffer)
 {
+    uint32_t ret_code = NRF_SUCCESS;
+
     if (p_buffer == NULL)
     {
         return NRF_ERROR_INVALID_PARAM;
@@ -199,26 +77,25 @@ uint32_t app_gpiote_init(uint8_t max_users, void * p_buffer)
     mp_users             = (gpiote_user_t *)p_buffer;
     m_user_array_size    = max_users;
     m_user_count         = 0;
-    m_enabled_users_mask = 0;
+    m_pins              = 0;
 
     memset(mp_users, 0, m_user_array_size * sizeof(gpiote_user_t));
 
-    // Initialize GPIOTE interrupt (will not be enabled until app_gpiote_user_enable() is called).
-    NRF_GPIOTE->INTENCLR = 0xFFFFFFFF;
+    if (nrf_drv_gpiote_is_init()==false)
+    {
+        ret_code = nrf_drv_gpiote_init();
+    }
 
-    NVIC_ClearPendingIRQ(GPIOTE_IRQn);
-    NVIC_SetPriority(GPIOTE_IRQn, APP_IRQ_PRIORITY_HIGH);
-    NVIC_EnableIRQ(GPIOTE_IRQn);
-
-    return NRF_SUCCESS;
+    return ret_code;
 }
-
 
 uint32_t app_gpiote_user_register(app_gpiote_user_id_t     * p_user_id,
                                   uint32_t                   pins_low_to_high_mask,
                                   uint32_t                   pins_high_to_low_mask,
                                   app_gpiote_event_handler_t event_handler)
 {
+    uint32_t user_pin_mask;
+    uint32_t ret_val = NRF_SUCCESS;
     // Check state and parameters.
     if (mp_users == NULL)
     {
@@ -233,155 +110,159 @@ uint32_t app_gpiote_user_register(app_gpiote_user_id_t     * p_user_id,
         return NRF_ERROR_NO_MEM;
     }
 
+    user_pin_mask = pins_low_to_high_mask | pins_high_to_low_mask;
     // Allocate new user.
-    mp_users[m_user_count].pins_mask             = pins_low_to_high_mask | pins_high_to_low_mask;
+    mp_users[m_user_count].pins_mask             = user_pin_mask;
     mp_users[m_user_count].pins_low_to_high_mask = pins_low_to_high_mask;
     mp_users[m_user_count].pins_high_to_low_mask = pins_high_to_low_mask;
     mp_users[m_user_count].event_handler         = event_handler;
+    mp_users[m_user_count].enabled               = false;
 
     *p_user_id = m_user_count++;
 
-    // Make sure SENSE is disabled for all pins.
-    pins_sense_disable(*p_user_id);
-
-    return NRF_SUCCESS;
+    uint32_t mask = 1;
+    uint32_t i;
+    const nrf_drv_gpiote_in_config_t config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(false);
+    for (i = 0; i < 32; i++)
+    {
+        if ((mask & user_pin_mask) & ~m_pins)
+        {
+            ret_val = nrf_drv_gpiote_in_init(i, &config, gpiote_handler);
+            if (ret_val != NRF_SUCCESS)
+            {
+                return ret_val;
+            }
+            m_pins |= mask;
+        }
+        mask <<= 1;
+    }
+    return ret_val;
 }
 
+__STATIC_INLINE uint32_t error_check(app_gpiote_user_id_t user_id)
+{
+    // Check state and parameters.
+    if (mp_users == NULL)
+    {
+        return NRF_ERROR_INVALID_STATE;
+    }
+    if (user_id >= m_user_count)
+    {
+        return NRF_ERROR_INVALID_PARAM;
+    }
+    return NRF_SUCCESS;
+}
+/**
+ * @brief Function for enabling event on pin (if not yet enabled) or disabling the event if no other
+ *        user requires it.
+ *
+ * @param pin    Pin to enable
+ * @param enable If true function will attempt to enable the pin else it will attempt to disable it.
+ */
+static void pin_event_enable(uint32_t pin, bool enable)
+{
+    uint32_t i;
+    uint32_t pin_mask = 1UL << pin;
+    bool enabled = false;
+    //search if any user already enabled given pin
+    for (i = 0; i < m_user_count; i++)
+    {
+        if (mp_users[i].enabled && (mp_users[i].pins_mask & pin_mask))
+        {
+            enabled = true;
+            break;
+        }
+    }
+    if (!enabled)
+    {
+        if (enable)
+        {
+            m_last_pins_state = nrf_gpio_pins_read();
+            nrf_drv_gpiote_in_event_enable(pin, true);
+        }
+        else
+        {
+            nrf_drv_gpiote_in_event_disable(pin);
+        }
+    }
+}
+
+/**
+ * @brief Function for enabling or disabling events for pins used by the user.
+ *
+ * Function will enable pin events only if they are not yet enabled. Function will disable pin
+ * events only if there is no other enabled user that is using them.
+ *
+ * @param user_id  User id.
+ * @param enable   If true function will attempt to enable the pin else it will attempt to disable it.
+ */
+static uint32_t user_enable(app_gpiote_user_id_t user_id, bool enable)
+{
+    uint32_t ret_code = error_check(user_id);
+
+    if (ret_code == NRF_SUCCESS)
+    {
+        uint32_t i;
+        uint32_t mask = 1UL;
+        for (i = 0; i < 32; i++)
+        {
+            if (mp_users[user_id].pins_mask & mask)
+            {
+                pin_event_enable(i, enable);
+            }
+            mask <<= 1;
+        }
+    }
+    return ret_code;
+}
 
 uint32_t app_gpiote_user_enable(app_gpiote_user_id_t user_id)
 {
-    uint32_t pin_no;
-    uint32_t pins_state;
+    uint32_t ret_code = NRF_SUCCESS;
 
-    // Check state and parameters.
-    if (mp_users == NULL)
+    if (mp_users[user_id].enabled == false)
     {
-        return NRF_ERROR_INVALID_STATE;
-    }
-    if (user_id >= m_user_count)
-    {
-        return NRF_ERROR_INVALID_PARAM;
-    }
-
-    // Clear any pending event.
-    NRF_GPIOTE->EVENTS_PORT = 0;
-    pins_state              = NRF_GPIO->IN;
-
-    // Enable user.
-    if (m_enabled_users_mask == 0)
-    {
-        NRF_GPIOTE->INTENSET = GPIOTE_INTENSET_PORT_Msk;
-    }
-    m_enabled_users_mask |= (1 << user_id);
-
-    // Enable sensing for all pins for specified user.
-    mp_users[user_id].sense_high_pins = 0;
-    for (pin_no = 0; pin_no < 32; pin_no++)
-    {
-        uint32_t pin_mask = (1 << pin_no);
-
-        if ((mp_users[user_id].pins_mask & pin_mask) != 0)
+        ret_code = user_enable(user_id, true);
+        if (ret_code != NRF_SUCCESS)
         {
-            uint32_t sense;
-
-            if ((pins_state & pin_mask) != 0)
-            {
-                sense = GPIO_PIN_CNF_SENSE_Low << GPIO_PIN_CNF_SENSE_Pos;
-            }
-            else
-            {
-                sense = GPIO_PIN_CNF_SENSE_High << GPIO_PIN_CNF_SENSE_Pos;
-                mp_users[user_id].sense_high_pins |= pin_mask;
-            }
-
-            NRF_GPIO->PIN_CNF[pin_no] &= ~GPIO_PIN_CNF_SENSE_Msk;
-            NRF_GPIO->PIN_CNF[pin_no] |= sense;
+            return ret_code;
+        }
+        else
+        {
+            mp_users[user_id].enabled = true;
+            return ret_code;
         }
     }
-
-    return NRF_SUCCESS;
+    else
+    {
+        return ret_code;
+    }
 }
-
 
 uint32_t app_gpiote_user_disable(app_gpiote_user_id_t user_id)
 {
-    // Check state and parameters.
-    if (mp_users == NULL)
+    uint32_t ret_code = NRF_SUCCESS;
+
+    if (mp_users[user_id].enabled)
     {
-        return NRF_ERROR_INVALID_STATE;
-    }
-    if (user_id >= m_user_count)
-    {
-        return NRF_ERROR_INVALID_PARAM;
+        mp_users[user_id].enabled = false;
+        ret_code = user_enable(user_id, false);
     }
 
-    // Disable sensing for all pins for specified user.
-    pins_sense_disable(user_id);
-
-    // Disable user.
-    m_enabled_users_mask &= ~(1UL << user_id);
-    if (m_enabled_users_mask == 0)
-    {
-        NRF_GPIOTE->INTENCLR = GPIOTE_INTENSET_PORT_Msk;
-    }
-
-    return NRF_SUCCESS;
+    return ret_code;
 }
-
 
 uint32_t app_gpiote_pins_state_get(app_gpiote_user_id_t user_id, uint32_t * p_pins)
 {
     gpiote_user_t * p_user;
+    uint32_t ret_code = error_check(user_id);
 
-    // Check state and parameters.
-    if (mp_users == NULL)
+    if (ret_code == NRF_SUCCESS)
     {
-        return NRF_ERROR_INVALID_STATE;
+        p_user  = &mp_users[user_id];
+        // Get pins.
+        *p_pins = nrf_gpio_pins_read() & p_user->pins_mask;
+
     }
-    if (user_id >= m_user_count)
-    {
-        return NRF_ERROR_INVALID_PARAM;
-    }
-
-    // Get pins.
-    p_user  = &mp_users[user_id];
-    *p_pins = NRF_GPIO->IN & p_user->pins_mask;
-
-    return NRF_SUCCESS;
+    return ret_code;
 }
-
-#if defined(SVCALL_AS_NORMAL_FUNCTION) || defined(SER_CONNECTIVITY)
-uint32_t app_gpiote_input_event_handler_register(const uint8_t                    channel,
-                                                 const uint32_t                   pin,
-                                                 const uint32_t                   polarity,
-                                                 app_gpiote_input_event_handler_t event_handler)
-{
-    (void)sense_level_toggle(NULL, pin);
-    return NRF_ERROR_NOT_SUPPORTED;
-}
-
-uint32_t app_gpiote_input_event_handler_unregister(const uint8_t channel)
-{
-    return NRF_ERROR_NOT_SUPPORTED;
-}
-
-uint32_t app_gpiote_end_irq_event_handler_register(app_gpiote_input_event_handler_t event_handler)
-{
-    return NRF_ERROR_NOT_SUPPORTED;
-}
-
-uint32_t app_gpiote_end_irq_event_handler_unregister(void)
-{
-    return NRF_ERROR_NOT_SUPPORTED;
-}
-
-uint32_t app_gpiote_enable_interrupts(void)
-{
-    return NRF_ERROR_NOT_SUPPORTED;
-}
-
-uint32_t app_gpiote_disable_interrupts(void)
-{
-    return NRF_ERROR_NOT_SUPPORTED;
-}
-#endif // SVCALL_AS_NORMAL_FUNCTION || SER_CONNECTIVITY

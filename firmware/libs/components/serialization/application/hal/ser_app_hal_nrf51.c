@@ -12,13 +12,19 @@
 
 #include "app_util_platform.h"
 #include "ser_app_hal.h"
-#include "nrf51.h"
+#include "nrf.h"
 #include "nrf_gpio.h"
 #include "nrf_soc.h"
 #include "nrf_delay.h"
 #include "boards.h"
 #include "ser_phy.h"
 #include "ser_phy_config_app_nrf51.h"
+
+#ifdef NRF51
+#define SOFTDEVICE_EVT_IRQ  SD_EVT_IRQn         /**< SoftDevice Event IRQ number. Used for both protocol events and SoC events. */
+#elif defined NRF52
+#define SOFTDEVICE_EVT_IRQ  SWI2_EGU2_IRQn
+#endif /* NRF51 */
 
 uint32_t ser_app_hal_hw_init()
 {
@@ -55,12 +61,12 @@ void ser_app_hal_nrf_reset_pin_set()
 
 void ser_app_hal_nrf_evt_irq_priority_set()
 {
-    NVIC_SetPriority(SD_EVT_IRQn, APP_IRQ_PRIORITY_LOW);
+    NVIC_SetPriority(SOFTDEVICE_EVT_IRQ, APP_IRQ_PRIORITY_LOW);
 }
 
 void ser_app_hal_nrf_evt_pending()
 {
-    NVIC_SetPendingIRQ(SD_EVT_IRQn);
+    NVIC_SetPendingIRQ(SOFTDEVICE_EVT_IRQ);
 }
 
 uint32_t sd_ppi_channel_enable_get(uint32_t * p_channel_enable)

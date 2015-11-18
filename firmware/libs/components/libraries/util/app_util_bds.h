@@ -28,6 +28,7 @@
 #include "compiler_abstraction.h"
 #include "app_util.h"
 #include "ble_srv_common.h"
+#include "nordic_common.h"
     
 typedef uint8_t nibble_t;
 typedef uint32_t uint24_t;

@@ -14,7 +14,7 @@
 #define NRF_SOC_H__
 
 #include <stdint.h>
-#include "nrf51.h"
+#include "nrf.h"
 
 /**@brief The interrupt priorities available to the application while the softdevice is active. */
 typedef uint8_t nrf_app_irq_priority_t;

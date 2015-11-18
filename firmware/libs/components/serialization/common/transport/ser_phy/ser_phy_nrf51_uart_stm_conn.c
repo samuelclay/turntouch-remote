@@ -39,8 +39,7 @@
 
 #include "nordic_common.h"
 #include "boards.h"
-#include "nrf51.h"
-#include "nrf51_bitfields.h"
+#include "nrf.h"
 #include "nrf_soc.h"
 #include "nrf_error.h"
 #include "nrf_gpio.h"

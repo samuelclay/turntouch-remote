@@ -22,7 +22,7 @@
 #include "app_error.h"
 #include "app_util_platform.h"
 #include "nrf_gpio.h"
-#include "nrf51_bitfields.h"
+#include "nrf.h"
 #include "spi_5W_master.h"
 #include "ser_config_5W_app.h"
 #include "ser_phy_debug_app.h"

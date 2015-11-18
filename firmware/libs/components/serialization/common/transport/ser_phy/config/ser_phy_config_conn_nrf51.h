@@ -22,6 +22,8 @@
 #define SER_PHY_SPI_PPI_RDY_CH                  0
 #define SER_PHY_SPI_GPIOTE_RDY_CH               0
 
+#define SER_PHY_SPI_SLAVE_INSTANCE              1
+
 #define SER_PHY_SPI_SLAVE_REQ_PIN               SER_CON_SPIS_REQ_PIN
 #define SER_PHY_SPI_SLAVE_RDY_PIN               SER_CON_SPIS_RDY_PIN
 #define SER_PHY_SPI_SLAVE_SCK_PIN               SER_CON_SPIS_SCK_PIN

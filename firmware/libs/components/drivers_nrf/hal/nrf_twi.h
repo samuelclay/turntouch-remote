@@ -13,7 +13,7 @@
  /**
  * @defgroup nrf_twi_hal TWI HAL
  * @{
- * @ingroup nrf_twi
+ * @ingroup nrf_twi_master
  *
  * @brief Hardware access layer for the two-wire interface (TWI) peripheral.
  */

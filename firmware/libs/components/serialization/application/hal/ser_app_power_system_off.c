@@ -10,8 +10,7 @@
  *
  */
 
-#include "nrf51.h"
-#include "nrf51_bitfields.h"
+#include "nrf.h"
 #include "ser_app_power_system_off.h"
 
 static bool m_power_system_off = false;

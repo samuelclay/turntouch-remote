@@ -21,6 +21,7 @@
 #include "ser_conn_pkt_decoder.h"
 #include "ser_conn_cmd_decoder.h"
 #include "ser_conn_dtm_cmd_decoder.h"
+#include "ser_conn_reset_cmd_decoder.h"
 
 
 uint32_t ser_conn_received_pkt_process(
@@ -45,6 +46,12 @@ uint32_t ser_conn_received_pkt_process(
             case SER_PKT_TYPE_DTM_CMD:
             {
                 err_code = ser_conn_dtm_command_process(p_command, command_len);
+                break;
+            }
+            
+            case SER_PKT_TYPE_RESET_CMD:
+            {
+                ser_conn_reset_command_process();
                 break;
             }
 

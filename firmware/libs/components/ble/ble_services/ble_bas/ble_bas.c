@@ -88,6 +88,11 @@ static void on_write(ble_bas_t * p_bas, ble_evt_t * p_ble_evt)
 
 void ble_bas_on_ble_evt(ble_bas_t * p_bas, ble_evt_t * p_ble_evt)
 {
+    if (p_bas == NULL || p_ble_evt == NULL)
+    {
+        return;
+    }
+    
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GAP_EVT_CONNECTED:
@@ -225,6 +230,11 @@ static uint32_t battery_level_char_add(ble_bas_t * p_bas, const ble_bas_init_t *
 
 uint32_t ble_bas_init(ble_bas_t * p_bas, const ble_bas_init_t * p_bas_init)
 {
+    if (p_bas == NULL || p_bas_init == NULL)
+    {
+        return NRF_ERROR_NULL;
+    }
+    
     uint32_t   err_code;
     ble_uuid_t ble_uuid;
 
@@ -250,6 +260,11 @@ uint32_t ble_bas_init(ble_bas_t * p_bas, const ble_bas_init_t * p_bas_init)
 
 uint32_t ble_bas_battery_level_update(ble_bas_t * p_bas, uint8_t battery_level)
 {
+    if (p_bas == NULL)
+    {
+        return NRF_ERROR_NULL;
+    }
+    
     uint32_t err_code = NRF_SUCCESS;
     ble_gatts_value_t gatts_value;
 
@@ -262,14 +277,16 @@ uint32_t ble_bas_battery_level_update(ble_bas_t * p_bas, uint8_t battery_level)
         gatts_value.offset  = 0;
         gatts_value.p_value = &battery_level;
 
-        // Save new battery value.
-        p_bas->battery_level_last = battery_level;
-
         // Update database.
         err_code = sd_ble_gatts_value_set(p_bas->conn_handle,
                                           p_bas->battery_level_handles.value_handle,
                                           &gatts_value);
-        if (err_code != NRF_SUCCESS)
+        if (err_code == NRF_SUCCESS)
+        {
+            // Save new battery value.
+            p_bas->battery_level_last = battery_level;
+        }
+        else
         {
             return err_code;
         }

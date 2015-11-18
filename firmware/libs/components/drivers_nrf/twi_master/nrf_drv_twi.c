@@ -13,7 +13,6 @@
 #include "nrf_drv_twi.h"
 #include "nrf_assert.h"
 #include "app_util_platform.h"
-#include "nordic_common.h"
 #include "nrf_delay.h"
 #include "nrf_gpio.h"
 
@@ -60,38 +59,41 @@ typedef enum
 /**@brief TWI transfer structure. */
 typedef struct
 {
-    bool             is_tx;                 /**< Transmission from master to slave (if is_tx is set) or from slave to master (if not). */
-    bool             xfer_pending;          /**< Transmission will be suspended (if xfer_pending is set) or stopped (if not). */
-    bool             transfer_in_progress;  /**< Data transfer is in progress. */
-    bool             error_condition;       /**< Error has occured. */
-    uint8_t          address;               /**< Address of slave device. */
-    uint8_t        * p_data;                /**< Pointer to data buffer. */
-    uint16_t         length;                /**< Length of data buffer. */
-    uint16_t         count;                 /**< Count of already transferred bytes. */
-    nrf_twi_tasks_t  task;                  /**< Next task. */
-    nrf_twi_events_t end_event;             /**< Event for which the state machine waits. */
-    nrf_twi_int_mask_t end_int;             /**< Interrupt for which the state machine waits. */
+    bool             is_tx;           /**< Transmission from master to slave (if is_tx is set) or from slave to master (if not). */
+    bool             xfer_pending;    /**< Transmission will be suspended (if xfer_pending is set) or stopped (if not). */
+    bool             error_condition; /**< Error has occured. */
+    uint8_t          address;         /**< Address of slave device. */
+    uint8_t        * p_data;          /**< Pointer to data buffer. */
+    uint16_t         length;          /**< Length of data buffer. */
+    uint16_t         count;           /**< Count of already transferred bytes. */
+    nrf_twi_tasks_t  task;            /**< Next task. */
+    nrf_twi_events_t end_event;       /**< Event for which the state machine waits. */
+    nrf_twi_int_mask_t end_int;       /**< Interrupt for which the state machine waits. */
 } transfer_t;
 
 /**@brief TWI driver instance control block structure. */
 typedef struct
 {
-    nrf_drv_state_t state;    /**< Instance state. */
-    substate_t      substate; /**< Instance substate when powered on. */
-    transfer_t      transfer; /**< Transfer structure. */
+    nrf_drv_state_t state;                /**< Instance state. */
+    substate_t      substate;             /**< Instance substate when powered on. */
+    bool volatile   transfer_in_progress; /**< Data transfer is in progress. */
+    transfer_t      transfer;             /**< Transfer structure. */
 } control_block_t;
 
 /**@brief Macro for getting the number of elements of the array. */
 #define ARRAY_LENGTH(a) (sizeof(a) / sizeof(a[0]))
 
 /** @brief User callbacks storage. */
-static volatile nrf_drv_twi_evt_handler_t m_handlers[TWI_COUNT];
+static nrf_drv_twi_evt_handler_t m_handlers[TWI_COUNT];
+
+/** @brief Context pointers, passed to user callbacks. */
+static void *                    mp_contexts[TWI_COUNT];
 
 /** @brief Control blocks storage. */
-static volatile control_block_t           m_cb[TWI_COUNT];
+static control_block_t           m_cb[TWI_COUNT];
 
 /** @brief TWI instances pointers storage. */
-static volatile nrf_drv_twi_t *           m_instances[TWI_COUNT];
+static nrf_drv_twi_t const *     m_instances[TWI_COUNT];
 
 static const nrf_drv_twi_config_t m_default_config[] = {
 #if (TWI0_ENABLED == 1)
@@ -103,7 +105,7 @@ static const nrf_drv_twi_config_t m_default_config[] = {
 };
 
 /**@brief TWI state machine action. */
-typedef void (* sm_action_t)(volatile nrf_drv_twi_t const * const p_instance);
+typedef void (* sm_action_t)(nrf_drv_twi_t const * const p_instance);
 
 /**@brief TWI transition structure. */
 typedef struct
@@ -118,56 +120,56 @@ typedef struct
  *
  * @param[in] p_instance      TWI.
  */
-static void address_req(volatile nrf_drv_twi_t const * const p_instance);
+static void address_req(nrf_drv_twi_t const * const p_instance);
 
 /**
  * @brief Function for initializing data transfer (from slave to master).
  *
  * @param[in] p_instance      TWI.
  */
-static void rx_address_req(volatile nrf_drv_twi_t const * const p_instance);
+static void rx_address_req(nrf_drv_twi_t const * const p_instance);
 
 /**
  * @brief Function for preparing byte transfer (from master to slave).
  *
  * @param[in] p_instance      TWI.
  */
-static void tx_prepare(volatile nrf_drv_twi_t const * const p_instance);
+static void tx_prepare(nrf_drv_twi_t const * const p_instance);
 
 /**
  * @brief Function for confirming byte transfer (from master to slave).
  *
  * @param[in] p_instance      TWI.
  */
-static void tx_done(volatile nrf_drv_twi_t const * const p_instance);
+static void tx_done(nrf_drv_twi_t const * const p_instance);
 
 /**
  * @brief Function for preparing byte transfer (from slave to master).
  *
  * @param[in] p_instance      TWI.
  */
-static void rx_prepare(volatile nrf_drv_twi_t const * const p_instance);
+static void rx_prepare(nrf_drv_twi_t const * const p_instance);
 
 /**
  * @brief Function for confirming byte transfer (from slave to master).
  *
  * @param[in] p_instance      TWI.
  */
-static void rx_done(volatile nrf_drv_twi_t const * const p_instance);
+static void rx_done(nrf_drv_twi_t const * const p_instance);
 
 /**
  * @brief Function for ending transfer after an error.
  *
  * @param[in] p_instance      TWI.
  */
-static void on_error(volatile nrf_drv_twi_t const * const p_instance);
+static void on_error(nrf_drv_twi_t const * const p_instance);
 
 /**
  * @brief Function for ending transfer after an error.
  *
  * @param[in] p_instance      TWI.
  */
-static void ack_error(volatile nrf_drv_twi_t const * const p_instance);
+static void ack_error(nrf_drv_twi_t const * const p_instance);
 
 /**@brief List of idle state transitions. */
 static const transition_t m_idle[] = {
@@ -231,7 +233,7 @@ static const uint32_t m_states_len[] =
  * @param[in] p_instance      TWI.
  * @param[in] evt             State machine event.
  */
-static void state_machine(volatile nrf_drv_twi_t const * const p_instance, sm_evt_t evt)
+static void state_machine(nrf_drv_twi_t const * const p_instance, sm_evt_t evt)
 {
     bool                 evt_found = false;
     substate_t           substate  = m_cb[p_instance->instance_id].substate;
@@ -261,10 +263,10 @@ static void state_machine(volatile nrf_drv_twi_t const * const p_instance, sm_ev
  *
  * @param[in] p_instance      TWI.
  */
-static void txrx_shorts_set_task_start(volatile nrf_drv_twi_t const * const p_instance)
+static void txrx_shorts_set_task_start(nrf_drv_twi_t const * const p_instance)
 {
     uint32_t short_mask;
-    volatile transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
+    transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
 
     nrf_twi_shorts_clear(p_instance->p_reg,
                          NRF_TWI_SHORTS_BB_SUSPEND_MASK | NRF_TWI_SHORTS_BB_STOP_MASK);
@@ -298,9 +300,9 @@ static void txrx_shorts_set_task_start(volatile nrf_drv_twi_t const * const p_in
 }
 
 
-static void address_req(volatile nrf_drv_twi_t const * const p_instance)
+static void address_req(nrf_drv_twi_t const * const p_instance)
 {
-    volatile transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
+    transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
     nrf_twi_address_set(p_instance->p_reg, p_transfer->address);
 
     nrf_twi_task_set(p_instance->p_reg, NRF_TWI_TASKS_RESUME);
@@ -319,9 +321,9 @@ static void address_req(volatile nrf_drv_twi_t const * const p_instance)
 }
 
 
-static void rx_address_req(volatile nrf_drv_twi_t const * const p_instance)
+static void rx_address_req(nrf_drv_twi_t const * const p_instance)
 {
-    volatile transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
+    transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
 
     nrf_twi_address_set(p_instance->p_reg, p_transfer->address);
     nrf_twi_task_set(p_instance->p_reg, NRF_TWI_TASKS_RESUME);
@@ -339,15 +341,15 @@ static void rx_address_req(volatile nrf_drv_twi_t const * const p_instance)
 }
 
 
-static void rx_prepare(volatile nrf_drv_twi_t const * const p_instance)
+static void rx_prepare(nrf_drv_twi_t const * const p_instance)
 {
     txrx_shorts_set_task_start(p_instance);
 }
 
 
-static void rx_done(volatile nrf_drv_twi_t const * const p_instance)
+static void rx_done(nrf_drv_twi_t const * const p_instance)
 {
-    volatile transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
+    transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
 
     p_transfer->p_data[p_transfer->count] = nrf_twi_rxd_get(p_instance->p_reg);
     p_transfer->count++;
@@ -359,18 +361,18 @@ static void rx_done(volatile nrf_drv_twi_t const * const p_instance)
 }
 
 
-static void tx_prepare(volatile nrf_drv_twi_t const * const p_instance)
+static void tx_prepare(nrf_drv_twi_t const * const p_instance)
 {
-    volatile transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
+    transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
 
     nrf_twi_txd_set(p_instance->p_reg, p_transfer->p_data[p_transfer->count]);
     txrx_shorts_set_task_start(p_instance);
 }
 
 
-static void tx_done(volatile nrf_drv_twi_t const * const p_instance)
+static void tx_done(nrf_drv_twi_t const * const p_instance)
 {
-    volatile transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
+    transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
 
     p_transfer->count++;
 
@@ -381,9 +383,9 @@ static void tx_done(volatile nrf_drv_twi_t const * const p_instance)
 }
 
 
-static void on_error(volatile nrf_drv_twi_t const * const p_instance)
+static void on_error(nrf_drv_twi_t const * const p_instance)
 {
-    volatile transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
+    transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
 
     p_transfer->end_event            = NRF_TWI_EVENTS_STOPPED;
     nrf_twi_event_clear(p_instance->p_reg, p_transfer->end_event);
@@ -399,10 +401,9 @@ static void on_error(volatile nrf_drv_twi_t const * const p_instance)
     nrf_twi_task_set(p_instance->p_reg, NRF_TWI_TASKS_STOP);
 }
 
-static void ack_error(volatile nrf_drv_twi_t const * const p_instance)
+static void ack_error(nrf_drv_twi_t const * const p_instance)
 {
-    volatile transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
-
+    transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
     p_transfer->error_condition = true;
 }
 
@@ -418,7 +419,7 @@ static bool twi_action_wait(nrf_drv_twi_t const * const p_instance)
     bool     error;
     bool     done;
     uint32_t timeout = 0;
-    volatile transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
+    transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
 
     do
     {
@@ -492,18 +493,17 @@ static ret_code_t twi_transfer(nrf_drv_twi_t const * const p_instance,
     ASSERT(m_cb[p_instance->instance_id].state == NRF_DRV_STATE_POWERED_ON);
     ASSERT(length > 0);
 
-    volatile transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
-
+    control_block_t * p_cb = &m_cb[p_instance->instance_id];
 
     bool is_busy = false;
     CRITICAL_REGION_ENTER();
-    if (p_transfer->transfer_in_progress)
+    if (p_cb->transfer_in_progress)
     {
         is_busy = true;
     }
     else
     {
-        p_transfer->transfer_in_progress = true;
+        p_cb->transfer_in_progress = true;
     }
     CRITICAL_REGION_EXIT();
     if (is_busy)
@@ -511,6 +511,7 @@ static ret_code_t twi_transfer(nrf_drv_twi_t const * const p_instance,
         return NRF_ERROR_BUSY;
     }
 
+    transfer_t * p_transfer = &p_cb->transfer;
     p_transfer->address         = address;
     p_transfer->length          = (uint16_t)length;
     p_transfer->p_data          = (uint8_t *)p_data;
@@ -537,12 +538,12 @@ static ret_code_t twi_transfer(nrf_drv_twi_t const * const p_instance,
 
             if (p_transfer->error_condition)
             {
-                p_transfer->transfer_in_progress = false;
+                p_cb->transfer_in_progress = false;
                 return NRF_ERROR_INTERNAL;
             }
         }
         while (p_transfer->count < p_transfer->length);
-        p_transfer->transfer_in_progress = false;
+        p_cb->transfer_in_progress = false;
     }
     return NRF_SUCCESS;
 }
@@ -550,7 +551,8 @@ static ret_code_t twi_transfer(nrf_drv_twi_t const * const p_instance,
 
 ret_code_t nrf_drv_twi_init(nrf_drv_twi_t const * const  p_instance,
                             nrf_drv_twi_config_t const * p_config,
-                            nrf_drv_twi_evt_handler_t    event_handler)
+                            nrf_drv_twi_evt_handler_t    event_handler,
+                            void *                       p_context)
 {
     if (m_cb[p_instance->instance_id].state != NRF_DRV_STATE_UNINITIALIZED)
     {
@@ -564,6 +566,7 @@ ret_code_t nrf_drv_twi_init(nrf_drv_twi_t const * const  p_instance,
 
 
     m_handlers[p_instance->instance_id]  = event_handler;
+    mp_contexts[p_instance->instance_id] = p_context;
     m_instances[p_instance->instance_id] = (nrf_drv_twi_t *)p_instance;
 
     twi_clear_bus(p_instance, p_config);
@@ -659,7 +662,7 @@ ret_code_t nrf_drv_twi_rx(nrf_drv_twi_t const * const p_instance,
 }
 
 
-uint32_t nrf_data_count_get(nrf_drv_twi_t const * const p_instance)
+uint32_t nrf_drv_twi_data_count_get(nrf_drv_twi_t const * const p_instance)
 {
     volatile transfer_t * p_transfer = &(m_cb[p_instance->instance_id].transfer);
 
@@ -674,7 +677,8 @@ uint32_t nrf_data_count_get(nrf_drv_twi_t const * const p_instance)
  */
 __STATIC_INLINE void nrf_drv_twi_int_handler(NRF_TWI_Type * p_reg, uint32_t instance_id)
 {
-    volatile transfer_t * p_transfer = &(m_cb[instance_id].transfer);
+    control_block_t * p_cb = &m_cb[instance_id];
+    transfer_t * p_transfer = &p_cb->transfer;
     sm_evt_t sm_event;
 
     bool error_occured   = nrf_twi_event_check(p_reg, NRF_TWI_EVENTS_ERROR);
@@ -699,7 +703,7 @@ __STATIC_INLINE void nrf_drv_twi_int_handler(NRF_TWI_Type * p_reg, uint32_t inst
 
         if (p_transfer->error_condition)
         {
-            p_transfer->transfer_in_progress = false;
+            p_cb->transfer_in_progress = false;
             nrf_drv_twi_evt_t evt =
             {
                 .type               = NRF_DRV_TWI_ERROR,
@@ -710,18 +714,18 @@ __STATIC_INLINE void nrf_drv_twi_int_handler(NRF_TWI_Type * p_reg, uint32_t inst
                              NRF_TWI_ERROR_ADDRESS_NACK) ? NRF_TWI_ERROR_ADDRESS_NACK
                              : NRF_TWI_ERROR_DATA_NACK,
             };
-            m_handlers[instance_id](&evt);
+            m_handlers[instance_id](&evt, mp_contexts[instance_id]);
         }
         else if (p_transfer->count >= p_transfer->length)
         {
-            p_transfer->transfer_in_progress = false;
+            p_cb->transfer_in_progress = false;
             nrf_drv_twi_evt_t evt =
             {
                 .type   = p_transfer->is_tx ? NRF_DRV_TWI_TX_DONE : NRF_DRV_TWI_RX_DONE,
                 .p_data = p_transfer->p_data,
                 .length = p_transfer->count,
             };
-            m_handlers[instance_id](&evt);
+            m_handlers[instance_id](&evt, mp_contexts[instance_id]);
         }
     }
 }

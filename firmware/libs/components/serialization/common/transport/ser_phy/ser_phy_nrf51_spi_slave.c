@@ -28,7 +28,7 @@
 #include "nrf_gpio.h"
 #include "nrf_drv_gpiote.h"
 #include "nrf_soc.h"
-#include "spi_slave.h"
+#include "nrf_drv_spis.h"
 #include "ser_config.h"
 #include "ser_phy.h"
 #include "ser_phy_config_conn_nrf51.h"
@@ -36,6 +36,8 @@
 
 #define SER_PHY_SPI_DEF_CHARACTER 0xFF //SPI default character. Character clocked out in case of an ignored transaction
 #define SER_PHY_SPI_ORC_CHARACTER 0xFF //SPI over-read character. Character clocked out after an over-read of the transmit buffer
+
+static nrf_drv_spis_t m_spis = NRF_DRV_SPIS_INSTANCE(SER_PHY_SPI_SLAVE_INSTANCE);
 
 //SPI raw peripheral device configuration data
 typedef struct
@@ -73,8 +75,8 @@ _static uint16_t m_current_tx_frame_length;
 _static uint8_t m_header_rx_buffer[SER_PHY_HEADER_SIZE];
 _static uint8_t m_header_tx_buffer[SER_PHY_HEADER_SIZE];
 
-_static uint8_t       m_frame_buffer[SER_PHY_SPI_MTU_SIZE];          //trash storage
-_static uint8_t const m_zero_buffer[SER_PHY_SPI_MTU_SIZE] = {  0  }; //ROM'able declaration
+_static uint8_t m_frame_buffer[SER_PHY_SPI_MTU_SIZE];          //trash storage
+_static uint8_t m_zero_buffer[SER_PHY_SPI_MTU_SIZE] = {  0  }; //ROM'able declaration
 
 _static uint8_t * volatile       m_p_rx_buffer = NULL;
 _static const uint8_t * volatile m_p_tx_buffer = NULL;
@@ -159,10 +161,11 @@ static uint32_t header_get()
 {
     uint32_t err_code;
 
-    err_code = spi_slave_buffers_set((uint8_t *) m_zero_buffer,
-                                     m_header_rx_buffer,
-                                     SER_PHY_HEADER_SIZE,
-                                     SER_PHY_HEADER_SIZE);
+    err_code = nrf_drv_spis_buffers_set(&m_spis,
+                                        (uint8_t *) m_zero_buffer,
+                                        SER_PHY_HEADER_SIZE,
+                                        m_header_rx_buffer,
+                                        SER_PHY_HEADER_SIZE);
     return err_code;
 }
 
@@ -176,17 +179,19 @@ static uint32_t frame_get()
     if (!m_trash_payload_flag)
     {
         err_code =
-            spi_slave_buffers_set((uint8_t *) m_zero_buffer,
-                                  &(m_p_rx_buffer[m_accumulated_rx_packet_length]),
-                                  m_current_rx_frame_length,
-                                  m_current_rx_frame_length);
+            nrf_drv_spis_buffers_set(&m_spis,
+                                     (uint8_t *) m_zero_buffer,
+                                     m_current_rx_frame_length,
+                                     &(m_p_rx_buffer[m_accumulated_rx_packet_length]),
+                                     m_current_rx_frame_length);
     }
     else
     {
-        err_code = spi_slave_buffers_set((uint8_t *) m_zero_buffer,
-                                         m_frame_buffer,
-                                         m_current_rx_frame_length,
-                                         m_current_rx_frame_length);
+        err_code = nrf_drv_spis_buffers_set(&m_spis,
+                                            (uint8_t *) m_zero_buffer,
+                                            m_current_rx_frame_length,
+                                            m_frame_buffer,
+                                            m_current_rx_frame_length);
     }
     return err_code;
 }
@@ -197,10 +202,11 @@ static uint32_t header_send(uint16_t len)
 
     (void) uint16_encode(len, m_header_tx_buffer);
     err_code =
-        spi_slave_buffers_set(m_header_tx_buffer,
-                              m_header_rx_buffer,
-                              sizeof (m_header_tx_buffer),
-                              sizeof (m_header_tx_buffer));
+        nrf_drv_spis_buffers_set(&m_spis,
+                                 m_header_tx_buffer,
+                                 sizeof (m_header_tx_buffer),
+                                 m_header_rx_buffer,
+                                 sizeof (m_header_tx_buffer));
     return err_code;
 }
 
@@ -210,11 +216,12 @@ static uint32_t frame_send()
 
     m_current_tx_frame_length = compute_current_frame_length(m_tx_packet_length,
                                                              m_accumulated_tx_packet_length);
-    err_code                  =
-        spi_slave_buffers_set((uint8_t *) &(m_p_tx_buffer[m_accumulated_tx_packet_length]),
-                              m_frame_buffer,
-                              m_current_tx_frame_length,
-                              m_current_tx_frame_length);
+    err_code                     =
+        nrf_drv_spis_buffers_set(&m_spis,
+                                 (uint8_t *) &(m_p_tx_buffer[m_accumulated_tx_packet_length]),
+                                 m_current_tx_frame_length,
+                                 m_frame_buffer,
+                                 m_current_tx_frame_length);
     return err_code;
 }
 
@@ -244,7 +251,7 @@ static void clear_request_line(void)
  * \brief Slave driver main state machine
  * For UML graph, please refer to SDK documentation
 */
-static void spi_slave_event_handle(spi_slave_evt_t event)
+static void spi_slave_event_handle(nrf_drv_spis_event_t event)
 {
     uint32_t        err_code = NRF_SUCCESS;
     static uint16_t packetLength;
@@ -258,13 +265,13 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
 
         case SPI_RAW_STATE_RX_HEADER:
 
-            if (event.evt_type == SPI_SLAVE_BUFFERS_SET_DONE)
+            if (event.evt_type == NRF_DRV_SPIS_BUFFERS_SET_DONE)
             {
                 DEBUG_EVT_SPI_SLAVE_RAW_BUFFERS_SET(0);
                 set_ready_line();
             }
 
-            if (event.evt_type == SPI_SLAVE_XFER_DONE)
+            if (event.evt_type == NRF_DRV_SPIS_XFER_DONE)
             {
                 DEBUG_EVT_SPI_SLAVE_RAW_RX_XFER_DONE(event.rx_amount);
                 spi_slave_raw_assert(event.rx_amount == SER_PHY_HEADER_SIZE);
@@ -297,7 +304,7 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
 
         case SPI_RAW_STATE_MEM_REQUESTED:
 
-            if (event.evt_type == SPI_SLAVE_EVT_TYPE_MAX) //This is API dummy event
+            if (event.evt_type == NRF_DRV_SPIS_EVT_TYPE_MAX) //This is API dummy event
             {
                 m_buffer_reqested_flag         = false;
                 m_trans_state                  = SPI_RAW_STATE_RX_PAYLOAD;
@@ -308,13 +315,13 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
 
         case SPI_RAW_STATE_RX_PAYLOAD:
 
-            if (event.evt_type == SPI_SLAVE_BUFFERS_SET_DONE)
+            if (event.evt_type == NRF_DRV_SPIS_BUFFERS_SET_DONE)
             {
                 DEBUG_EVT_SPI_SLAVE_RAW_BUFFERS_SET(0);
                 set_ready_line();
             }
 
-            if (event.evt_type == SPI_SLAVE_XFER_DONE)
+            if (event.evt_type == NRF_DRV_SPIS_XFER_DONE)
             {
                 DEBUG_EVT_SPI_SLAVE_RAW_RX_XFER_DONE(event.rx_amount);
                 spi_slave_raw_assert(event.rx_amount == m_current_rx_frame_length);
@@ -344,13 +351,13 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
 
         case SPI_RAW_STATE_TX_HEADER:
 
-            if (event.evt_type == SPI_SLAVE_BUFFERS_SET_DONE)
+            if (event.evt_type == NRF_DRV_SPIS_BUFFERS_SET_DONE)
             {
                 DEBUG_EVT_SPI_SLAVE_RAW_BUFFERS_SET(0);
                 set_ready_line();
             }
 
-            if (event.evt_type == SPI_SLAVE_XFER_DONE)
+            if (event.evt_type == NRF_DRV_SPIS_XFER_DONE)
             {
                 DEBUG_EVT_SPI_SLAVE_RAW_TX_XFER_DONE(event.tx_amount);
                 spi_slave_raw_assert(event.tx_amount == SER_PHY_HEADER_SIZE);
@@ -363,13 +370,13 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
 
         case SPI_RAW_STATE_TX_PAYLOAD:
 
-            if (event.evt_type == SPI_SLAVE_BUFFERS_SET_DONE)
+            if (event.evt_type == NRF_DRV_SPIS_BUFFERS_SET_DONE)
             {
                 DEBUG_EVT_SPI_SLAVE_RAW_BUFFERS_SET(0);
                 set_ready_line();
             }
 
-            if (event.evt_type == SPI_SLAVE_XFER_DONE)
+            if (event.evt_type == NRF_DRV_SPIS_XFER_DONE)
             {
                 DEBUG_EVT_SPI_SLAVE_RAW_TX_XFER_DONE(event.tx_amount);
                 spi_slave_raw_assert(event.tx_amount == m_current_tx_frame_length);
@@ -434,20 +441,20 @@ static void spi_slave_gpio_init(void)
 /* ser_phy API function */
 void ser_phy_interrupts_enable(void)
 {
-    (void)sd_nvic_EnableIRQ(SPI1_TWI1_IRQn);
+    (void)sd_nvic_EnableIRQ(m_spis.irq);
 }
 
 /* ser_phy API function */
 void ser_phy_interrupts_disable(void)
 {
-    (void)sd_nvic_DisableIRQ(SPI1_TWI1_IRQn);
+    (void)sd_nvic_DisableIRQ(m_spis.irq);
 }
 
 /* ser_phy API function */
 uint32_t ser_phy_rx_buf_set(uint8_t * p_buffer)
 {
-    uint32_t        status = NRF_SUCCESS;
-    spi_slave_evt_t event;
+    uint32_t             status = NRF_SUCCESS;
+    nrf_drv_spis_event_t event;
 
     ser_phy_interrupts_disable();
 
@@ -463,7 +470,7 @@ uint32_t ser_phy_rx_buf_set(uint8_t * p_buffer)
         {
             m_trash_payload_flag = true;
         }
-        event.evt_type  = SPI_SLAVE_EVT_TYPE_MAX; //force transition with dummy event
+        event.evt_type  = NRF_DRV_SPIS_EVT_TYPE_MAX; //force transition with dummy event
         event.rx_amount = 0;
         event.tx_amount = 0;
         spi_slave_event_handle(event);
@@ -507,9 +514,9 @@ uint32_t ser_phy_tx_pkt_send(const uint8_t * p_buffer, uint16_t num_of_bytes)
 /* ser_phy API function */
 uint32_t ser_phy_open(ser_phy_events_handler_t events_handler)
 {
-    uint32_t           err_code;
-    spi_slave_config_t spi_slave_config;
-    spi_slave_evt_t    event;
+    uint32_t              err_code;
+    nrf_drv_spis_config_t spi_slave_config;
+    nrf_drv_spis_event_t  event;
 
     if (m_trans_state != SPI_RAW_STATE_UNKNOWN)
     {
@@ -531,39 +538,35 @@ uint32_t ser_phy_open(ser_phy_events_handler_t events_handler)
     spi_slave_gpiote_init();
     spi_slave_ppi_init();
 
-    err_code = spi_slave_evt_handler_register(spi_slave_event_handle);
+    spi_slave_config.miso_pin         = SER_PHY_SPI_SLAVE_MISO_PIN;
+    spi_slave_config.mosi_pin         = SER_PHY_SPI_SLAVE_MOSI_PIN;
+    spi_slave_config.sck_pin          = SER_PHY_SPI_SLAVE_SCK_PIN;
+    spi_slave_config.csn_pin          = SER_PHY_SPI_SLAVE_SS_PIN;
+    spi_slave_config.mode             = NRF_DRV_SPIS_MODE_0;
+    spi_slave_config.bit_order        = NRF_DRV_SPIS_BIT_ORDER_LSB_FIRST;
+    spi_slave_config.def              = SER_PHY_SPI_DEF_CHARACTER;
+    spi_slave_config.orc              = SER_PHY_SPI_ORC_CHARACTER;        
+    spi_slave_config.irq_priority     = NRF_APP_PRIORITY_LOW;
+    spi_slave_config.miso_drive       = NRF_DRV_SPIS_DEFAULT_MISO_DRIVE;
+    //use /CS pullup because state of the line might be undefined when master redefines PIO lines
+    spi_slave_config.csn_pullup       = NRF_GPIO_PIN_PULLUP;
+
+    //keep /CS high when init
+    nrf_gpio_cfg_input(spi_slave_config.csn_pin, NRF_GPIO_PIN_PULLUP);
+
+    err_code = nrf_drv_spis_init(&m_spis, &spi_slave_config, spi_slave_event_handle);
+    APP_ERROR_CHECK(err_code);
 
     if (err_code == NRF_SUCCESS)
     {
+        m_ser_phy_callback = events_handler;
 
-        spi_slave_config.pin_miso         = SER_PHY_SPI_SLAVE_MISO_PIN;
-        spi_slave_config.pin_mosi         = SER_PHY_SPI_SLAVE_MOSI_PIN;
-        spi_slave_config.pin_sck          = SER_PHY_SPI_SLAVE_SCK_PIN;
-        spi_slave_config.pin_csn          = SER_PHY_SPI_SLAVE_SS_PIN;
-        spi_slave_config.mode             = SPI_MODE_0;
-        spi_slave_config.bit_order        = SPIM_LSB_FIRST;
-        spi_slave_config.def_tx_character = SER_PHY_SPI_DEF_CHARACTER;
-        spi_slave_config.orc_tx_character = SER_PHY_SPI_ORC_CHARACTER;
+        m_trans_state   = SPI_RAW_STATE_SETUP_HEADER;
+        event.evt_type  = NRF_DRV_SPIS_EVT_TYPE_MAX; //force transition for dummy event
+        event.rx_amount = 0;
+        event.tx_amount = 0;
+        spi_slave_event_handle(event);
 
-        //keep /CS high when init
-        nrf_gpio_cfg_input(spi_slave_config.pin_csn, NRF_GPIO_PIN_PULLUP);
-        //use /CS pullup because state of the line might be undefined when master redefines PIO lines
-        err_code = spi_slave_set_cs_pull_up_config(GPIO_PIN_CNF_PULL_Pullup);
-        APP_ERROR_CHECK(err_code);
-
-        err_code = spi_slave_init(&spi_slave_config);
-
-        if (err_code == NRF_SUCCESS)
-        {
-            m_ser_phy_callback = events_handler;
-
-            m_trans_state   = SPI_RAW_STATE_SETUP_HEADER;
-            event.evt_type  = SPI_SLAVE_EVT_TYPE_MAX; //force transition for dummy event
-            event.rx_amount = 0;
-            event.tx_amount = 0;
-            spi_slave_event_handle(event);
-
-        }
     }
     return err_code;
 }
@@ -571,7 +574,7 @@ uint32_t ser_phy_open(ser_phy_events_handler_t events_handler)
 /* ser_phy API function */
 void ser_phy_close(void)
 {
-    (void) spi_slave_evt_handler_register(NULL);
+    nrf_drv_spis_uninit(&m_spis);
     m_ser_phy_callback = NULL;
     m_trans_state      = SPI_RAW_STATE_UNKNOWN;
 }

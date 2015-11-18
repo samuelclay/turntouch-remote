@@ -20,7 +20,7 @@
  * @defgroup nrf_ppi_hal PPI HAL
  * @{
  * @ingroup nrf_ppi
- * @brief Hardware abstraction layer for setting up Programmable Peripheral Interconnect (PPI) channels.
+ * @brief Hardware access layer for setting up Programmable Peripheral Interconnect (PPI) channels.
  */
 
 #define NRF_PPI_TASK_SET    (1UL)
@@ -168,6 +168,17 @@ __STATIC_INLINE nrf_ppi_channel_enable_t nrf_ppi_channel_enable_get(nrf_ppi_chan
 __STATIC_INLINE void nrf_ppi_channel_disable_all(void)
 {
     NRF_PPI->CHENCLR = ((uint32_t)0xFFFFFFFFuL);
+}
+
+
+/**
+ * @brief Function for disabling multiple PPI channels.
+ *
+ * @param[in] mask Channel mask.
+ */
+__STATIC_INLINE void nrf_ppi_channels_disable(uint32_t mask)
+{
+    NRF_PPI->CHENCLR = mask;
 }
 
 

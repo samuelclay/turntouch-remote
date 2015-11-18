@@ -90,6 +90,7 @@ INC_PATHS += -I./libs/components/ble/ble_services/ble_dis
 INC_PATHS += -I./libs/components/ble/ble_services/ble_dfu
 INC_PATHS += -I./libs/components/device
 INC_PATHS += -I./libs/components/drivers_nrf/common
+INC_PATHS += -I./libs/components/drivers_nrf/delay
 INC_PATHS += -I./libs/components/drivers_nrf/gpiote
 INC_PATHS += -I./libs/components/drivers_nrf/hal
 INC_PATHS += -I./libs/components/drivers_nrf/ppi

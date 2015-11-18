@@ -12,7 +12,7 @@
 
 #include "ble_debug_assert_handler.h"
 #include <string.h>
-#include "nrf51.h"
+#include "nrf.h"
 #include "ble_error_log.h"
 #include "nordic_common.h"
 

@@ -55,31 +55,13 @@
 #define BSP_BUTTONS_ALL      0xFFFFFFFF
 #define BSP_BUTTONS_NONE     0
 
-#if (LEDS_NUMBER > 0) && !defined(BSP_SIMPLE)
-    #define BSP_LED_APP_TIMERS_NUMBER 2
-#else
-    #define BSP_APP_APP_TIMERS_NUMBER 0
-#endif // LEDS_NUMBER > 0
-
-#if (BUTTONS_NUMBER > 0) && !defined(BSP_SIMPLE)
-    #define BSP_BUTTONS_APP_TIMERS_NUMBER 1
-#else
-    #define BSP_BUTTONS_APP_TIMERS_NUMBER 0
-#endif // LEDS_NUMBER > 0
-
-/**@def BSP_APP_TIMERS_NUMBER
- * Number of @ref app_timer instances required by the BSP module.
- */
-#define BSP_APP_TIMERS_NUMBER (BSP_LED_APP_TIMERS_NUMBER + BSP_BUTTONS_APP_TIMERS_NUMBER)
-
 /**@brief Types of BSP initialization.
  */
 #define BSP_INIT_NONE    0        /**< This define specifies the type of initialization without support for LEDs and buttons (@ref bsp_init).*/
 #define BSP_INIT_LED     (1 << 0) /**< This bit enables LEDs during initialization (@ref bsp_init).*/
 #define BSP_INIT_BUTTONS (1 << 1) /**< This bit enables buttons during initialization (@ref bsp_init).*/
-#define BSP_INIT_UART    (1 << 2) /**< This bit enables UART during initialization (@ref bsp_init).*/
 
-#define BSP_LONG_PUSH_TIMEOUT_MS (500) /**< The time to hold for a long push (in milliseconds). */
+#define BSP_LONG_PUSH_TIMEOUT_MS (1000) /**< The time to hold for a long push (in milliseconds). */
 
 typedef uint8_t bsp_button_action_t; /**< The different actions that can be performed on a button. */
 

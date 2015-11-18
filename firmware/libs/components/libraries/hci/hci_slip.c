@@ -14,7 +14,6 @@
 #include <stdlib.h>
 #include "hci_transport_config.h"
 #include "app_uart.h"
-#include "nrf51_bitfields.h"
 #include "nrf_error.h"
 
 #define APP_SLIP_END        0xC0                            /**< SLIP code for identifying the beginning and end of a packet frame.. */
@@ -30,7 +29,6 @@ typedef enum
     SLIP_TRANSMITTING,                                      /**< SLIP state is transmitting indicating write() has been called but data transmission has not completed. */
 } slip_states_t;
 
-static uint16_t                 m_uart_id;                  /** UART id returned from the UART module when calling app_uart_init, this id is kept, as it must be provided to the UART module when calling app_uart_close. */
 static slip_states_t            m_current_state = SLIP_OFF; /** Current state for the SLIP TX state machine. */
 
 static hci_slip_event_handler_t m_slip_event_handler;       /** Event callback function for handling of SLIP events, @ref hci_slip_evt_type_t . */
@@ -180,7 +178,7 @@ static void transmit_buffer(void)
 
         err_code = send_tx_byte();
 
-        if (err_code == NRF_ERROR_NO_MEM)
+        if (err_code == NRF_ERROR_NO_MEM || err_code == NRF_ERROR_BUSY)
         {
             // No memory left in UART TX buffer. Abort and wait for APP_UART_TX_EMPTY to continue.
             return;
@@ -347,8 +345,7 @@ static uint32_t slip_uart_open(void)
     err_code = app_uart_init(&comm_params,
                              NULL,
                              slip_uart_eventhandler,
-                             APP_IRQ_PRIORITY_LOW,
-                             &m_uart_id);
+                             APP_IRQ_PRIORITY_LOW);
 
     if (err_code == NRF_SUCCESS)
     {
@@ -386,7 +383,7 @@ uint32_t hci_slip_open()
 uint32_t hci_slip_close()
 {
     m_current_state   = SLIP_OFF;
-    uint32_t err_code = app_uart_close(m_uart_id);
+    uint32_t err_code = app_uart_close();
 
     return err_code;
 }

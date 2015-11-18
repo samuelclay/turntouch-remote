@@ -57,6 +57,20 @@ uint32_t ser_conn_command_process(uint8_t * p_command, uint16_t command_len)
             err_code = op_status_enc
                            (opcode, NRF_ERROR_NOT_SUPPORTED,
                            &p_tx_buf[SER_PKT_OP_CODE_POS], &tx_buf_len, &index);
+            if (NRF_SUCCESS == err_code)
+            {
+                tx_buf_len += SER_PKT_TYPE_SIZE;
+                err_code   = ser_hal_transport_tx_pkt_send(p_tx_buf, (uint16_t)tx_buf_len);
+                /* TX buffer is going to be freed automatically in the HAL Transport layer. */
+                if (NRF_SUCCESS != err_code)
+                {
+                    err_code = NRF_ERROR_INTERNAL;
+                }
+            }
+            else
+            {
+                err_code = NRF_ERROR_INTERNAL;
+            }
         }
         else if (NRF_SUCCESS == err_code) /* Send a response. */
         {

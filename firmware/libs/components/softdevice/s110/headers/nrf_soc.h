@@ -47,8 +47,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "nrf_svc.h"
-#include "nrf51.h"
-#include "nrf51_bitfields.h"
+#include "nrf.h"
 #include "nrf_error_soc.h"
 
 /**@addtogroup NRF_SOC_DEFINES Defines
@@ -70,6 +69,7 @@
 
 #define SD_EVT_IRQn                       (SWI2_IRQn)        /**< SoftDevice Event IRQ number. Used for both protocol events and SoC events. */
 #define SD_EVT_IRQHandler                 (SWI2_IRQHandler)  /**< SoftDevice Event IRQ handler. Used for both protocol events and SoC events. */
+
 #define RADIO_NOTIFICATION_IRQn           (SWI1_IRQn)        /**< The radio notification IRQ number. */
 #define RADIO_NOTIFICATION_IRQHandler     (SWI1_IRQHandler)  /**< The radio notification IRQ handler. */
 

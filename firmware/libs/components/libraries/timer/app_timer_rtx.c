@@ -1,7 +1,6 @@
 #include "app_timer.h"
 #include <stdlib.h>
-#include "nrf51.h"
-#include "nrf51_bitfields.h"
+#include "nrf.h"
 #include "nrf_soc.h"
 #include "app_error.h"
 #include "app_util.h"
@@ -12,7 +11,6 @@
 /**@brief This structure keeps information about osTimer.*/
 typedef struct
 {
-    void       * argument;
     osTimerDef_t timerDef;
     uint32_t     buffer[5];
     osTimerId    id;
@@ -41,10 +39,10 @@ typedef struct os_timer_cb_
 } os_timer_cb;
 
 /**@brief This functions are defined by RTX.*/
+//lint --save -e10 -e19 -e526
 extern osStatus svcTimerStop(osTimerId timer_id);                        /**< Used in app_timer_stop(). */
-
 extern osStatus svcTimerStart(osTimerId timer_id, uint32_t millisec);    /**< Used in app_timer_start(). */
-
+// lint --restore
 static void * rt_id2obj(void *id)                                         /**< Used in app_timer_start(). This function gives information if osTimerID is valid */
 {
 
@@ -68,7 +66,6 @@ static void * rt_id2obj(void *id)                                         /**< U
 
 
 uint32_t app_timer_init(uint32_t                      prescaler,
-                        uint8_t                       max_timers,
                         uint8_t                       op_queues_size,
                         void                        * p_buffer,
                         app_timer_evt_schedule_func_t evt_schedule_func)
@@ -79,20 +76,13 @@ uint32_t app_timer_init(uint32_t                      prescaler,
     }
 
     app_timer_control.prescaler  = prescaler;
-    app_timer_control.max_timers = max_timers;
     app_timer_control.app_timers = p_buffer;
 
-    // Initialize buffer for timer
-    for (int i = 0; i < max_timers; i++)
-    {
-        app_timer_control.app_timers[i].timerDef.timer = app_timer_control.app_timers[i].buffer;
-        app_timer_control.app_timers[i].id             = 0;
-    }
     return NRF_SUCCESS;
 }
 
 
-uint32_t app_timer_create(app_timer_id_t            * p_timer_id,
+uint32_t app_timer_create(app_timer_id_t const      * p_timer_id,
                           app_timer_mode_t            mode,
                           app_timer_timeout_handler_t timeout_handler)
 {
@@ -102,31 +92,21 @@ uint32_t app_timer_create(app_timer_id_t            * p_timer_id,
         return NRF_ERROR_INVALID_PARAM;
     }
 
-    // Find free timer
-    for (int i = 0; i < app_timer_control.max_timers; i++)
+    app_timer_info_t * p_timer_info = (app_timer_info_t *)*p_timer_id;
+    p_timer_info->timerDef.timer = p_timer_info->buffer;
+    p_timer_info->timerDef.ptimer = (os_ptimer)timeout_handler;
+
+    p_timer_info->id = osTimerCreate(&(p_timer_info->timerDef), (os_timer_type)mode, NULL);
+
+    if (p_timer_info->id)
+        return NRF_SUCCESS;
+    else
     {
-        if (!app_timer_control.app_timers[i].id)
-        {
-            app_timer_control.app_timers[i].timerDef.ptimer = (os_ptimer)timeout_handler;
-            app_timer_control.app_timers[i].id              =
-                osTimerCreate((const osTimerDef_t *)&(app_timer_control.app_timers[i].timerDef),
-                              (os_timer_type)mode, NULL);
-            *p_timer_id = (app_timer_id_t) app_timer_control.app_timers[i].id;
-
-            if (p_timer_id)
-                return NRF_SUCCESS;
-            else
-            {
-                app_timer_control.app_timers[i].id = 0;
-                return NRF_ERROR_INVALID_PARAM; // This error is unspecified by rtx
-            }
-
-        }
+        return NRF_ERROR_INVALID_PARAM; // This error is unspecified by rtx
     }
-    return NRF_ERROR_NO_MEM;
 }
 
-
+#define osTimerRunning  2
 uint32_t app_timer_start(app_timer_id_t timer_id, uint32_t timeout_ticks, void * p_context)
 {
     if ((timeout_ticks < APP_TIMER_MIN_TIMEOUT_TICKS))
@@ -137,14 +117,19 @@ uint32_t app_timer_start(app_timer_id_t timer_id, uint32_t timeout_ticks, void *
         ((uint32_t)ROUNDED_DIV(timeout_ticks * 1000 * (app_timer_control.prescaler + 1),
                                (uint32_t)APP_TIMER_CLOCK_FREQ));
 
-    if (rt_id2obj((void *)timer_id) == NULL)
+    app_timer_info_t * p_timer_info = (app_timer_info_t *)timer_id;
+    if (rt_id2obj((void *)p_timer_info->id) == NULL)
         return NRF_ERROR_INVALID_PARAM;
 
     // Pass p_context to timer_timeout_handler
-    ((os_timer_cb *)(timer_id))->arg = p_context;
+    ((os_timer_cb *)(p_timer_info->id))->arg = p_context;
 
+    if (((os_timer_cb *)(p_timer_info->id))->state == osTimerRunning)
+    {
+        return NRF_SUCCESS;
+    }
     // osTimerStart() returns osErrorISR if it is called in interrupt routine.
-    switch (osTimerStart((osTimerId)timer_id, timeout_ms) )
+    switch (osTimerStart((osTimerId)p_timer_info->id, timeout_ms) )
     {
         case osOK:
             return NRF_SUCCESS;
@@ -160,7 +145,7 @@ uint32_t app_timer_start(app_timer_id_t timer_id, uint32_t timeout_ticks, void *
     }
 
     // Start timer without svcCall
-    switch (svcTimerStart((osTimerId)timer_id, timeout_ms))
+    switch (svcTimerStart((osTimerId)p_timer_info->id, timeout_ms))
     {
         case osOK:
             return NRF_SUCCESS;
@@ -176,10 +161,10 @@ uint32_t app_timer_start(app_timer_id_t timer_id, uint32_t timeout_ticks, void *
     }
 }
 
-
 uint32_t app_timer_stop(app_timer_id_t timer_id)
 {
-    switch (osTimerStop((osTimerId)timer_id) )
+    app_timer_info_t * p_timer_info = (app_timer_info_t *)timer_id;
+    switch (osTimerStop((osTimerId)p_timer_info->id) )
     {
         case osOK:
             return NRF_SUCCESS;
@@ -198,7 +183,7 @@ uint32_t app_timer_stop(app_timer_id_t timer_id)
     }
 
     // Stop timer without svcCall
-    switch (svcTimerStop((osTimerId)timer_id))
+    switch (svcTimerStop((osTimerId)p_timer_info->id))
     {
         case osOK:
             return NRF_SUCCESS;

@@ -34,9 +34,7 @@ typedef struct
  *   Mailbox used for communication between event handler (called from serial stream
  *   interrupt context) and event processing function (called from scheduler or interrupt context).
  */
-APP_MAILBOX_DEF(sd_ble_evt_mailbox, SD_BLE_EVT_MAILBOX_QUEUE_SIZE, ser_sd_handler_evt_data_t);
-
-static app_mailbox_id_t m_ble_evt_mailbox_id; /**< mailbox identifier. */
+APP_MAILBOX_DEF(sd_ble_evt_mailbox, SD_BLE_EVT_MAILBOX_QUEUE_SIZE, sizeof(ser_sd_handler_evt_data_t));
 
 /**
  * @brief Function to be replaced by user implementation if needed.
@@ -78,7 +76,7 @@ static void ser_softdevice_evt_handler(uint8_t * p_data, uint16_t length)
     err_code = ser_sd_transport_rx_free(p_data);
     APP_ERROR_CHECK(err_code);
 
-    err_code = app_mailbox_put(m_ble_evt_mailbox_id, &item);
+    err_code = app_mailbox_put(&sd_ble_evt_mailbox, &item);
     APP_ERROR_CHECK(err_code);
 
     ser_app_hal_nrf_evt_pending();
@@ -109,7 +107,7 @@ uint32_t sd_ble_evt_get(uint8_t * p_data, uint16_t * p_len)
 {
     uint32_t err_code;
 
-    err_code = app_mailbox_get(m_ble_evt_mailbox_id, p_data);
+    err_code = app_mailbox_get(&sd_ble_evt_mailbox, p_data);
 
     if (err_code == NRF_SUCCESS) //if anything in the mailbox
     {
@@ -132,9 +130,9 @@ uint32_t sd_ble_evt_get(uint8_t * p_data, uint16_t * p_len)
 
 uint32_t sd_ble_evt_mailbox_length_get(uint32_t * p_mailbox_length)
 {
-    uint32_t err_code;
+    uint32_t err_code = NRF_SUCCESS;
     
-    err_code = app_mailbox_get_length(m_ble_evt_mailbox_id, p_mailbox_length);
+    *p_mailbox_length = app_mailbox_length_get(&sd_ble_evt_mailbox);
     
     return err_code;
 }
@@ -150,7 +148,7 @@ uint32_t sd_softdevice_enable(nrf_clock_lfclksrc_t           clock_source,
     {
         connectivity_reset_low();
 
-        err_code = app_mailbox_create(APP_MAILBOX(sd_ble_evt_mailbox), &m_ble_evt_mailbox_id);
+        err_code = app_mailbox_create(&sd_ble_evt_mailbox);
 
         if (err_code == NRF_SUCCESS)
         {

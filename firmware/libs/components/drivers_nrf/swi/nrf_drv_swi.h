@@ -30,27 +30,50 @@
 #include "nrf_drv_config.h"
 #include "sdk_errors.h"
 
+#ifndef EGU_ENABLED
+    #define EGU_ENABLED 0
+#endif
 
-typedef uint32_t nrf_swi_t;         ///< @brief SWI channel (unsigned integer).
+#if EGU_ENABLED > 0
+#include "nrf_egu.h"
+#endif
 
-/**  @brief   SWI user flags (unsigned integer).
- *   @details User flags are set during the SWI trigger and passed to the callback function as an argument.
+typedef uint8_t nrf_swi_t;         ///< @brief SWI channel (unsigned integer).
+
+/** @brief   SWI user flags (unsigned integer).
+ *
+ *  User flags are set during the SWI trigger and passed to the callback function as an argument.
  */
 typedef uint16_t nrf_swi_flags_t;
 
-#define NRF_SWI_UNALLOCATED ((nrf_swi_t) 0xFFFFFFFFuL)  ///< @brief Unallocated channel value.
+/** @brief Unallocated channel value. */
+#define NRF_SWI_UNALLOCATED ((nrf_swi_t) 0xFFFFFFFFuL)
 
-/** @brief SWI handler. Takes two arguments: SWI number (nrf_swi_t) and flags (nrf_swi_flags_t). */
+/** @brief   SWI handler function.
+ *
+ *  Takes two arguments: SWI number (nrf_swi_t) and flags (nrf_swi_flags_t).
+ */
 typedef void (* nrf_swi_handler_t)(nrf_swi_t, nrf_swi_flags_t);
 
 /**@brief Maximum numbers of SWIs. This number is fixed for a specific chip. */
+#if EGU_ENABLED > 0
+#define SWI_MAX              NRF_EGU_COUNT
+#else
 #define SWI_MAX              6
+#endif
 
 /**@brief Number of flags per SWI (fixed number). */
+#if EGU_ENABLED > 0
+#define SWI_MAX_FLAGS        NRF_EGU_CHANNEL_COUNT
+#else
 #define SWI_MAX_FLAGS        16
+#endif
 
 #ifndef SWI_COUNT
-/**@brief Number of software interrupts available. This number can be set in the range from 1 to SWI_MAX. */
+/** @brief Number of software interrupts available.
+ *
+ *  This number can be set in the range from 1 to SWI_MAX.
+ */
 #define SWI_COUNT 4
 #endif
 
@@ -84,9 +107,6 @@ ret_code_t nrf_drv_swi_init(void);
 /**@brief Function for uninitializing the SWI module.
  *
  * This function also disables all SWIs.
- *
- * @retval     NRF_SUCCESS             If the module was successfully uninitialized.
- * @retval     NRF_ERROR_INVALID_STATE If the module has not been initialized yet.
  */
 void nrf_drv_swi_uninit(void);
 
@@ -106,7 +126,7 @@ ret_code_t nrf_drv_swi_alloc(nrf_swi_t * p_swi, nrf_swi_handler_t event_handler,
 
 /**@brief Function for freeing a previously allocated SWI.
  *
- * @param[in]  p_swi                 SWI to free.
+ * @param[in,out]  p_swi     SWI to free. The value is changed to NRF_SWI_UNALLOCATED on success.
  */
 void nrf_drv_swi_free(nrf_swi_t * p_swi);
 
@@ -118,6 +138,30 @@ void nrf_drv_swi_free(nrf_swi_t * p_swi);
  */
 void nrf_drv_swi_trigger(nrf_swi_t swi, uint8_t flag_number);
 
-#endif
+
+#if EGU_ENABLED > 0
+
+/**@brief Function for returning the EGU trigger task address.
+ *
+ * @param[in]  swi           SWI instance.
+ * @param[in]  channel       Number of the EGU channel.
+ *
+ * @returns EGU trigger task address.
+ */
+uint32_t nrf_drv_swi_task_trigger_address_get(nrf_swi_t swi, uint8_t channel);
+
+/**@brief Function for returning the EGU triggered event address.
+ *
+ * @param[in]  swi           SWI instance.
+ * @param[in]  channel       Number of the EGU channel.
+ *
+ * @returns EGU triggered event address.
+ */
+uint32_t nrf_drv_swi_event_triggered_address_get(nrf_swi_t swi, uint8_t channel);
+
+#endif // EGU_ENABLED > 0
+
+
+#endif // NRF_DRV_SWI_H__
 
 /** @} */

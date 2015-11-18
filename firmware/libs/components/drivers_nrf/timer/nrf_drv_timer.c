@@ -12,7 +12,6 @@
 
 #include "nrf_drv_timer.h"
 #include "nrf_assert.h"
-#include "nordic_common.h"
 #include "nrf_drv_common.h"
 #include "app_util_platform.h"
 
@@ -344,5 +343,19 @@ void TIMER1_IRQHandler(void)
 void TIMER2_IRQHandler(void)
 {
     nrf_drv_timer_interrupt_handle(NRF_TIMER2, TIMER2_INSTANCE_INDEX);
+}
+#endif
+
+#if TIMER3_ENABLED == 1
+void TIMER3_IRQHandler(void)
+{
+    nrf_drv_timer_interrupt_handle(NRF_TIMER3, TIMER3_INSTANCE_INDEX);
+}
+#endif
+
+#if TIMER4_ENABLED == 1
+void TIMER4_IRQHandler(void)
+{
+    nrf_drv_timer_interrupt_handle(NRF_TIMER4, TIMER4_INSTANCE_INDEX);
 }
 #endif

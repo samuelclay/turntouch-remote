@@ -21,11 +21,12 @@
  * @defgroup nrf_rng_hal RNG HAL
  * @{
  * @ingroup nrf_rng
- * @brief Hardware abstraction layer for managing the random number generator (RNG).
+ * @brief Hardware access layer for managing the random number generator (RNG).
  */
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 #include "nrf.h"
 
 #define NRF_RNG_TASK_SET    (1UL)

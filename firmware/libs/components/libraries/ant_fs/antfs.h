@@ -10,7 +10,7 @@ All rights reserved.
  * This file is based on implementation originally made by Dynastream Innovations Inc. - August 2012
  * @defgroup ant_fs_client_main ANT-FS client device simulator
  * @{
- * @ingroup nrf_ant_fs_client
+ * @ingroup ant_sdk_utils
  *
  * @brief The ANT-FS client device simulator.
  *
@@ -23,6 +23,7 @@ All rights reserved.
 #include <stdint.h>
 #include <stdbool.h>
 #include "defines.h"
+#include "antfs_config.h"
 
 #define ANTFS_VERSION_MAJOR               1u                                                                                             /**< Version major number. */
 #define ANTFS_VERSION_MINOR               0                                                                                              /**< Version minor number. */
@@ -39,7 +40,6 @@ All rights reserved.
 #define ANTFS_PAIRING_TIMEOUT             120u                                                                                           /**< Pairing timeout (time the UI will wait for a response to the pairing request before switching to the link layer, in seconds). */
 #define ANTFS_LINK_COMMAND_TIMEOUT        10u                                                                                            /**< Command timeout (time the client will wait without receiving any commands before switching to the link layer, in seconds). */
 #define ANTFS_TRANS_TYPE                  5u                                                                                             /**< ANT-FS Transmission Type. */
-#define ANTFS_DEVICE_TYPE                 1u                                                                                             /**< ANT-FS Device Type. */
 #define ANTFS_CHANNEL_TYPE                CHANNEL_TYPE_MASTER                                                                            /**< ANT-FS Client Channel Type. */
 #define ANTFS_BEACON_PERIOD_STATUS        BEACON_PERIOD_4_HZ                                                                             /**< ANT-FS Beacon Message Period. */
 #define ANTFS_TRANSMIT_POWER              3u                                                                                             /**< ANT Transmit Power (0dBm). */
@@ -245,7 +245,7 @@ typedef void(*antfs_burst_wait_handler_t)(void);
 /**@brief Function for setting initial ANT-FS configuration parameters.
  *
  * @param[in] p_params                 The initial ANT-FS configuration parameters.
- * @param[in] p_burst_wait_handler     Burst wait handler
+ * @param[in] burst_wait_handler       Burst wait handler.
  */
 void antfs_init(const antfs_params_t * const p_params,
                 antfs_burst_wait_handler_t burst_wait_handler);

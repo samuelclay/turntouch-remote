@@ -13,7 +13,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <nrf51.h>
+#include <nrf.h>
 #include "ble_error_log.h"
 #include "app_util.h"
 #include "app_error.h"

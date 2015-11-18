@@ -60,6 +60,26 @@ void sensorsim_init(sensorsim_state_t *     p_state,
 uint32_t sensorsim_measure(sensorsim_state_t *     p_state,
                                const sensorsim_cfg_t * p_cfg);
 
+/**@brief Function for incrementing a simulated sensor measurement value.
+ *
+ * @param[in,out]  p_state  Current state of simulator.
+ * @param[in]      p_cfg    Simulator configuration.
+ *
+ * @return         Simulator output.
+ */
+void sensorsim_increment(sensorsim_state_t *     p_state,
+                         const sensorsim_cfg_t * p_cfg);
+
+/**@brief Function for decrementing a simulated sensor measurement value.
+ *
+ * @param[in,out]  p_state  Current state of simulator.
+ * @param[in]      p_cfg    Simulator configuration.
+ *
+ * @return         Simulator output.
+ */
+void sensorsim_decrement(sensorsim_state_t *     p_state,
+                         const sensorsim_cfg_t * p_cfg);
+
 #endif // SENSORSIM_H__
 
 /** @} */

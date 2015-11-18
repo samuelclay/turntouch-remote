@@ -22,7 +22,7 @@
  * @defgroup nrf_rtc_hal RTC HAL
  * @{
  * @ingroup nrf_rtc
- * @brief Hardware abstraction layer for managing the real time counter (RTC).
+ * @brief Hardware access layer for managing the real time counter (RTC).
  */
 
 #include <stdint.h>
@@ -249,6 +249,10 @@ __STATIC_INLINE uint32_t nrf_rtc_event_pending(NRF_RTC_Type * p_rtc, nrf_rtc_eve
 __STATIC_INLINE void nrf_rtc_event_clear(NRF_RTC_Type * p_rtc, nrf_rtc_event_t event)
 {
     *((volatile uint32_t *)((uint8_t *)p_rtc + (uint32_t)event)) = 0;
+#if __CORTEX_M == 0x04
+    volatile uint32_t dummy = *((volatile uint32_t *)((uint8_t *)p_rtc + (uint32_t)event));
+    (void)dummy;
+#endif
 }
 
 __STATIC_INLINE uint32_t nrf_rtc_counter_get(NRF_RTC_Type * p_rtc)

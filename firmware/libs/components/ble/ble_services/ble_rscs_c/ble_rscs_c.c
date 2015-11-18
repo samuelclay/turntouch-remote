@@ -283,8 +283,8 @@ static uint32_t cccd_configure(uint16_t conn_handle, uint16_t handle_cccd, bool 
     p_msg->req.write_req.gattc_params.p_value  = p_msg->req.write_req.gattc_value;
     p_msg->req.write_req.gattc_params.offset   = 0;
     p_msg->req.write_req.gattc_params.write_op = BLE_GATT_OP_WRITE_REQ;
-    p_msg->req.write_req.gattc_value[0]        = LSB(cccd_val);
-    p_msg->req.write_req.gattc_value[1]        = MSB(cccd_val);
+    p_msg->req.write_req.gattc_value[0]        = LSB_16(cccd_val);
+    p_msg->req.write_req.gattc_value[1]        = MSB_16(cccd_val);
     p_msg->conn_handle                         = conn_handle;
     p_msg->type                                = WRITE_REQ;
 

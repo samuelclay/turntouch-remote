@@ -39,7 +39,7 @@
 #include <string.h>
 
 #include "nordic_common.h"
-#include "nrf51.h"
+#include "nrf.h"
 #include "nrf_error.h"
 #include "nrf_gpio.h"
 #include "app_util.h"
@@ -53,6 +53,12 @@
 #endif /* SER_CONNECTIVITY */
 
 #include "boards.h"
+
+#ifdef NRF51
+#define SER_UART_IRQ UART0_IRQn
+#elif defined NRF52
+#define SER_UART_IRQ UARTE0_UART0_IRQn
+#endif /* NRF51 */
 
 static uint8_t * mp_tx_stream;                         /**< Pointer to Tx data */
 static uint16_t  m_tx_stream_length;                   /**< Length of Tx data including SER_PHY
@@ -347,9 +353,9 @@ uint32_t ser_phy_open(ser_phy_events_handler_t events_handler)
     //uart_evt_handler is used to handle events produced by low-level uart driver
     APP_UART_INIT(&comm_params, ser_phy_uart_evt_callback, UART_IRQ_PRIORITY, err_code);
 
-    //Pull down Rx pin until another side gets up to avoid receiving false bytes due to glitches
-    //on Rx line
-    nrf_gpio_cfg_input(comm_params.rx_pin_no, NRF_GPIO_PIN_PULLDOWN);
+//    //Pull down Rx pin until another side gets up to avoid receiving false bytes due to glitches
+//    //on Rx line
+//    nrf_gpio_cfg_input(comm_params.rx_pin_no, NRF_GPIO_PIN_PULLDOWN);
 
     m_ser_phy_event_handler = events_handler;
 
@@ -418,19 +424,17 @@ uint32_t ser_phy_rx_buf_set(uint8_t * p_buffer)
 
 void ser_phy_close(void)
 {
-    uint16_t uart_id = 0;
-
     m_ser_phy_event_handler = NULL;
-    (void)app_uart_close(uart_id);
+    (void)app_uart_close();
 }
 
 void ser_phy_interrupts_enable(void)
 {
-    NVIC_EnableIRQ(UART0_IRQn);
+    NVIC_EnableIRQ(SER_UART_IRQ);
 }
 
 void ser_phy_interrupts_disable(void)
 {
-    NVIC_DisableIRQ(UART0_IRQn);
+    NVIC_DisableIRQ(SER_UART_IRQ);
 }
 

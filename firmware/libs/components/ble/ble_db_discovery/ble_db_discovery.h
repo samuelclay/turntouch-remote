@@ -25,10 +25,11 @@
  *           @image html db_discovery.jpg
  *
  * @warning  The maximum number of characteristics per service that can be discovered by this module
- *           is indicated by the value of @ref BLE_DB_DISCOVERY_MAX_CHAR_PER_SRV. If the peer
- *           has more than the supported number of characteristics, then the first found will be
- *           discovered and any further characteristics will be ignored. No descriptors other
- *           than Client Characteristic Configuration Descriptors will be searched for at the peer.
+ *           is determined by the number of characteristics in the service structure defined in
+ *           ble_gatt_db.h. If the peer has more than the supported number of characteristics, then
+ *           the first found will be discovered and any further characteristics will be ignored. No
+ *           descriptors other than Client Characteristic Configuration Descriptors will be searched
+ *           for at the peer.
  *
  * @note     Presently only one instance of a Primary Service can be discovered by this module. If
  *           there are multiple instances of the service at the peer, only the first instance
@@ -47,6 +48,7 @@
 #include "ble.h"
 #include "nrf_error.h"
 #include "ble_srv_common.h"
+#include "ble_gatt_db.h"
 
 /**
  * @defgroup db_disc_defines Defines
@@ -54,7 +56,6 @@
  */
 
 #define BLE_DB_DISCOVERY_MAX_SRV          2  /**< Maximum number of services supported by this module. This also indicates the maximum number of users allowed to be registered to this module. (one user per service). */
-#define BLE_DB_DISCOVERY_MAX_CHAR_PER_SRV 3  /**< Maximum number of characteristics per service supported by this module. */
 
 /** @} */
 
@@ -79,25 +80,6 @@ typedef enum
  * @{
  */
 
-/**@brief Structure for holding the characteristic and the handle of its CCCD found during the
- *        discovery process.
- */
-typedef struct
-{
-    ble_gattc_char_t characteristic;  /**< Structure containing information about the characteristic. */
-    uint16_t         cccd_handle;     /**< CCCD Handle value for this characteristic. This will be set to BLE_GATT_HANDLE_INVALID if a CCCD is not present at the server. */
-} ble_db_discovery_char_t;
-
-/**@brief Structure for holding information about the service and the characteristics found during
- *        the discovery process.
- */
-typedef struct
-{
-    ble_uuid_t               srv_uuid;                                           /**< UUID of the service. */    
-    uint8_t                  char_count;                                         /**< Number of characteristics present in the service. */
-    ble_db_discovery_char_t  charateristics[BLE_DB_DISCOVERY_MAX_CHAR_PER_SRV];  /**< Array of information related to the characteristics present in the service. */
-    ble_gattc_handle_range_t handle_range;                                       /**< Service Handle Range. */
-} ble_db_discovery_srv_t;
 
 /**@brief   Structure for holding the information related to the GATT database at the server.
  *
@@ -108,12 +90,13 @@ typedef struct
  */
 typedef struct
 {
-    ble_db_discovery_srv_t services[BLE_DB_DISCOVERY_MAX_SRV];  /**< Information related to the current service being discovered. This is intended for internal use during service discovery.*/
-    uint16_t               conn_handle;                         /**< Connection handle as provided by the SoftDevice. */
-    uint8_t                srv_count;                           /**< Number of services at the peers GATT database.*/
-    uint8_t                curr_char_ind;                       /**< Index of the current characteristic being discovered. This is intended for internal use during service discovery.*/
-    uint8_t                curr_srv_ind;                        /**< Index of the current service being discovered. This is intended for internal use during service discovery.*/
-    bool                   discovery_in_progress;               /**< Variable to indicate if there is a service discovery in progress. */
+    ble_gatt_db_srv_t   services[BLE_DB_DISCOVERY_MAX_SRV];  /**< Information related to the current service being discovered. This is intended for internal use during service discovery.*/
+    uint16_t            conn_handle;                         /**< Connection handle as provided by the SoftDevice. */
+    uint8_t             srv_count;                           /**< Number of services at the peers GATT database.*/
+    uint8_t             curr_char_ind;                       /**< Index of the current characteristic being discovered. This is intended for internal use during service discovery.*/
+    uint8_t             curr_srv_ind;                        /**< Index of the current service being discovered. This is intended for internal use during service discovery.*/
+    bool                discovery_in_progress;               /**< Variable to indicate if there is a service discovery in progress. */
+    uint8_t             discoveries_count;                   /**< Number of service discoveries made, both successful and unsuccessful. */
 } ble_db_discovery_t;
 
 
@@ -125,7 +108,7 @@ typedef struct
     uint16_t                    conn_handle;  /**< Handle of the connection for which this event has occurred. */
     union
     {
-        ble_db_discovery_srv_t discovered_db;  /**< Structure containing the information about the GATT Database at the server. This will be filled when the event type is @ref BLE_DB_DISCOVERY_COMPLETE.*/
+        ble_gatt_db_srv_t discovered_db;  /**< Structure containing the information about the GATT Database at the server. This will be filled when the event type is @ref BLE_DB_DISCOVERY_COMPLETE.*/
         uint32_t               err_code;       /**< nRF Error code indicating the type of error which occurred in the DB Discovery module. This will be filled when the event type is @ref BLE_DB_DISCOVERY_ERROR. */
     } params;
 } ble_db_discovery_evt_t;

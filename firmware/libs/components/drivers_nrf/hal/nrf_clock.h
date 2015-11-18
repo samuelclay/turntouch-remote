@@ -16,14 +16,13 @@
 #include <stddef.h>
 #include <stdbool.h>
  
-#include "nrf51.h"
-#include "nrf51_bitfields.h"
+#include "nrf.h"
 
 /**
  * @defgroup nrf_clock_hal Clock HAL
  * @{
  * @ingroup nrf_clock
- * @brief Hardware abstraction layer for managing the low-frequency clock (LFCLK) and the high-frequency clock (HFCLK).
+ * @brief Hardware access layer for managing the low-frequency clock (LFCLK) and the high-frequency clock (HFCLK).
  */
 
 #define NRF_CLOCK_TASK_TRIGGER (1UL)
@@ -45,8 +44,8 @@ typedef enum
  */
 typedef enum
 {
-    NRF_CLOCK_HF_SRC_RC   = CLOCK_HFCLKSTAT_SRC_RC,  /**< Internal 16 MHz RC oscillator. */
-    NRF_CLOCK_HF_SRC_Xtal = CLOCK_HFCLKSTAT_SRC_Xtal /**< External 16 MHz/32 MHz crystal oscillator. */
+    NRF_CLOCK_HF_SRC_LOW_ACCURACY   = CLOCK_HFCLKSTAT_SRC_RC,  /**< Internal 16 MHz RC oscillator. */
+    NRF_CLOCK_HF_SRC_HIGH_ACCURACY  = CLOCK_HFCLKSTAT_SRC_Xtal /**< External 16 MHz/32 MHz crystal oscillator. */
 } nrf_clock_hf_src_t;
 
 /**
@@ -64,8 +63,13 @@ typedef enum
  */
 typedef enum
 {
-    NRF_CLOCK_XTALFREQ_16MHz = CLOCK_XTALFREQ_XTALFREQ_16MHz, /**< 16 MHz crystal. */
-    NRF_CLOCK_XTALFREQ_32MHz = CLOCK_XTALFREQ_XTALFREQ_32MHz  /**< 32 MHz crystal. */
+#ifdef NRF51
+    NRF_CLOCK_XTALFREQ_Default = CLOCK_XTALFREQ_XTALFREQ_16MHz, /**< Default. 32MHz. */
+    NRF_CLOCK_XTALFREQ_16MHz   = CLOCK_XTALFREQ_XTALFREQ_16MHz, /**< 16 MHz crystal. */
+    NRF_CLOCK_XTALFREQ_32MHz   = CLOCK_XTALFREQ_XTALFREQ_32MHz  /**< 32 MHz crystal. */
+#elif defined NRF52
+    NRF_CLOCK_XTALFREQ_Default,                                 /**< Default. 64MHz. */
+#endif
 } nrf_clock_xtalfreq_t;
 
 /**
@@ -184,6 +188,10 @@ __STATIC_INLINE uint32_t nrf_clock_event_address_get(nrf_clock_event_t event)
 __STATIC_INLINE void nrf_clock_event_clear(nrf_clock_event_t event)
 {
     *((volatile uint32_t *)((uint8_t *)NRF_CLOCK + event)) = NRF_CLOCK_EVENT_CLEAR;
+#if __CORTEX_M == 0x04
+    volatile uint32_t dummy = *((volatile uint32_t *)((uint8_t *)NRF_CLOCK + event));
+    (void)dummy;
+#endif
 }
 
 /**
@@ -321,8 +329,12 @@ __STATIC_INLINE nrf_clock_start_task_status_t nrf_clock_hf_start_task_status_get
  */
 __STATIC_INLINE nrf_clock_xtalfreq_t nrf_clock_xtalfreq_get(void)
 {
+#ifdef NRF51
     return (nrf_clock_xtalfreq_t)((NRF_CLOCK->XTALFREQ &
-                                   CLOCK_XTALFREQ_XTALFREQ_Msk) >> CLOCK_XTALFREQ_XTALFREQ_Pos);
+                                       CLOCK_XTALFREQ_XTALFREQ_Msk) >> CLOCK_XTALFREQ_XTALFREQ_Pos);
+#elif defined NRF52
+    return NRF_CLOCK_XTALFREQ_Default;
+#endif
 }
 
 /**
@@ -332,8 +344,12 @@ __STATIC_INLINE nrf_clock_xtalfreq_t nrf_clock_xtalfreq_get(void)
  */
 __STATIC_INLINE void nrf_clock_xtalfreq_set(nrf_clock_xtalfreq_t xtalfreq)
 {
+#ifdef NRF51
     NRF_CLOCK->XTALFREQ =
         (uint32_t)((xtalfreq << CLOCK_XTALFREQ_XTALFREQ_Pos) & CLOCK_XTALFREQ_XTALFREQ_Msk);
+#elif defined NRF52
+    return;
+#endif
 }
 
 /**

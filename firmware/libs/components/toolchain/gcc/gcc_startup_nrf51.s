@@ -72,22 +72,22 @@ __HeapLimit:
     .align 2
     .globl __Vectors
 __Vectors:
-    .long    __StackTop            /* Top of Stack */
-    .long   Reset_Handler               /* Reset Handler */
-    .long   NMI_Handler                 /* NMI Handler */
-    .long   HardFault_Handler           /* Hard Fault Handler */
-    .long   0                           /* Reserved */
-    .long   0                           /* Reserved */
-    .long   0                           /* Reserved */
-    .long   0                           /* Reserved */
-    .long   0                           /* Reserved */
-    .long   0                           /* Reserved */
-    .long   0                           /* Reserved */
-    .long   SVC_Handler                 /* SVCall Handler */
-    .long   0                           /* Reserved */
-    .long   0                           /* Reserved */
-    .long   PendSV_Handler              /* PendSV Handler */
-    .long   SysTick_Handler             /* SysTick Handler */
+    .long   __StackTop                  /* Top of Stack */
+    .long   Reset_Handler
+    .long   NMI_Handler
+    .long   HardFault_Handler
+    .long   0                           /*Reserved */
+    .long   0                           /*Reserved */
+    .long   0                           /*Reserved */
+    .long   0                           /*Reserved */
+    .long   0                           /*Reserved */
+    .long   0                           /*Reserved */
+    .long   0                           /*Reserved */
+    .long   SVC_Handler
+    .long   0                           /*Reserved */
+    .long   0                           /*Reserved */
+    .long   PendSV_Handler
+    .long   SysTick_Handler
 
   /* External Interrupts */
     .long   POWER_CLOCK_IRQHandler
@@ -95,7 +95,7 @@ __Vectors:
     .long   UART0_IRQHandler
     .long   SPI0_TWI0_IRQHandler
     .long   SPI1_TWI1_IRQHandler
-    .long   0                         /*Reserved */
+    .long   0                           /*Reserved */
     .long   GPIOTE_IRQHandler
     .long   ADC_IRQHandler
     .long   TIMER0_IRQHandler
@@ -116,12 +116,12 @@ __Vectors:
     .long   SWI3_IRQHandler
     .long   SWI4_IRQHandler
     .long   SWI5_IRQHandler
-    .long   0                         /*Reserved */
-    .long   0                         /*Reserved */
-    .long   0                         /*Reserved */
-    .long   0                         /*Reserved */
-    .long   0                         /*Reserved */
-    .long   0                         /*Reserved */
+    .long   0                           /*Reserved */
+    .long   0                           /*Reserved */
+    .long   0                           /*Reserved */
+    .long   0                           /*Reserved */
+    .long   0                           /*Reserved */
+    .long   0                           /*Reserved */
 
     .size    __Vectors, . - __Vectors
 

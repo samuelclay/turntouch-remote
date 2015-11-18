@@ -95,7 +95,7 @@ static void hfclk_start(void)
 static void hfclk_stop(void)
 {
     nrf_clock_task_trigger(NRF_CLOCK_TASK_HFCLKSTOP);
-    while (nrf_clock_hf_src_get() == NRF_CLOCK_HF_SRC_Xtal)
+    while (nrf_clock_hf_src_get() == NRF_CLOCK_HF_SRC_HIGH_ACCURACY)
     {
         
     }
@@ -187,7 +187,7 @@ static bool hfclk_control(bool interrupt_enable)
 #endif
         )
     {
-        if ((nrf_clock_hf_src_get() != NRF_CLOCK_HF_SRC_Xtal)
+        if ((nrf_clock_hf_src_get() != NRF_CLOCK_HF_SRC_HIGH_ACCURACY)
             && (nrf_clock_hf_start_task_status_get() == NRF_CLOCK_START_TASK_NOT_TRIGGERED))
         {
             result = true;
@@ -201,7 +201,7 @@ static bool hfclk_control(bool interrupt_enable)
     }
     else
     {
-        if ((nrf_clock_hf_src_get() == NRF_CLOCK_HF_SRC_Xtal) 
+        if ((nrf_clock_hf_src_get() == NRF_CLOCK_HF_SRC_HIGH_ACCURACY)
             || (nrf_clock_hf_start_task_status_get() == NRF_CLOCK_START_TASK_TRIGGERED))
         {
             hfclk_stop();

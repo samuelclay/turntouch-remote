@@ -12,7 +12,7 @@
 
 /** @file
  *
- * @defgroup ble_debug_assert_handler Assert Handler for debug purposes.
+ * @defgroup ble_debug_assert_handler Assert handler for debug purposes
  * @{
  * @ingroup ble_sdk_lib
  * @brief Module for handling of assert during application development when debugging.

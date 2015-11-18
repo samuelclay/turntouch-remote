@@ -57,17 +57,16 @@ __vector_table
         DCD     Reset_Handler
         DCD     NMI_Handler
         DCD     HardFault_Handler
-        DCD     0
-        DCD     0
-        DCD     0
-;__vector_table_0x1c
-        DCD     0
-        DCD     0
-        DCD     0
-        DCD     0
+        DCD     0                         ; Reserved
+        DCD     0                         ; Reserved
+        DCD     0                         ; Reserved
+        DCD     0                         ; Reserved
+        DCD     0                         ; Reserved
+        DCD     0                         ; Reserved
+        DCD     0                         ; Reserved
         DCD     SVC_Handler
-        DCD     0
-        DCD     0
+        DCD     0                         ; Reserved
+        DCD     0                         ; Reserved
         DCD     PendSV_Handler
         DCD     SysTick_Handler
 

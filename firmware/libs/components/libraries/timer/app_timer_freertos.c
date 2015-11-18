@@ -16,88 +16,215 @@
 
 #include "app_timer.h"
 #include <stdlib.h>
-#include "nrf51.h"
-#include "nrf51_bitfields.h"
+#include <string.h>
+#include "nrf.h"
 #include "app_error.h"
+#include "app_util.h"
+#include "nordic_common.h"
 
-portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+/* Check if RTC FreeRTOS version is used */
+#if configTICK_SOURCE != FREERTOS_USE_RTC
+#error app_timer in FreeRTOS variant have to be used with RTC tick source configuration. Default configuration have to be used in other case.
+#endif
 
-/**@brief Creates a FreeRTOS Timer
+/**
+ * @brief Waiting time for the timer queue
  *
- * @param[in]  p_timer_id        Id of created timer.
- * @param[in]  mode              Mode of created timer.
- * @param[in]  timeout_handler   Function which will be executed when timer expires.
- *
- * @return     This function returns timer handle (ID).
+ * Number of system ticks to wait for the timer queue to put the message.
+ * It is strongly recommended to set this to the value bigger than 1.
+ * In other case if timer message queue is full - any operation on timer may fail.
+ * @note
+ * Timer functions called from interrupt context would never wait.
  */
-uint32_t app_timer_create(app_timer_id_t            * p_timer_id,
+#define APP_TIMER_WAIT_FOR_QUEUE 2
+
+/**@brief This structure keeps information about osTimer.*/
+typedef struct
+{
+    void                      * argument;
+    TimerHandle_t               osHandle;
+    app_timer_timeout_handler_t func;
+    /**
+     * This member is to make sure that timer function is only called if timer is running.
+     * FreeRTOS may have timer running even after stop function is called,
+     * because it processes commands in Timer task and stopping function only puts command into the queue. */
+    bool                        active;
+}app_timer_info_t;
+
+/**
+ * @brief Prescaler that was set by the user
+ *
+ * In FreeRTOS version of app_timer the prescaler setting is constant and done by the operating system.
+ * But the application expect the prescaler to be set according to value given in setup and then
+ * calculate required ticks using this value.
+ * For compatibility we remember the value set and use it for recalculation of required timer setting.
+ */
+static uint32_t m_prescaler;
+
+/* Check if freeRTOS timers are activated */
+#if configUSE_TIMERS == 0
+    #error app_timer for freeRTOS requires configUSE_TIMERS option to be activated.
+#endif
+
+/* Check if app_timer_t variable type can held our app_timer_info_t structure */
+STATIC_ASSERT(sizeof(app_timer_info_t) <= sizeof(app_timer_t));
+
+
+/**
+ * @brief Internal callback function for the system timer
+ *
+ * Internal function that is called from the system timer.
+ * It gets our parameter from timer data and sends it to user function.
+ * @param[in] xTimer Timer handler
+ */
+static void app_timer_callback(TimerHandle_t xTimer)
+{
+    app_timer_info_t * pinfo = (app_timer_info_t*)(pvTimerGetTimerID(xTimer));
+    ASSERT(pinfo->osHandle == xTimer);
+    ASSERT(pinfo->func != NULL);
+
+    if(pinfo->active)
+        pinfo->func(pinfo->argument);
+}
+
+
+uint32_t app_timer_init(uint32_t                      prescaler,
+                        uint8_t                       op_queues_size,
+                        void                        * p_buffer,
+                        app_timer_evt_schedule_func_t evt_schedule_func)
+{
+    UNUSED_PARAMETER(op_queues_size);
+    UNUSED_PARAMETER(p_buffer);
+    UNUSED_PARAMETER(evt_schedule_func);
+
+    m_prescaler = prescaler + 1;
+
+    return NRF_SUCCESS;
+}
+
+
+uint32_t app_timer_create(app_timer_id_t const *      p_timer_id,
                           app_timer_mode_t            mode,
                           app_timer_timeout_handler_t timeout_handler)
 {
-    uint32_t      err_code;
+    app_timer_info_t * pinfo = (app_timer_info_t*)(*p_timer_id);
+    uint32_t      err_code = NRF_SUCCESS;
     unsigned long timer_mode;
 
-    if ( mode == APP_TIMER_MODE_SINGLE_SHOT )
-        timer_mode = pdFALSE;
-    else
-        timer_mode = pdTRUE;
+    if((timeout_handler == NULL) || (p_timer_id == NULL))
+    {
+        return NRF_ERROR_INVALID_PARAM;
+    }
+    if(pinfo->active)
+    {
+        return NRF_ERROR_INVALID_STATE;
+    }
 
-    *p_timer_id = xTimerCreate(" ", 1000, timer_mode, NULL, timeout_handler);
+    if(pinfo->osHandle == NULL)
+    {
+        /* New timer is created */
+        memset(pinfo, 0, sizeof(pinfo));
 
-    if( p_timer_id != NULL )
-        err_code = NRF_SUCCESS;
+        if(mode == APP_TIMER_MODE_SINGLE_SHOT)
+            timer_mode = pdFALSE;
+        else
+            timer_mode = pdTRUE;
+
+        pinfo->func = timeout_handler;
+        pinfo->osHandle = xTimerCreate(" ", 1000, timer_mode, pinfo, app_timer_callback);
+
+        if(pinfo->osHandle == NULL)
+            err_code = NRF_ERROR_NULL;
+    }
     else
-        err_code = NRF_ERROR_NULL;
+    {
+        /* Timer cannot be reinitialized using FreeRTOS API */
+        return NRF_ERROR_INVALID_STATE;
+    }
 
     return err_code;
 }
 
 
-/**@brief Start a FreeRTOS timer.
- *
- * @param[in]  p_timer_id        Id of timer.
- * @param[in]  timeout_ticks     The timer period in [ms].
- * @param[in]  p_contex          This pointer should be always NULL.
- *
- * @return     NRF_SUCCESS on success, otherwise error code.
- */
-uint32_t app_timer_start(TimerHandle_t timer_id, uint32_t timeout_ticks, void * p_context)
+uint32_t app_timer_start(app_timer_id_t timer_id, uint32_t timeout_ticks, void * p_context)
 {
-    if (__get_IPSR() != 0)
-    {
-        if( xTimerChangePeriodFromISR( timer_id, timeout_ticks, 
-                                       &xHigherPriorityTaskWoken) != pdPASS )
-        {
-            if( xTimerStartFromISR( timer_id, &xHigherPriorityTaskWoken ) != pdPASS )
-                return NRF_ERROR_NOT_FOUND;
-        }
-        else
-            return NRF_SUCCESS;
-    }
-    else
-    {
-        xTimerChangePeriod(timer_id, timeout_ticks, NULL);
+    app_timer_info_t * pinfo = (app_timer_info_t*)(timer_id);
+    TimerHandle_t hTimer = pinfo->osHandle;
+    uint32_t rtc_prescaler = portNRF_RTC_REG->PRESCALER  + 1;
+    /* Get back the microseconds to wait */
+    uint32_t timeout_corrected = ROUNDED_DIV(timeout_ticks*m_prescaler, rtc_prescaler);
 
-        if( xTimerStart(timer_id, NULL) != pdPASS )
-            return NRF_ERROR_NOT_FOUND;
-        else
-            return NRF_SUCCESS;
+    if(hTimer == NULL)
+    {
+        return NRF_ERROR_INVALID_STATE;
     }
-    return NRF_ERROR_NOT_FOUND;
-}
-
-/**@brief Stop a FreeRTOS timer.
- *
- * @param[in]  p_timer_id        Id of timer.
- *
- * @return     NRF_SUCCESS on success, otherwise error code.
- */
-uint32_t app_timer_stop(TimerHandle_t timer_id)
-{
-    if( xTimerStop(timer_id, NULL) != pdPASS )
-        return NRF_ERROR_NOT_FOUND;
-    else
+    if(pinfo->active && (xTimerIsTimerActive(hTimer) != pdFALSE))
+    {
+        // Timer already running - exit silently
         return NRF_SUCCESS;
+    }
+
+    pinfo->argument = p_context;
+
+    if(__get_IPSR() != 0)
+    {
+        BaseType_t yieldReq = pdFALSE;
+        if(xTimerChangePeriodFromISR(hTimer, timeout_corrected, &yieldReq) != pdPASS)
+        {
+            return NRF_ERROR_NO_MEM;
+        }
+
+        if( xTimerStartFromISR(hTimer, &yieldReq) != pdPASS )
+        {
+            return NRF_ERROR_NO_MEM;
+        }
+
+        portYIELD_FROM_ISR(yieldReq);
+    }
+    else
+    {
+        if(xTimerChangePeriod(hTimer, timeout_corrected, APP_TIMER_WAIT_FOR_QUEUE) != pdPASS)
+        {
+            return NRF_ERROR_NO_MEM;
+        }
+
+        if(xTimerStart(hTimer, APP_TIMER_WAIT_FOR_QUEUE) != pdPASS)
+        {
+            return NRF_ERROR_NO_MEM;
+        }
+    }
+
+    pinfo->active = true;
+    return NRF_SUCCESS;
 }
 
 
+uint32_t app_timer_stop(app_timer_id_t timer_id)
+{
+    app_timer_info_t * pinfo = (app_timer_info_t*)(timer_id);
+    TimerHandle_t hTimer = pinfo->osHandle;
+    if(hTimer == NULL)
+    {
+        return NRF_ERROR_INVALID_STATE;
+    }
+
+    if(__get_IPSR() != 0)
+    {
+        BaseType_t yieldReq = pdFALSE;
+        if(xTimerStopFromISR(timer_id, &yieldReq) != pdPASS)
+        {
+            return NRF_ERROR_NO_MEM;
+        }
+        portYIELD_FROM_ISR(yieldReq);
+    }
+    else
+    {
+        if(xTimerStop(timer_id, APP_TIMER_WAIT_FOR_QUEUE) != pdPASS)
+        {
+            return NRF_ERROR_NO_MEM;
+        }
+    }
+
+    pinfo->active = false;
+    return NRF_SUCCESS;
+}

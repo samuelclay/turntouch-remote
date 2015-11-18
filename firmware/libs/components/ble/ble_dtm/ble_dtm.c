@@ -171,6 +171,7 @@ static void radio_reset(void)
  */
 static uint32_t radio_init(void)
 {
+#ifdef NRF51
     // Handle BLE Radio tuning parameters from production for DTM if required.
     // Only needed for DTM without SoftDevice, as the SoftDevice normally handles this.
     // PCN-083.
@@ -182,6 +183,7 @@ static uint32_t radio_init(void)
         NRF_RADIO->OVERRIDE3 = NRF_FICR->BLE_1MBIT[3];
         NRF_RADIO->OVERRIDE4 = NRF_FICR->BLE_1MBIT[4];
     }
+#endif // NRF51
 
     // Initializing code below is quite generic - for BLE, the values are fixed, and expressions
     // are constant. Non-constant values are essentially set in radio_prepare().
@@ -233,7 +235,12 @@ static uint32_t radio_init(void)
  */
 static void radio_prepare(bool rx)
 {
+#ifdef NRF51
     NRF_RADIO->TEST         = 0;
+#elif defined(NRF52)
+    NRF_RADIO->MODECNF0     = (RADIO_MODECNF0_RU_Default << RADIO_MODECNF0_RU_Pos) |
+                              (RADIO_MODECNF0_DTX_B1 << RADIO_MODECNF0_DTX_Pos);
+#endif // NRF51 / NRF52
     NRF_RADIO->CRCPOLY      = m_crc_poly;
     NRF_RADIO->CRCINIT      = m_crc_init;
     NRF_RADIO->FREQUENCY    = (m_phys_ch << 1) + 2;                  // Actual frequency (MHz): 2400 + register value
@@ -258,7 +265,12 @@ static void radio_prepare(bool rx)
  */
 static void dtm_test_done(void)
 {
+#ifdef NRF51
     NRF_RADIO->TEST = 0;
+#elif defined(NRF52)
+    NRF_RADIO->MODECNF0 = (RADIO_MODECNF0_RU_Default << RADIO_MODECNF0_RU_Pos) |
+                          (RADIO_MODECNF0_DTX_B1 << RADIO_MODECNF0_DTX_Pos);
+#endif // NRF51 / NRF52
     NRF_PPI->CHENCLR = 0x01;
     NRF_PPI->CH[0].EEP = 0;     // Break connection from timer to radio to stop transmit loop
     NRF_PPI->CH[0].TEP = 0;
@@ -323,8 +335,13 @@ static uint32_t dtm_vendor_specific_pkt(uint32_t vendor_cmd, dtm_freq_t vendor_o
             // Not a packet type, but used to indicate that a continuous carrier signal
             // should be transmitted by the radio.
             radio_prepare(TX_MODE);
+#ifdef NRF51
             NRF_RADIO->TEST = (RADIO_TEST_PLL_LOCK_Enabled << RADIO_TEST_PLL_LOCK_Pos) |
                               (RADIO_TEST_CONST_CARRIER_Enabled << RADIO_TEST_CONST_CARRIER_Pos);
+#elif defined(NRF52)
+            NRF_RADIO->MODECNF0 = (RADIO_MODECNF0_RU_Default << RADIO_MODECNF0_RU_Pos) |
+                                  (RADIO_MODECNF0_DTX_B1 << RADIO_MODECNF0_DTX_Pos);
+#endif // NRF51 / NRF52
 
             // Shortcut between READY event and START task
             NRF_RADIO->SHORTS = 1 << RADIO_SHORTS_READY_START_Pos;

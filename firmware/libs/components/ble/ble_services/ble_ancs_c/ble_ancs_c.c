@@ -192,7 +192,7 @@ static void db_discover_evt_handler(ble_db_discovery_evt_t * p_evt)
     LOG("[ANCS]: Database Discovery handler called with event 0x%x\r\n", p_evt->evt_type);
 
     ble_ancs_c_evt_t evt;
-    ble_db_discovery_char_t * p_chars;
+    ble_gatt_db_char_t * p_chars;
 
     p_chars = p_evt->params.discovered_db.charateristics;
 
@@ -609,8 +609,8 @@ static uint32_t cccd_configure(const uint16_t conn_handle, const uint16_t handle
     p_msg->req.write_req.gattc_params.p_value  = p_msg->req.write_req.gattc_value;
     p_msg->req.write_req.gattc_params.offset   = 0;
     p_msg->req.write_req.gattc_params.write_op = BLE_GATT_OP_WRITE_REQ;
-    p_msg->req.write_req.gattc_value[0]        = LSB(cccd_val);
-    p_msg->req.write_req.gattc_value[1]        = MSB(cccd_val);
+    p_msg->req.write_req.gattc_value[0]        = LSB_16(cccd_val);
+    p_msg->req.write_req.gattc_value[1]        = MSB_16(cccd_val);
     p_msg->conn_handle                         = conn_handle;
     p_msg->type                                = WRITE_REQ;
 

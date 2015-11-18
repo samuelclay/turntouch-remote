@@ -26,6 +26,7 @@ typedef enum
     SER_PKT_TYPE_EVT,         /**< Event packet type. */
     SER_PKT_TYPE_DTM_CMD,     /**< DTM Command packet type. */
     SER_PKT_TYPE_DTM_RESP,    /**< DTM Response packet type. */
+    SER_PKT_TYPE_RESET_CMD,   /**< System Reset Command packet type. */
     SER_PKT_TYPE_MAX          /**< Upper bound. */
 } ser_pkt_type_t;
 

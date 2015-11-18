@@ -628,9 +628,7 @@ uint32_t ser_phy_hci_slip_open(ser_phy_hci_slip_event_handler_t events_handler)
 
 void ser_phy_hci_slip_close(void)
 {
-    uint16_t uart_id = 0;
-
     m_ser_phy_hci_slip_event_handler = NULL;
-    (void)app_uart_close(uart_id);
+    (void)app_uart_close();
 }
 

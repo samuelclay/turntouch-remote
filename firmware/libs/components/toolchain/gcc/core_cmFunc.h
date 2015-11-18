@@ -1,13 +1,13 @@
 /**************************************************************************//**
  * @file     core_cmFunc.h
  * @brief    CMSIS Cortex-M Core Function Access Header File
- * @version  V3.20
- * @date     25. February 2013
+ * @version  V4.00
+ * @date     28. August 2014
  *
  * @note
  *
  ******************************************************************************/
-/* Copyright (c) 2009 - 2013 ARM LIMITED
+/* Copyright (c) 2009 - 2014 ARM LIMITED
 
    All rights reserved.
    Redistribution and use in source and binary forms, with or without
@@ -55,7 +55,7 @@
 /* intrinsic void __enable_irq();     */
 /* intrinsic void __disable_irq();    */
 
-/** \brief Function for getting Control Register.
+/** \brief  Get Control Register
 
     This function returns the content of the Control Register.
 
@@ -68,7 +68,7 @@ __STATIC_INLINE uint32_t __get_CONTROL(void)
 }
 
 
-/** \brief Function for setting Control Register.
+/** \brief  Set Control Register
 
     This function writes the given value to the Control Register.
 
@@ -81,7 +81,7 @@ __STATIC_INLINE void __set_CONTROL(uint32_t control)
 }
 
 
-/** \brief Function for getting IPSR Register.
+/** \brief  Get IPSR Register
 
     This function returns the content of the IPSR Register.
 
@@ -94,7 +94,7 @@ __STATIC_INLINE uint32_t __get_IPSR(void)
 }
 
 
-/** \brief Function for getting APSR Register.
+/** \brief  Get APSR Register
 
     This function returns the content of the APSR Register.
 
@@ -107,7 +107,7 @@ __STATIC_INLINE uint32_t __get_APSR(void)
 }
 
 
-/** \brief Function for getting xPSR Register.
+/** \brief  Get xPSR Register
 
     This function returns the content of the xPSR Register.
 
@@ -120,7 +120,7 @@ __STATIC_INLINE uint32_t __get_xPSR(void)
 }
 
 
-/** \brief Function for getting Process Stack Pointer.
+/** \brief  Get Process Stack Pointer
 
     This function returns the current value of the Process Stack Pointer (PSP).
 
@@ -133,7 +133,7 @@ __STATIC_INLINE uint32_t __get_PSP(void)
 }
 
 
-/** \brief Function for setting Process Stack Pointer.
+/** \brief  Set Process Stack Pointer
 
     This function assigns the given value to the Process Stack Pointer (PSP).
 
@@ -146,7 +146,7 @@ __STATIC_INLINE void __set_PSP(uint32_t topOfProcStack)
 }
 
 
-/** \brief Function for getting Main Stack Pointer.
+/** \brief  Get Main Stack Pointer
 
     This function returns the current value of the Main Stack Pointer (MSP).
 
@@ -159,7 +159,7 @@ __STATIC_INLINE uint32_t __get_MSP(void)
 }
 
 
-/** \brief Function for setting Main Stack Pointer.
+/** \brief  Set Main Stack Pointer
 
     This function assigns the given value to the Main Stack Pointer (MSP).
 
@@ -172,7 +172,7 @@ __STATIC_INLINE void __set_MSP(uint32_t topOfMainStack)
 }
 
 
-/** \brief Function for getting Priority Mask.
+/** \brief  Get Priority Mask
 
     This function returns the current state of the priority mask bit from the Priority Mask Register.
 
@@ -185,7 +185,7 @@ __STATIC_INLINE uint32_t __get_PRIMASK(void)
 }
 
 
-/** \brief Function for setting Priority Mask.
+/** \brief  Set Priority Mask
 
     This function assigns the given value to the Priority Mask Register.
 
@@ -198,9 +198,9 @@ __STATIC_INLINE void __set_PRIMASK(uint32_t priMask)
 }
 
 
-#if       (__CORTEX_M >= 0x03)
+#if       (__CORTEX_M >= 0x03) || (__CORTEX_SC >= 300)
 
-/** \brief Function for enabling FIQ.
+/** \brief  Enable FIQ
 
     This function enables FIQ interrupts by clearing the F-bit in the CPSR.
     Can only be executed in Privileged modes.
@@ -208,7 +208,7 @@ __STATIC_INLINE void __set_PRIMASK(uint32_t priMask)
 #define __enable_fault_irq                __enable_fiq
 
 
-/** \brief Function for disabling FIQ.
+/** \brief  Disable FIQ
 
     This function disables FIQ interrupts by setting the F-bit in the CPSR.
     Can only be executed in Privileged modes.
@@ -216,7 +216,7 @@ __STATIC_INLINE void __set_PRIMASK(uint32_t priMask)
 #define __disable_fault_irq               __disable_fiq
 
 
-/** \brief Function for getting Base Priority.
+/** \brief  Get Base Priority
 
     This function returns the current value of the Base Priority register.
 
@@ -229,7 +229,7 @@ __STATIC_INLINE uint32_t  __get_BASEPRI(void)
 }
 
 
-/** \brief Function for setting Base Priority.
+/** \brief  Set Base Priority
 
     This function assigns the given value to the Base Priority register.
 
@@ -242,7 +242,7 @@ __STATIC_INLINE void __set_BASEPRI(uint32_t basePri)
 }
 
 
-/** \brief Function for getting Fault Mask.
+/** \brief  Get Fault Mask
 
     This function returns the current value of the Fault Mask register.
 
@@ -255,7 +255,7 @@ __STATIC_INLINE uint32_t __get_FAULTMASK(void)
 }
 
 
-/** \brief Function for setting Fault Mask.
+/** \brief  Set Fault Mask
 
     This function assigns the given value to the Fault Mask register.
 
@@ -267,12 +267,12 @@ __STATIC_INLINE void __set_FAULTMASK(uint32_t faultMask)
   __regFaultMask = (faultMask & (uint32_t)1);
 }
 
-#endif /* (__CORTEX_M >= 0x03) */
+#endif /* (__CORTEX_M >= 0x03) || (__CORTEX_SC >= 300) */
 
 
-#if       (__CORTEX_M == 0x04)
+#if       (__CORTEX_M == 0x04) || (__CORTEX_M == 0x07)
 
-/** \brief Function for getting FPSCR.
+/** \brief  Get FPSCR
 
     This function returns the current value of the Floating Point Status/Control register.
 
@@ -289,7 +289,7 @@ __STATIC_INLINE uint32_t __get_FPSCR(void)
 }
 
 
-/** \brief Function for setting FPSCR.
+/** \brief  Set FPSCR
 
     This function assigns the given value to the Floating Point Status/Control register.
 
@@ -303,25 +303,13 @@ __STATIC_INLINE void __set_FPSCR(uint32_t fpscr)
 #endif
 }
 
-#endif /* (__CORTEX_M == 0x04) */
-
-
-#elif defined ( __ICCARM__ ) /*------------------ ICC Compiler -------------------*/
-/* IAR iccarm specific functions */
-
-#include <cmsis_iar.h>
-
-
-#elif defined ( __TMS470__ ) /*---------------- TI CCS Compiler ------------------*/
-/* TI CCS specific functions */
-
-#include <cmsis_ccs.h>
+#endif /* (__CORTEX_M == 0x04) || (__CORTEX_M == 0x07) */
 
 
 #elif defined ( __GNUC__ ) /*------------------ GNU Compiler ---------------------*/
 /* GNU gcc specific functions */
 
-/** \brief Function for enabling IRQ Interrupts.
+/** \brief  Enable IRQ Interrupts
 
   This function enables IRQ interrupts by clearing the I-bit in the CPSR.
   Can only be executed in Privileged modes.
@@ -332,7 +320,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __enable_irq(void)
 }
 
 
-/** \brief Function for disabling IRQ Interrupts.
+/** \brief  Disable IRQ Interrupts
 
   This function disables IRQ interrupts by setting the I-bit in the CPSR.
   Can only be executed in Privileged modes.
@@ -343,7 +331,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __disable_irq(void)
 }
 
 
-/** \brief Function for getting Control Register.
+/** \brief  Get Control Register
 
     This function returns the content of the Control Register.
 
@@ -358,7 +346,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_CONTROL(void)
 }
 
 
-/** \brief Function for setting Control Register.
+/** \brief  Set Control Register
 
     This function writes the given value to the Control Register.
 
@@ -370,7 +358,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_CONTROL(uint32_t c
 }
 
 
-/** \brief Function for getting IPSR Register.
+/** \brief  Get IPSR Register
 
     This function returns the content of the IPSR Register.
 
@@ -385,7 +373,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_IPSR(void)
 }
 
 
-/** \brief Function for getting APSR Register.
+/** \brief  Get APSR Register
 
     This function returns the content of the APSR Register.
 
@@ -400,7 +388,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_APSR(void)
 }
 
 
-/** \brief Function for getting xPSR Register.
+/** \brief  Get xPSR Register
 
     This function returns the content of the xPSR Register.
 
@@ -415,7 +403,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_xPSR(void)
 }
 
 
-/** \brief Function for getting Process Stack Pointer.
+/** \brief  Get Process Stack Pointer
 
     This function returns the current value of the Process Stack Pointer (PSP).
 
@@ -430,7 +418,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_PSP(void)
 }
 
 
-/** \brief Function for setting Process Stack Pointer.
+/** \brief  Set Process Stack Pointer
 
     This function assigns the given value to the Process Stack Pointer (PSP).
 
@@ -442,7 +430,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_PSP(uint32_t topOf
 }
 
 
-/** \brief Function for getting Main Stack Pointer.
+/** \brief  Get Main Stack Pointer
 
     This function returns the current value of the Main Stack Pointer (MSP).
 
@@ -457,7 +445,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_MSP(void)
 }
 
 
-/** \brief Function for setting Main Stack Pointer.
+/** \brief  Set Main Stack Pointer
 
     This function assigns the given value to the Main Stack Pointer (MSP).
 
@@ -469,7 +457,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_MSP(uint32_t topOf
 }
 
 
-/** \brief Function for getting Priority Mask.
+/** \brief  Get Priority Mask
 
     This function returns the current state of the priority mask bit from the Priority Mask Register.
 
@@ -484,7 +472,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_PRIMASK(void)
 }
 
 
-/** \brief Function for setting Priority Mask.
+/** \brief  Set Priority Mask
 
     This function assigns the given value to the Priority Mask Register.
 
@@ -498,7 +486,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_PRIMASK(uint32_t p
 
 #if       (__CORTEX_M >= 0x03)
 
-/** \brief Function for enabling FIQ.
+/** \brief  Enable FIQ
 
     This function enables FIQ interrupts by clearing the F-bit in the CPSR.
     Can only be executed in Privileged modes.
@@ -509,7 +497,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __enable_fault_irq(void)
 }
 
 
-/** \brief Function for disabling FIQ.
+/** \brief  Disable FIQ
 
     This function disables FIQ interrupts by setting the F-bit in the CPSR.
     Can only be executed in Privileged modes.
@@ -520,7 +508,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __disable_fault_irq(void
 }
 
 
-/** \brief Function for getting Base Priority.
+/** \brief  Get Base Priority
 
     This function returns the current value of the Base Priority register.
 
@@ -535,7 +523,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_BASEPRI(void)
 }
 
 
-/** \brief Function for setting Base Priority.
+/** \brief  Set Base Priority
 
     This function assigns the given value to the Base Priority register.
 
@@ -547,7 +535,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_BASEPRI(uint32_t v
 }
 
 
-/** \brief Function for getting Fault Mask.
+/** \brief  Get Fault Mask
 
     This function returns the current value of the Fault Mask register.
 
@@ -562,7 +550,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_FAULTMASK(void
 }
 
 
-/** \brief Function for setting Fault Mask.
+/** \brief  Set Fault Mask
 
     This function assigns the given value to the Fault Mask register.
 
@@ -576,9 +564,9 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_FAULTMASK(uint32_t
 #endif /* (__CORTEX_M >= 0x03) */
 
 
-#if       (__CORTEX_M == 0x04)
+#if       (__CORTEX_M == 0x04) || (__CORTEX_M == 0x07)
 
-/** \brief Function for getting FPSCR.
+/** \brief  Get FPSCR
 
     This function returns the current value of the Floating Point Status/Control register.
 
@@ -600,7 +588,7 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_FPSCR(void)
 }
 
 
-/** \brief Function for setting FPSCR.
+/** \brief  Set FPSCR
 
     This function assigns the given value to the Floating Point Status/Control register.
 
@@ -616,21 +604,34 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_FPSCR(uint32_t fps
 #endif
 }
 
-#endif /* (__CORTEX_M == 0x04) */
+#endif /* (__CORTEX_M == 0x04) || (__CORTEX_M == 0x07) */
+
+
+#elif defined ( __ICCARM__ ) /*------------------ ICC Compiler -------------------*/
+/* IAR iccarm specific functions */
+#include <cmsis_iar.h>
+
+
+#elif defined ( __TMS470__ ) /*---------------- TI CCS Compiler ------------------*/
+/* TI CCS specific functions */
+#include <cmsis_ccs.h>
 
 
 #elif defined ( __TASKING__ ) /*------------------ TASKING Compiler --------------*/
 /* TASKING carm specific functions */
-
 /*
  * The CMSIS functions have been implemented as intrinsics in the compiler.
- * Please use "carm -?i" to get an up to date list of all instrinsics,
+ * Please use "carm -?i" to get an up to date list of all intrinsics,
  * Including the CMSIS ones.
  */
+
+
+#elif defined ( __CSMC__ ) /*------------------ COSMIC Compiler -------------------*/
+/* Cosmic specific functions */
+#include <cmsis_csm.h>
 
 #endif
 
 /*@} end of CMSIS_Core_RegAccFunctions */
-
 
 #endif /* __CORE_CMFUNC_H */

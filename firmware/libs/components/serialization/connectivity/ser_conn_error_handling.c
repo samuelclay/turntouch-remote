@@ -82,9 +82,10 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
         uint32_t temp = 1;
         while(temp);
 #endif
-        CRITICAL_REGION_EXIT();
 
     }
+
+    CRITICAL_REGION_EXIT();
 }
 
 

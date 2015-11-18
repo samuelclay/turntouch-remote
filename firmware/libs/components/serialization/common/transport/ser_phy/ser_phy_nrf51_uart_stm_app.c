@@ -39,8 +39,7 @@
 
 #include "nordic_common.h"
 #include "boards.h"
-#include "nrf51.h"
-#include "nrf51_bitfields.h"
+#include "nrf.h"
 #include "nrf_error.h"
 #include "nrf_gpio.h"
 #include "nrf_delay.h"
@@ -136,7 +135,7 @@ static void uart_peripheral_disable(void)
 
         nrf_gpio_cfg_input(SER_PHY_UART_RTS, NRF_GPIO_PIN_NOPULL);
 
-        nrf_gpiote_event_config(0, SER_PHY_UART_CTS, NRF_GPIOTE_POLARITY_TOGGLE);
+        nrf_gpiote_event_configure(0, SER_PHY_UART_CTS, NRF_GPIOTE_POLARITY_TOGGLE);
 
         if (!nrf_gpio_pin_read(SER_PHY_UART_CTS))
         {
@@ -155,7 +154,7 @@ static void uart_tx_start(void)
         //If RX is already ongoing then no wakeup signal is required.
         if (m_rx_state == UART_IDLE)
         {
-            nrf_gpiote_unconfig(0);
+            nrf_gpiote_event_disable(0);
             NRF_GPIO->OUTSET = 1 << SER_PHY_UART_RTS;
             nrf_gpio_cfg_output(SER_PHY_UART_RTS);
             uart_peripheral_connect_flow();
@@ -185,12 +184,12 @@ static void uart_tx_last_byte(void)
     m_tx_state = UART_TX_LAST_BYTE_WAIT;
 
     //Configure event in case CTS is going low during this function execution
-    nrf_gpiote_event_config(0, SER_PHY_UART_CTS, NRF_GPIOTE_POLARITY_TOGGLE);
+    nrf_gpiote_event_configure(0, SER_PHY_UART_CTS, NRF_GPIOTE_POLARITY_TOGGLE);
 
     if (!nrf_gpio_pin_read(SER_PHY_UART_CTS)) //All pins are low --> last byte can be transmitted.
     {
         //Re-check state as it might have changed due to preemption of current interrupt.
-        nrf_gpiote_unconfig(0);
+        nrf_gpiote_event_disable(0);
 
         if (m_tx_state == UART_TX_LAST_BYTE_WAIT)
         {
@@ -241,7 +240,7 @@ static void uart_txdrdy_handle(void)
         if (m_rx_state == UART_IDLE)
         {
             nrf_delay_us(15);
-            nrf_gpiote_event_config(0, SER_PHY_UART_CTS, NRF_GPIOTE_POLARITY_TOGGLE);
+            nrf_gpiote_event_configure(0, SER_PHY_UART_CTS, NRF_GPIOTE_POLARITY_TOGGLE);
 
             if (nrf_gpio_pin_read(SER_PHY_UART_CTS))
             {
@@ -251,7 +250,7 @@ static void uart_txdrdy_handle(void)
             {
                 uart_peripheral_connect_flow();
                 m_cts_high_disconnect = true;
-                nrf_gpiote_event_config(0, SER_PHY_UART_CTS, NRF_GPIOTE_POLARITY_TOGGLE);
+                nrf_gpiote_event_configure(0, SER_PHY_UART_CTS, NRF_GPIOTE_POLARITY_TOGGLE);
 
                 if (nrf_gpio_pin_read(SER_PHY_UART_CTS))
                 {
@@ -314,7 +313,7 @@ static __INLINE void on_cts_high(void)
 static __INLINE void on_cts_low(void)
 {
     m_cts_high_disconnect = false;
-    nrf_gpiote_unconfig(0);
+    nrf_gpiote_event_disable(0);
 
     if (m_tx_state == UART_STALL)
     {
@@ -365,7 +364,7 @@ static void uart_rxdrdy_handle(void)
             if (m_tx_state == UART_TX_LAST_BYTE_WAIT)
             {
                 m_tx_state = UART_STALL;
-                nrf_gpiote_unconfig(0);
+                nrf_gpiote_event_disable(0);
 
                 //Checking pending state.
                 //- If pending is true then CTS have become low after we stalled the UART and final byte should be transmitted here.
@@ -659,7 +658,7 @@ void ser_phy_close(void)
 
     //Will not check err_code here as we will still continue with closure of UART despite errors.
     //Note that any error will still be reported back in the system.
-    nrf_gpiote_unconfig(0);
+    nrf_gpiote_event_disable(0);
 
     uart_peripheral_disable();
 

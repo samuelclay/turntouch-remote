@@ -44,9 +44,9 @@ typedef struct
     int8_t                       pin_assignments[NUMBER_OF_PINS];
     int8_t                       port_handlers_pins[GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS];
     nrf_drv_state_t              state;
-} control_block_t;
+} gpiote_control_block_t;
 
-static control_block_t m_cb;
+static gpiote_control_block_t m_cb;
 
 __STATIC_INLINE bool pin_in_use(uint32_t pin)
 {
@@ -223,8 +223,6 @@ ret_code_t nrf_drv_gpiote_out_init(nrf_drv_gpiote_pin_t pin,
 
         if (result == NRF_SUCCESS)
         {
-            nrf_gpio_cfg_output(pin);
-
             if (p_config->init_state == NRF_GPIOTE_INITIAL_VALUE_HIGH)
             {
                 nrf_gpio_pin_set(pin);
@@ -233,6 +231,8 @@ ret_code_t nrf_drv_gpiote_out_init(nrf_drv_gpiote_pin_t pin,
             {
                 nrf_gpio_pin_clear(pin);
             }
+            
+            nrf_gpio_cfg_output(pin);
         }
     }
 
@@ -246,7 +246,8 @@ void nrf_drv_gpiote_out_uninit(nrf_drv_gpiote_pin_t pin)
 
     if (pin_in_use_by_te(pin))
     {
-        channel_free((uint8_t)m_cb.pin_assignments[pin]);
+        channel_free((uint8_t)channel_port_get(pin));
+        nrf_gpiote_te_default(channel_port_get(pin));
     }
     pin_in_use_clear(pin);
 
@@ -417,7 +418,7 @@ void nrf_drv_gpiote_in_event_disable(nrf_drv_gpiote_pin_t pin)
     ASSERT(pin_in_use_by_gpiote(pin));
     if (pin_in_use_by_port(pin))
     {
-        nrf_gpio_input_disconnect(pin);
+        nrf_gpio_cfg_sense_set(pin,NRF_GPIO_PIN_NOSENSE);
     }
     else if(pin_in_use_by_te(pin))
     {

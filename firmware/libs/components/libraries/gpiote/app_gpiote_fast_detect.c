@@ -21,6 +21,14 @@
 #define NRF51_GPIOTE_CHANNEL 4
 #define NRF51_PINS           31
 
+#ifdef NRF51
+#define SWI_IRQHandler SWI1_IRQHandler
+#define SWI_IRQn       SWI1_IRQn
+#elif defined NRF52
+#define SWI_IRQHandler SWI1_EGU1_IRQHAndler
+#define SWI_IRQn       SWI1_EGU1_IRQn
+#endif
+
 /**@brief GPIOTE user type. */
 typedef struct
 {
@@ -146,14 +154,14 @@ void GPIOTE_IRQHandler(void)
 
     if (gpiote_port_evt)
     {
-        NVIC_SetPendingIRQ(SWI1_IRQn);
+        NVIC_SetPendingIRQ(SWI_IRQn);
     }
 }
 
 
 /**@brief Function for handling the SWI1 interrupt.
  */
-void SWI1_IRQHandler(void)
+void SWI_IRQHandler(void)
 {
     uint8_t  i;
     uint32_t pins_changed;
@@ -215,16 +223,16 @@ void SWI1_IRQHandler(void)
  */
 static void app_gpiote_swi1_enable_irq(void)
 {
-    NVIC_ClearPendingIRQ(SWI1_IRQn);
-    NVIC_SetPriority(SWI1_IRQn, APP_IRQ_PRIORITY_LOW);
-    NVIC_EnableIRQ(SWI1_IRQn);
+    NVIC_ClearPendingIRQ(SWI_IRQn);
+    NVIC_SetPriority(SWI_IRQn, APP_IRQ_PRIORITY_LOW);
+    NVIC_EnableIRQ(SWI_IRQn);
 }
 
 /**@brief Function for disabling interrupt SWI1.
  */
 static void app_gpiote_swi1_disable_irq(void)
 {
-    NVIC_DisableIRQ(SWI1_IRQn);
+    NVIC_DisableIRQ(SWI_IRQn);
 }
 
 /**@brief Function for sense disabling for all pins for specified user.

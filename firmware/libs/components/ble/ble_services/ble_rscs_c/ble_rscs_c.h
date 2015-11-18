@@ -51,7 +51,6 @@ typedef struct
     } params;
 } ble_rscs_c_evt_t;
 
-
 // Forward declaration of the ble_rscs_c_t type.
 typedef struct ble_rscs_c_s ble_rscs_c_t;
 
@@ -84,7 +83,6 @@ uint32_t ble_rscs_c_init(ble_rscs_c_t * p_ble_rscs_c, ble_rscs_c_init_t * p_ble_
 void ble_rscs_c_on_ble_evt(ble_rscs_c_t * p_ble_rscs_c, const ble_evt_t * p_ble_evt);
 
 uint32_t ble_rscs_c_rsc_notif_enable(ble_rscs_c_t * p_ble_rscs_c);
-
 
 #endif // BLE_RSCS_C_H__
 
