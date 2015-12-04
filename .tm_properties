@@ -1,1 +1,1 @@
-exclude = "{$exclude,{_build,build,arm5}/*.{htm,map,dep,bak,lnp,lst,d},enclosure,{remote eagle/*.lbr},*.{uvprojx,uvoptx},JLinkLog.txt}"
+exclude = "{$exclude,{_build,build,arm5}/*.{htm,map,dep,bak,lnp,lst,d},enclosure,{remote eagle/*.lbr},*.{uvprojx,uvoptx},JLinkLog.txt,archive}"

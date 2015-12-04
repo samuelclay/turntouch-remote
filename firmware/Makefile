@@ -245,6 +245,7 @@ cleanobj:
 flash: $(MAKECMDGOALS)
 	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
+	nrfjprog --pin-reset
 
 erase:
 	nrfjprog --erase-all
@@ -255,6 +256,7 @@ flashsd:
 flashsdapp:
 	srec_cat $(SOFTDEVICE_HEX) -intel $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -intel --line-length=44 -o $(OUTPUT_BINARY_DIRECTORY)/sd_app.hex -intel
 	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/sd_app.hex
+	nrfjprog --pin-reset
 
 flashall:
 	srec_cat $(SOFTDEVICE_HEX) -intel $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -intel ../bootloader/build/nrf51822_xxac.hex -intel -exclude 0x3FC00 0x3FC20 -generate 0x3FC00 0x3FC04 \
@@ -269,4 +271,5 @@ flashall:
 # https://devzone.nordicsemi.com/blogs/685/common-faq-on-dfu/
 	sed -i.bak 's/10FC00000100000000000000FE00000000000000F5/10FC00000100000000000000FE000000FFFFFFFFF9/' build/sd_app_bootloader.hex
 	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/sd_app_bootloader.hex
+	nrfjprog --pin-reset
 

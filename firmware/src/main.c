@@ -1159,30 +1159,45 @@ int main(void)
     uint32_t err_code;
     SEGGER_RTT_Init();
     
-    rtt_print(0, "%s%sStarting up Turn Touch Remote%s\n", RTT_CTRL_TEXT_BRIGHT_YELLOW,
+    rtt_print(0, "%s%sStarting up Turn Touch Remote...%s\n", RTT_CTRL_TEXT_BRIGHT_YELLOW,
                                                           RTT_CTRL_BG_BRIGHT_MAGENTA, 
                                                           RTT_CTRL_RESET);
     
     // Initialize buttons
     clock_initialization();
+    rtt_print(0, "%sInitialized clock%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     timers_init();
+    rtt_print(0, "%sInitialized timers%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     bsp_configuration();
+    rtt_print(0, "%sInitialized BSP%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
 
     // Initialize
     ble_stack_init();
+    rtt_print(0, "%sInitialized BLE stack%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     scheduler_init();
+    rtt_print(0, "%sInitialized scheduler%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     device_manager_init();
+    rtt_print(0, "%sInitialized device manager%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     gap_params_init();
+    rtt_print(0, "%sInitialized GAP Params%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     advertising_init();
+    rtt_print(0, "%sInitialized advertising%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     services_init();
+    rtt_print(0, "%sInitialized services%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     conn_params_init();
+    rtt_print(0, "%sInitialized connection params%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     sec_params_init();
+    rtt_print(0, "%sInitialized security params%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     battery_level_update();
+    rtt_print(0, "%sInitialized battery level updater%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
 
     // Start execution
     gpio_start();
+    rtt_print(0, "%sStarted GPIO%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     application_timers_start();
+    rtt_print(0, "%sStarted application timers%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
+    rtt_print(0, "%sStarted BLE advertising fast%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     APP_ERROR_CHECK(err_code);
     err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
     APP_ERROR_CHECK(err_code);
