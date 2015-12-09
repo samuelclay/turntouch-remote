@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.0.0">
+<eagle version="7.2.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.005" altunitdist="inch" altunit="inch"/>
+<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -592,8 +592,8 @@
 <circle x="0" y="0" radius="10" width="0.127" layer="21"/>
 <text x="-3.81" y="13.97" size="1.27" layer="21">+</text>
 <text x="-3.81" y="-15.24" size="1.27" layer="21">-</text>
-<circle x="-3.175" y="14.605" radius="0.898025" width="0.127" layer="21"/>
-<circle x="-3.175" y="-14.605" radius="0.898025" width="0.127" layer="21"/>
+<circle x="-3.048" y="14.605" radius="0.898025" width="0.127" layer="21"/>
+<circle x="-3.048" y="-14.605" radius="0.898025" width="0.127" layer="21"/>
 </package>
 <package name="DOME-M-SERIES">
 <smd name="P$1" x="0" y="0" dx="3.81" dy="3.81" layer="1" roundness="100"/>
@@ -611,7 +611,7 @@
 <vertex x="-3.81" y="0" curve="-90"/>
 <vertex x="-0.1778" y="3.81"/>
 </polygon>
-<pad name="P$2" x="0" y="1.27" drill="0.3302" diameter="0.508" stop="no" first="yes"/>
+<pad name="P$2" x="0" y="1.27" drill="0.508" diameter="0.762" thermals="no" first="yes"/>
 <wire x1="-7.62" y1="-7.62" x2="-7.62" y2="-6.35" width="0.127" layer="21"/>
 <wire x1="-7.62" y1="-6.35" x2="-7.62" y2="4.55395" width="0.127" layer="21"/>
 <wire x1="-7.62" y1="4.55395" x2="-4.55395" y2="7.62" width="0.127" layer="21" curve="-90"/>
@@ -670,6 +670,7 @@
 <vertex x="-3.81" y="0" curve="-90"/>
 <vertex x="-0.1778" y="3.81"/>
 </polygon>
+<circle x="0" y="0" radius="2.83980625" width="1.905" layer="39"/>
 </package>
 </packages>
 <symbols>

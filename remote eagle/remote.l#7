@@ -628,6 +628,32 @@
 <wire x1="6.35" y1="12.7" x2="5.08" y2="11.43" width="0.127" layer="21"/>
 <wire x1="5.08" y1="11.43" x2="6.35" y2="10.16" width="0.127" layer="21"/>
 <wire x1="6.35" y1="10.16" x2="6.35" y2="7.62" width="0.127" layer="21"/>
+<polygon width="0.1524" layer="1">
+<vertex x="-0.1778" y="5.08" curve="90"/>
+<vertex x="-5.08" y="0" curve="90"/>
+<vertex x="0" y="-5.08" curve="90"/>
+<vertex x="5.08" y="0" curve="87.062397"/>
+<vertex x="0" y="5.08"/>
+<vertex x="0" y="3.81" curve="-90"/>
+<vertex x="3.81" y="0.254"/>
+<vertex x="3.81" y="0" curve="-90"/>
+<vertex x="0" y="-3.81" curve="-90"/>
+<vertex x="-3.81" y="0" curve="-90"/>
+<vertex x="-0.1778" y="3.81"/>
+</polygon>
+<polygon width="0.508" layer="31">
+<vertex x="-0.1778" y="5.08" curve="90"/>
+<vertex x="-5.08" y="0" curve="90"/>
+<vertex x="0" y="-5.08" curve="90"/>
+<vertex x="5.08" y="0" curve="87.062397"/>
+<vertex x="0" y="5.08"/>
+<vertex x="0" y="3.81" curve="-90"/>
+<vertex x="3.81" y="0.254"/>
+<vertex x="3.81" y="0" curve="-90"/>
+<vertex x="0" y="-3.81" curve="-90"/>
+<vertex x="-3.81" y="0" curve="-90"/>
+<vertex x="-0.1778" y="3.81"/>
+</polygon>
 </package>
 </packages>
 <symbols>

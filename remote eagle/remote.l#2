@@ -592,8 +592,8 @@
 <circle x="0" y="0" radius="10" width="0.127" layer="21"/>
 <text x="-3.81" y="13.97" size="1.27" layer="21">+</text>
 <text x="-3.81" y="-15.24" size="1.27" layer="21">-</text>
-<circle x="-3.429" y="14.605" radius="0.898025" width="0.127" layer="21"/>
-<circle x="-3.429" y="-14.605" radius="0.898025" width="0.127" layer="21"/>
+<circle x="-3.048" y="14.605" radius="0.898025" width="0.127" layer="21"/>
+<circle x="-3.048" y="-14.605" radius="0.898025" width="0.127" layer="21"/>
 </package>
 <package name="DOME-M-SERIES">
 <smd name="P$1" x="0" y="0" dx="3.81" dy="3.81" layer="1" roundness="100"/>
