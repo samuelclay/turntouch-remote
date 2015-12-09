@@ -5,7 +5,7 @@ OUTPUT_FILENAME := nrf51822_xxac
 MAKEFILE_NAME := $(MAKEFILE_LIST)
 MAKEFILE_DIR := $(dir $(MAKEFILE_NAME) ) 
 
-TEMPLATE_PATH = ../libs/components/toolchain/gcc
+TEMPLATE_PATH = ../firmware/libs/components/toolchain/gcc
 ifeq ($(OS),Windows_NT)
 include $(TEMPLATE_PATH)/Makefile.windows
 else
@@ -37,60 +37,60 @@ remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-ou
 
 #source common to all targets
 C_SOURCE_FILES += \
-../libs/components/libraries/util/app_error.c \
-../libs/components/libraries/scheduler/app_scheduler.c \
-../libs/components/libraries/timer/app_timer.c \
-../libs/components/libraries/timer/app_timer_appsh.c \
-../libs/components/libraries/bootloader_dfu/bootloader.c \
-../libs/components/libraries/bootloader_dfu/bootloader_settings.c \
-../libs/components/libraries/bootloader_dfu/bootloader_util.c \
-../libs/components/libraries/crc16/crc16.c \
-../libs/components/libraries/bootloader_dfu/dfu_dual_bank.c \
-../libs/components/libraries/bootloader_dfu/dfu_init_template.c \
-../libs/components/libraries/bootloader_dfu/dfu_transport_ble.c \
-../libs/components/libraries/hci/hci_mem_pool.c \
-../libs/components/libraries/util/nrf_assert.c \
-../libs/components/drivers_nrf/delay/nrf_delay.c \
-../libs/components/drivers_nrf/pstorage/pstorage_raw.c \
+../firmware/libs/components/libraries/util/app_error.c \
+../firmware/libs/components/libraries/scheduler/app_scheduler.c \
+../firmware/libs/components/libraries/timer/app_timer.c \
+../firmware/libs/components/libraries/timer/app_timer_appsh.c \
+../firmware/libs/components/libraries/bootloader_dfu/bootloader.c \
+../firmware/libs/components/libraries/bootloader_dfu/bootloader_settings.c \
+../firmware/libs/components/libraries/bootloader_dfu/bootloader_util.c \
+../firmware/libs/components/libraries/crc16/crc16.c \
+../firmware/libs/components/libraries/bootloader_dfu/dfu_dual_bank.c \
+../firmware/libs/components/libraries/bootloader_dfu/dfu_init_template.c \
+../firmware/libs/components/libraries/bootloader_dfu/dfu_transport_ble.c \
+../firmware/libs/components/libraries/hci/hci_mem_pool.c \
+../firmware/libs/components/libraries/util/nrf_assert.c \
+../firmware/libs/components/drivers_nrf/delay/nrf_delay.c \
+../firmware/libs/components/drivers_nrf/pstorage/pstorage_raw.c \
 ./dfu_ble_svc.c \
 ./main.c \
-../src/rtt.c \
-../libs/components/ble/common/ble_advdata.c \
-../libs/components/ble/common/ble_conn_params.c \
-../libs/components/ble/ble_services/ble_dfu/ble_dfu.c \
-../libs/components/ble/common/ble_srv_common.c \
-../libs/components/toolchain/system_nrf51.c \
-../libs/components/softdevice/common/softdevice_handler/softdevice_handler.c \
-../libs/components/softdevice/common/softdevice_handler/softdevice_handler_appsh.c \
-../libs/RTT/SEGGER_RTT.c \
-../libs/RTT/SEGGER_RTT_printf.c \
+../firmware/src/rtt.c \
+../firmware/libs/components/ble/common/ble_advdata.c \
+../firmware/libs/components/ble/common/ble_conn_params.c \
+../firmware/libs/components/ble/ble_services/ble_dfu/ble_dfu.c \
+../firmware/libs/components/ble/common/ble_srv_common.c \
+../firmware/libs/components/toolchain/system_nrf51.c \
+../firmware/libs/components/softdevice/common/softdevice_handler/softdevice_handler.c \
+../firmware/libs/components/softdevice/common/softdevice_handler/softdevice_handler_appsh.c \
+../firmware/libs/RTT/SEGGER_RTT.c \
+../firmware/libs/RTT/SEGGER_RTT_printf.c \
 
 #assembly files common to all targets
-ASM_SOURCE_FILES  = ../libs/components/toolchain/gcc/gcc_startup_nrf51.s
+ASM_SOURCE_FILES  = ../firmware/libs/components/toolchain/gcc/gcc_startup_nrf51.s
 
 #includes common to all targets
 INC_PATHS  = -I./config/dfu_dual_bank_ble_s110_pca10028
 INC_PATHS += -I./config
-INC_PATHS += -I../libs/components/libraries/util
-INC_PATHS += -I../libs/components/libraries/timer
-INC_PATHS += -I../libs/components/toolchain
-INC_PATHS += -I../libs/components/libraries/bootloader_dfu
-INC_PATHS += -I../libs/components/libraries/scheduler
-INC_PATHS += -I../libs/components/softdevice/s110/headers
-INC_PATHS += -I../libs/bsp
-INC_PATHS += -I../libs/RTT
-INC_PATHS += -I../src
-INC_PATHS += -I../libs/components/drivers_nrf/delay
-INC_PATHS += -I../libs/components/drivers_nrf/pstorage
-INC_PATHS += -I../libs/components/toolchain/gcc
-INC_PATHS += -I../libs/components/libraries/bootloader_dfu/ble_transport
-INC_PATHS += -I../libs/components/device
-INC_PATHS += -I../libs/components/libraries/hci
-INC_PATHS += -I../libs/components/softdevice/common/softdevice_handler
-INC_PATHS += -I../libs/components/libraries/crc16
-INC_PATHS += -I../libs/components/ble/ble_services/ble_dfu
-INC_PATHS += -I../libs/components/drivers_nrf/hal
-INC_PATHS += -I../libs/components/ble/common
+INC_PATHS += -I../firmware/libs/components/libraries/util
+INC_PATHS += -I../firmware/libs/components/libraries/timer
+INC_PATHS += -I../firmware/libs/components/toolchain
+INC_PATHS += -I../firmware/libs/components/libraries/bootloader_dfu
+INC_PATHS += -I../firmware/libs/components/libraries/scheduler
+INC_PATHS += -I../firmware/libs/components/softdevice/s110/headers
+INC_PATHS += -I../firmware/libs/bsp
+INC_PATHS += -I../firmware/libs/RTT
+INC_PATHS += -I../firmware/src
+INC_PATHS += -I../firmware/libs/components/drivers_nrf/delay
+INC_PATHS += -I../firmware/libs/components/drivers_nrf/pstorage
+INC_PATHS += -I../firmware/libs/components/toolchain/gcc
+INC_PATHS += -I../firmware/libs/components/libraries/bootloader_dfu/ble_transport
+INC_PATHS += -I../firmware/libs/components/device
+INC_PATHS += -I../firmware/libs/components/libraries/hci
+INC_PATHS += -I../firmware/libs/components/softdevice/common/softdevice_handler
+INC_PATHS += -I../firmware/libs/components/libraries/crc16
+INC_PATHS += -I../firmware/libs/components/ble/ble_services/ble_dfu
+INC_PATHS += -I../firmware/libs/components/drivers_nrf/hal
+INC_PATHS += -I../firmware/libs/components/ble/common
 
 OBJECT_DIRECTORY = build
 LISTING_DIRECTORY = $(OBJECT_DIRECTORY)
