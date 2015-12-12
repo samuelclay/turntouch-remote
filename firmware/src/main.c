@@ -71,6 +71,7 @@ void bsp_evt_handler(bsp_event_t evt) {
             case BSP_EVENT_KEY_6:
             case BSP_EVENT_KEY_7:
                 mode_change = true;
+                rtt_print(0, "%sMode Change #%X: %s%X%X(%X)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, evt, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
                 break;
             default:
                 break;
@@ -81,6 +82,7 @@ void bsp_evt_handler(bsp_event_t evt) {
             app_button_is_pushed(0, &pushed);
             if (pushed) {
                 button_state[0] ^= (1 << 0);
+                rtt_print(0, "%sButton #%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, evt, BSP_EVENT_KEY_0, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
                 LEDS_ON(BSP_LED_0_MASK);
             } else {
                 button_state[0] |= (1 << 0);
@@ -91,6 +93,7 @@ void bsp_evt_handler(bsp_event_t evt) {
             app_button_is_pushed(1, &pushed);
             if (pushed) {
                 button_state[0] ^= (1 << 1);
+                rtt_print(0, "%sButton #%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, evt, BSP_EVENT_KEY_1, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
                 LEDS_ON(BSP_LED_1_MASK);
             } else {
                 button_state[0] |= (1 << 1);
@@ -101,6 +104,7 @@ void bsp_evt_handler(bsp_event_t evt) {
             app_button_is_pushed(2, &pushed);
             if (pushed) {
                 button_state[0] ^= (1 << 2);
+                rtt_print(0, "%sButton #%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, evt, BSP_EVENT_KEY_2, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
                 LEDS_ON(BSP_LED_2_MASK);
             } else {
                 button_state[0] |= (1 << 2);
@@ -111,6 +115,7 @@ void bsp_evt_handler(bsp_event_t evt) {
             app_button_is_pushed(3, &pushed);
             if (pushed) {
                 button_state[0] ^= (1 << 3);
+                rtt_print(0, "%sButton #%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, evt, BSP_EVENT_KEY_3, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
                 LEDS_ON(BSP_LED_3_MASK);
             } else {
                 button_state[0] |= (1 << 3);
@@ -143,7 +148,7 @@ void bsp_evt_handler(bsp_event_t evt) {
                 APP_ERROR_HANDLER(err_code);
             }
         } else {
-            rtt_print(0, "%sIgnoring button, not connected: %s%X/%X\n", RTT_CTRL_TEXT_BRIGHT_BLACK, RTT_CTRL_TEXT_BLUE, m_conn_handle, BLE_GAP_EVT_CONNECTED);
+            rtt_print(0, "%sIgnoring button, not connected: %s%X%X/%X\n", RTT_CTRL_TEXT_BRIGHT_BLACK, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], BLE_GAP_EVT_CONNECTED);
         }
     } else {
         rtt_print(0, "%sUnhandled bsp_evt: %s%X%s\n", RTT_CTRL_TEXT_RED, RTT_CTRL_TEXT_BRIGHT_RED, evt, RTT_CTRL_RESET);
