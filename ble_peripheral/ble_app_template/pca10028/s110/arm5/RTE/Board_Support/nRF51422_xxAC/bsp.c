@@ -206,7 +206,7 @@ static void bsp_button_event_handler(uint8_t pin_no, uint8_t button_action)
             case BSP_BUTTON_ACTION_LONG_PUSH:
 								// double check that the BSP_LONG_PUSH_TIMEOUT_MS has elapsed
 								// before setting the event
-								SEGGER_RTT_printf(0,"long push \n\tRTC1:%d\n\t Tstart:%d\n\tdiff:%d\n",NRF_RTC1->COUNTER,button_timer_Start_ticks,BSP_MS_TO_TICK(BSP_LONG_PUSH_TIMEOUT_MS));
+								SEGGER_RTT_printf(0,"long push \n\t RTC1:%d\n\t start:%d\n\t diff:%d\n",NRF_RTC1->COUNTER,button_timer_Start_ticks,BSP_MS_TO_TICK(BSP_LONG_PUSH_TIMEOUT_MS));
 								while((NRF_RTC1->COUNTER - button_timer_Start_ticks) < BSP_MS_TO_TICK(BSP_LONG_PUSH_TIMEOUT_MS))
 								{
 									bool pressed = false;

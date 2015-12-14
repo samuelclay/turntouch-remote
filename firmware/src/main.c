@@ -61,15 +61,17 @@ void bsp_evt_handler(bsp_event_t evt) {
         evt == BSP_EVENT_KEY_6 ||
         evt == BSP_EVENT_KEY_7) {
         uint32_t err_code;
-        bool pushed;
-        uint8_t button_state[BUTTON_STATUS_PACKET_BYTES] = {0x0F, 0x00};
-        bool mode_change;
+        bool pushed = false;
+        uint8_t button_state[BUTTON_STATUS_PACKET_BYTES] = {0xFF, 0x00};
+        bool mode_change = false;
         switch (evt)
         {
             case BSP_EVENT_KEY_4:            
             case BSP_EVENT_KEY_5:
             case BSP_EVENT_KEY_6:
             case BSP_EVENT_KEY_7:
+                rtt_print(0, "%sMode change #%X%s\n", RTT_CTRL_TEXT_BLUE, evt, RTT_CTRL_RESET);
+            
                 mode_change = true;
                 rtt_print(0, "%sMode Change #%X: %s%X%X(%X)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, evt, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
                 break;
@@ -77,61 +79,72 @@ void bsp_evt_handler(bsp_event_t evt) {
                 break;
         }
     
-        // Button down
-        if ((evt == BSP_EVENT_KEY_0) || mode_change) {
-            app_button_is_pushed(0, &pushed);
+        uint32_t num;
+        for (num = 0; num < BUTTONS_NUMBER; num++) {
+            app_button_is_pushed(num, &pushed);
             if (pushed) {
-                button_state[0] ^= (1 << 0);
-                rtt_print(0, "%sButton #%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, evt, BSP_EVENT_KEY_0, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
-                LEDS_ON(BSP_LED_0_MASK);
+                button_state[0] ^= (1 << num);
+                rtt_print(0, "%sButton down #%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, evt, BSP_EVENT_KEY_0+num, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
+                switch (num) {
+                    case 0:
+                        LEDS_ON(BSP_LED_0_MASK);
+                        break;
+                    case 1:
+                        LEDS_ON(BSP_LED_1_MASK);
+                        break;
+                    case 2:
+                        LEDS_ON(BSP_LED_2_MASK);
+                        break;
+                    case 3:
+                        LEDS_ON(BSP_LED_3_MASK);
+                        break;
+                    default:
+                        break;
+                }
             } else {
-                button_state[0] |= (1 << 0);
-                LEDS_OFF(BSP_LED_0_MASK);
-            }
+                rtt_print(0, "%sButton up #%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, evt, BSP_EVENT_KEY_0+num, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
+                if (evt == BSP_EVENT_KEY_0+num) {
+                    if (m_last_press == evt && !mode_change) {
+                        button_state[0] ^= (1 << (num+4));
+                        rtt_print(0, "%sDouble click! #%X=%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, m_last_press, evt, BSP_EVENT_KEY_0+num, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
+                    } else if (!mode_change) {
+                        rtt_print(0, "%sStoring double click #(%X) %X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, m_last_press, evt, BSP_EVENT_KEY_0+num, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
+                        m_last_press = BSP_EVENT_KEY_0+num;
+                    }
+                }
+                // button_state[0] |= (1 << 0);
+                switch (num) {
+                    case 0:
+                        LEDS_OFF(BSP_LED_0_MASK);
+                        break;
+                    case 1:
+                        LEDS_OFF(BSP_LED_1_MASK);
+                        break;
+                    case 2:
+                        LEDS_OFF(BSP_LED_2_MASK);
+                        break;
+                    case 3:
+                        LEDS_OFF(BSP_LED_3_MASK);
+                        break;
+                    default:
+                        break;
+                }
+            }            
         }
-        if ((evt == BSP_EVENT_KEY_1) || mode_change) {
-            app_button_is_pushed(1, &pushed);
-            if (pushed) {
-                button_state[0] ^= (1 << 1);
-                rtt_print(0, "%sButton #%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, evt, BSP_EVENT_KEY_1, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
-                LEDS_ON(BSP_LED_1_MASK);
-            } else {
-                button_state[0] |= (1 << 1);
-                LEDS_OFF(BSP_LED_1_MASK);
-            }
-        }
-        if ((evt == BSP_EVENT_KEY_2) || mode_change) {
-            app_button_is_pushed(2, &pushed);
-            if (pushed) {
-                button_state[0] ^= (1 << 2);
-                rtt_print(0, "%sButton #%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, evt, BSP_EVENT_KEY_2, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
-                LEDS_ON(BSP_LED_2_MASK);
-            } else {
-                button_state[0] |= (1 << 2);
-                LEDS_OFF(BSP_LED_2_MASK);
-            }
-        }
-        if ((evt == BSP_EVENT_KEY_3) || mode_change) {
-            app_button_is_pushed(3, &pushed);
-            if (pushed) {
-                button_state[0] ^= (1 << 3);
-                rtt_print(0, "%sButton #%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, evt, BSP_EVENT_KEY_3, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
-                LEDS_ON(BSP_LED_3_MASK);
-            } else {
-                button_state[0] |= (1 << 3);
-                LEDS_OFF(BSP_LED_3_MASK);
-            }
-        }
-    
+
         // Mode change
-        if ((evt == BSP_EVENT_KEY_4) || 
-            (evt == BSP_EVENT_KEY_5) ||
-            (evt == BSP_EVENT_KEY_6) ||
-            (evt == BSP_EVENT_KEY_7)) {
+        if (mode_change) {
+            m_last_press = BSP_EVENT_NOTHING; // Ignore subsequent double click
             button_state[1] |= 0xFF;
             LEDS_ON(LEDS_MASK);
         }    
-    
+        
+        if (!pushed) {
+            m_dblclick_timer_start = NRF_RTC1->COUNTER;
+            err_code = app_timer_start(m_doubleclick_timer_id, APP_TIMER_TICKS(DOUBLECLICK_DURATION, APP_TIMER_PRESCALER), NULL);
+            APP_ERROR_CHECK(err_code);
+        }
+        
         if (m_conn_handle != BLE_CONN_HANDLE_INVALID) {
             err_code = ble_buttonstatus_on_button_change(&m_buttonservice, button_state);
             if ((err_code != NRF_SUCCESS) &&
@@ -148,7 +161,7 @@ void bsp_evt_handler(bsp_event_t evt) {
                 APP_ERROR_HANDLER(err_code);
             }
         } else {
-            rtt_print(0, "%sIgnoring button, not connected: %s%X%X/%X\n", RTT_CTRL_TEXT_BRIGHT_BLACK, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], BLE_GAP_EVT_CONNECTED);
+            rtt_print(0, "%sIgnoring button, not connected: %s%X:%X\n", RTT_CTRL_TEXT_BRIGHT_BLACK, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1]);
         }
     } else {
         rtt_print(0, "%sUnhandled bsp_evt: %s%X%s\n", RTT_CTRL_TEXT_RED, RTT_CTRL_TEXT_BRIGHT_RED, evt, RTT_CTRL_RESET);
@@ -331,6 +344,26 @@ static void battery_level_meas_timeout_handler(void * p_context)
 {
     UNUSED_PARAMETER(p_context);
     battery_level_update();
+}
+
+static void doubleclick_timeout_handler(void * p_context) {
+    UNUSED_PARAMETER(p_context);
+    uint32_t err_code;
+    
+    if ((NRF_RTC1->COUNTER - m_dblclick_timer_start) < APP_TIMER_TICKS(DOUBLECLICK_DURATION, APP_TIMER_PRESCALER)) {
+        rtt_print(0, "%sDouble-click expiring... %s%X: %d < %d%s\n", RTT_CTRL_TEXT_GREEN, RTT_CTRL_TEXT_BRIGHT_GREEN, m_last_press, (NRF_RTC1->COUNTER - m_dblclick_timer_start), APP_TIMER_TICKS(DOUBLECLICK_DURATION, APP_TIMER_PRESCALER), RTT_CTRL_RESET);
+
+        err_code = app_timer_stop(m_doubleclick_timer_id);
+        APP_ERROR_CHECK(err_code);
+        err_code = app_timer_start(m_doubleclick_timer_id, APP_TIMER_TICKS(DOUBLECLICK_DURATION, APP_TIMER_PRESCALER), NULL);
+        APP_ERROR_CHECK(err_code);
+    } else {
+        rtt_print(0, "%sDouble-click expired: %s%X%s\n", RTT_CTRL_TEXT_GREEN, RTT_CTRL_TEXT_BRIGHT_GREEN, m_last_press, RTT_CTRL_RESET);
+        m_last_press = BSP_EVENT_NOTHING;
+    
+        err_code = app_timer_stop(m_doubleclick_timer_id);
+        APP_ERROR_CHECK(err_code);
+    }
 }
 
 // =============
@@ -690,7 +723,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 {
     uint32_t                         err_code;
     static ble_gap_evt_auth_status_t m_auth_status;
-    bool                             master_id_matches;
+    bool                             master_id_matches = false;
     ble_gap_sec_kdist_t *            p_distributed_keys;
     ble_gap_enc_info_t *             p_enc_info;
     ble_gap_irk_t *                  p_id_info;
@@ -1118,6 +1151,11 @@ static void timers_init(void)
     err_code = app_timer_create(&m_battery_timer_id,
                                 APP_TIMER_MODE_REPEATED,
                                 battery_level_meas_timeout_handler);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = app_timer_create(&m_doubleclick_timer_id,
+                                APP_TIMER_MODE_SINGLE_SHOT,
+                                doubleclick_timeout_handler);
     APP_ERROR_CHECK(err_code);
 }
 

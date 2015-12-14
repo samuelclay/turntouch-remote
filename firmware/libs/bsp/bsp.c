@@ -190,14 +190,14 @@ static void bsp_button_event_handler(uint8_t pin_no, uint8_t button_action)
                     {
                         current_long_push_pin_no = pin_no;
                     }
-										rtt_print(0,"timer start %x\n",err_code);
+                                        // rtt_print(0,"timer start %x\n",err_code);
                 }
                 release_event_at_push[button] = m_events_list[button].release_event;
                 break;
             case APP_BUTTON_RELEASE:
 								SEGGER_RTT_printf(0,"------------------------button release------------------------\n");
                 err_code = app_timer_stop(m_button_timer_id);
-								rtt_print(0,"timer stop %x\n",err_code);
+                                // rtt_print(0,"timer stop %x\n",err_code);
                 if (release_event_at_push[button] == m_events_list[button].release_event)
                 {
                     event = m_events_list[button].release_event;
@@ -206,7 +206,7 @@ static void bsp_button_event_handler(uint8_t pin_no, uint8_t button_action)
             case BSP_BUTTON_ACTION_LONG_PUSH:
 								// double check that the BSP_LONG_PUSH_TIMEOUT_MS has elapsed
 								// before setting the event
-								SEGGER_RTT_printf(0,"long push \n\tRTC1:%d\n\t Tstart:%d\n\tdiff:%d\n",NRF_RTC1->COUNTER,button_timer_Start_ticks,BSP_MS_TO_TICK(BSP_LONG_PUSH_TIMEOUT_MS));
+								SEGGER_RTT_printf(0,"long push \n\t RTC1:%d\n\tstart:%d\n\t diff:%d\n",NRF_RTC1->COUNTER,button_timer_Start_ticks,BSP_MS_TO_TICK(BSP_LONG_PUSH_TIMEOUT_MS));
 								while((NRF_RTC1->COUNTER - button_timer_Start_ticks) < BSP_MS_TO_TICK(BSP_LONG_PUSH_TIMEOUT_MS))
 								{
 									bool pressed = false;
@@ -234,7 +234,7 @@ static void bsp_button_event_handler(uint8_t pin_no, uint8_t button_action)
  */
 static void button_timer_handler(void * p_context)
 {
-		rtt_print(0,"timer handler  %x \n",NRF_RTC1->COUNTER);
+        // rtt_print(0,"timer handler  %x \n",NRF_RTC1->COUNTER);
 		bsp_button_event_handler(*(uint8_t *)p_context, BSP_BUTTON_ACTION_LONG_PUSH);
 }
 
