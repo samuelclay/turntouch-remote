@@ -71,7 +71,7 @@ __WEAK void app_error_handler(uint32_t error_code, uint32_t line_num, const uint
 
     // The following variable helps Keil keep the call stack visible, in addition, it can be set to
     // 0 in the debugger to continue executing code after the error check.
-    volatile bool loop = true;
+    volatile bool loop = false;
     UNUSED_VARIABLE(loop);
 
     m_error_code = error_code;

@@ -212,8 +212,13 @@ static void bsp_button_event_handler(uint8_t pin_no, uint8_t button_action)
 									bool pressed = false;
 									app_button_is_pushed(button, &pressed);
 									SEGGER_RTT_printf(0,"button %x\tbutton state %x\n",button,pressed);
-									if(pressed==false)
-										return;
+									if (!pressed) return;
+                                    uint32_t num;
+                                    for (num = 0; num < BUTTONS_NUMBER; num++) {
+                                        if (num == button) continue;
+                                        app_button_is_pushed(num, &pressed);
+                                        if (pressed) return;
+                                    }
 									nrf_delay_ms(50);
 									
 								}

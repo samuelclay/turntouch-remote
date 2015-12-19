@@ -132,6 +132,7 @@ void bsp_evt_handler(bsp_event_t evt) {
             }            
         }
 
+
         // Mode change
         if (mode_change) {
             m_last_press = BSP_EVENT_NOTHING; // Ignore subsequent double click
@@ -352,7 +353,7 @@ static void doubleclick_timeout_handler(void * p_context) {
     
     if ((NRF_RTC1->COUNTER - m_dblclick_timer_start) < APP_TIMER_TICKS(DOUBLECLICK_DURATION, APP_TIMER_PRESCALER)) {
         rtt_print(0, "%sDouble-click expiring... %s%X: %d < %d%s\n", RTT_CTRL_TEXT_GREEN, RTT_CTRL_TEXT_BRIGHT_GREEN, m_last_press, (NRF_RTC1->COUNTER - m_dblclick_timer_start), APP_TIMER_TICKS(DOUBLECLICK_DURATION, APP_TIMER_PRESCALER), RTT_CTRL_RESET);
-
+        
         err_code = app_timer_stop(m_doubleclick_timer_id);
         APP_ERROR_CHECK(err_code);
         err_code = app_timer_start(m_doubleclick_timer_id, APP_TIMER_TICKS(DOUBLECLICK_DURATION, APP_TIMER_PRESCALER), NULL);
