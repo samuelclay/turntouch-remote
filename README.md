@@ -54,7 +54,9 @@ To use gcc, you will need to download:
 In Supporting Files/defaults.plist, change `TT:firmware:version`
 
 ## Build flash hex
-mergehex -m Z:/remote/firmware/libs/components/softdevice/s110/hex/s110_nrf51_8.0.0_softdevice.hex Z:/remote/ble_peripheral/dfu/bootloader/pca10028/dual_bank_ble_s110/arm5/_build/nrf51422_xxac.hex Z:/remote/ble_peripheral/ble_app_template/pca10028/s110/arm5/_build/nrf51422_xxac_s110.hex -o Z:/remote/ble_peripheral/nrf51_sd_bootloader_app.hex
+
+    $ mergehex -m Z:/remote/firmware/libs/components/softdevice/s110/hex/s110_nrf51_8.0.0_softdevice.hex Z:/remote/ble_peripheral/dfu/bootloader/pca10028/dual_bank_ble_s110/arm5/_build/nrf51422_xxac.hex Z:/remote/ble_peripheral/ble_app_template/pca10028/s110/arm5/_build/nrf51422_xxac_s110.hex -o Z:/remote/ble_peripheral/nrf51_sd_bootloader_app.hex
+
 ### `make flashwin` on Mac in firmware/
 
 # Upgrading to latest nrf51 SDK
