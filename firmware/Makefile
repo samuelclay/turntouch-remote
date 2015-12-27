@@ -273,3 +273,5 @@ flashall:
 	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/sd_app_bootloader.hex
 	nrfjprog --pin-reset
 
+flashwin:
+	nrfjprog --flash ../ble_peripheral/nrf51_sd_bootloader_app.hex

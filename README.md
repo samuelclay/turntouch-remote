@@ -40,13 +40,22 @@ To use gcc, you will need to download:
 # Build on Windows
 
 ## Build DFU package
-C:\Keil_v5\ARM\ARMCC\bin\fromelf.exe --bin --output Z:\remote\ble_peripheral\ble_app_template\pca10028\s110\arm5\_build\nrf51422_xxac_s110.bin Z:\remote\ble_peripheral\ble_app_template\pca10028\s110\arm5\_build\nrf51422_xxac_s110.axf
 
-& 'C:\Program Files (x86)\Nordic Semiconductor\Master Control Panel\3.10.0.14\nrf\nrfutil.exe' dfu genpkg --sd-req 0xfffe --application Z:\remote\ble_peripheral\ble_app_template\pca10028\s110\arm5\_build\nrf51422_xxac_s110.bin --application-version 0x01 --dev-revision 0x01 Z:\remote\ble_peripheral\nrf51_01.zip
+    $ C:\Keil_v5\ARM\ARMCC\bin\fromelf.exe --bin --output Z:\remote\ble_peripheral\ble_app_template\pca10028\s110\arm5\_build\nrf51422_xxac_s110.bin Z:\remote\ble_peripheral\ble_app_template\pca10028\s110\arm5\_build\nrf51422_xxac_s110.axf
+
+    $ & 'C:\Program Files (x86)\Nordic Semiconductor\Master Control Panel\3.10.0.14\nrf\nrfutil.exe' dfu genpkg --sd-req 0xfffe --application Z:\remote\ble_peripheral\ble_app_template\pca10028\s110\arm5\_build\nrf51422_xxac_s110.bin --application-version 0x04 --dev-revision 0x01 Z:\remote\ble_peripheral\nrf51_04.zip
+
+### Back on Mac
+
+    $ cp ../ble_peripheral/nrf51_*.zip ../../app/Turn\ Touch\ Remote/DFU/firmwares/
+
+### In Xcode
+
+In Supporting Files/defaults.plist, change `TT:firmware:version`
 
 ## Build flash hex
-mergehex -m Z:/remote/firmware/libs/components/softdevice/s110/hex/s110_softdevice.hex Z:/remote/ble_peripheral/dfu/bootloader/pca10028/dual_bank_ble_s110/arm5/_build/nrf51422_xxac.hex Z:/remote/ble_peripheral/ble_app_template/pca10028/s110/arm5/_build/nrf51422_xxac_s110.hex -o Z:/remote/ble_peripheral/nrf51_sd_bootloader_app.hex
-
+mergehex -m Z:/remote/firmware/libs/components/softdevice/s110/hex/s110_nrf51_8.0.0_softdevice.hex Z:/remote/ble_peripheral/dfu/bootloader/pca10028/dual_bank_ble_s110/arm5/_build/nrf51422_xxac.hex Z:/remote/ble_peripheral/ble_app_template/pca10028/s110/arm5/_build/nrf51422_xxac_s110.hex -o Z:/remote/ble_peripheral/nrf51_sd_bootloader_app.hex
+### `make flashwin` on Mac in firmware/
 
 # Upgrading to latest nrf51 SDK
 
