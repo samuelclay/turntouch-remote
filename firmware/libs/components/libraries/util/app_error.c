@@ -23,7 +23,7 @@
 #include "app_error.h"
 #include "compiler_abstraction.h"
 #include "nordic_common.h"
-#ifdef DEBUG
+// #ifdef DEBUG
 #include "bsp.h"
 #include "rtt.h"
 
@@ -31,7 +31,7 @@
 uint32_t m_error_code;
 uint32_t m_line_num;
 const uint8_t * m_p_file_name;
-#endif
+// #endif
 
 /**@brief Function for error handling, which is called when an error has occurred.
  *
@@ -49,6 +49,8 @@ const uint8_t * m_p_file_name;
 /*lint -save -e14 */
 __WEAK void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p_file_name)
 {
+    rtt_print(0, "%sError 0x%X at line %d: %X%s\n", RTT_CTRL_TEXT_BRIGHT_RED, error_code, line_num, *p_file_name, RTT_CTRL_RESET);
+
     // On assert, the system can only recover with a reset.
 #ifndef DEBUG
     NVIC_SystemReset();
@@ -67,7 +69,6 @@ __WEAK void app_error_handler(uint32_t error_code, uint32_t line_num, const uint
     //                Use with care. Uncomment the line below to use.
     //ble_debug_assert_handler(error_code, line_num, p_file_name);
 #endif // BSP_DEFINES_ONLY
-    rtt_print(0, "%sError 0x%X at line %d: %X%s\n", RTT_CTRL_TEXT_BRIGHT_RED, error_code, line_num, *p_file_name, RTT_CTRL_RESET);
 
     // The following variable helps Keil keep the call stack visible, in addition, it can be set to
     // 0 in the debugger to continue executing code after the error check.

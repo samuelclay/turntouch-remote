@@ -142,8 +142,10 @@ void bsp_evt_handler(bsp_event_t evt) {
         
         if (!pushed) {
             m_dblclick_timer_start = NRF_RTC1->COUNTER;
+            rtt_print(0, "m_doubleclick_timer_id: %X\n", m_doubleclick_timer_id);
             err_code = app_timer_start(m_doubleclick_timer_id, APP_TIMER_TICKS(DOUBLECLICK_DURATION, APP_TIMER_PRESCALER), NULL);
-            APP_ERROR_CHECK(err_code);
+            rtt_print(0, "m_doubleclick app error: %d\n", err_code);
+            // APP_ERROR_CHECK(err_code);
         }
         
         if (m_conn_handle != BLE_CONN_HANDLE_INVALID) {
