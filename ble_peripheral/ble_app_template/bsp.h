@@ -20,7 +20,7 @@
  * @details This module provides a layer of abstraction from the board.
  *          It allows the user to indicate certain states on LEDs in a simple way.
  *          Module functionality can be modified by additional defines:
- *          - BSP_SIMPLE reduces functionality of this module to enable
+ *          - BSP_SIMPLE reduces functionality of this module to enable 
  *            and read state of the buttons
  *          - BSP_UART_SUPPORT enables support for UART
  */

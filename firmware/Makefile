@@ -3,7 +3,7 @@ PROJECT_NAME := remote_s110_pca10028
 export OUTPUT_FILENAME
 #MAKEFILE_NAME := $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 MAKEFILE_NAME := $(MAKEFILE_LIST)
-MAKEFILE_DIR := $(dir $(MAKEFILE_NAME) ) 
+MAKEFILE_DIR := $(dir $(MAKEFILE_NAME) )
 OUTPUT_FILENAME := nrf51
 LINKER_SCRIPT=./src/remote_gcc_nrf51.ld
 
@@ -19,7 +19,7 @@ RM := rm -rf
 
 #echo suspend
 ifeq ("$(VERBOSE)","1")
-NO_ECHO := 
+NO_ECHO :=
 else
 NO_ECHO := @
 endif
@@ -161,7 +161,7 @@ default: clean nrf51
 #building all targets
 all: clean
 	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e cleanobj
-	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e nrf51 
+	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e nrf51
 
 #target for printing all targets
 help:
@@ -262,10 +262,10 @@ flashall:
 	srec_cat $(SOFTDEVICE_HEX) -intel $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -intel ../bootloader/build/nrf51822_xxac.hex -intel -exclude 0x3FC00 0x3FC20 -generate 0x3FC00 0x3FC04 \
 -constant-l-e 0x01 4 -generate 0x3FC04 0x3FC08 \
 -constant-l-e 0x00 4 -generate 0x3FC08 0x3FC0C \
--constant-l-e 0xFE 4 -generate 0x3FC0C 0x3FC20 -constant 0x00 --line-length=44 -o $(OUTPUT_BINARY_DIRECTORY)/sd_app_bootloader.hex -intel 
-# At the address 0x3FC00 the bootloader stores its information. The first byte (0x01) marks that a 
-# valid application exists. The following two bytes are the CRC the application is checked against 
-# to determine its validity. This hex-File writes these values to 0x00 which forces the bootloader 
+-constant-l-e 0xFE 4 -generate 0x3FC0C 0x3FC20 -constant 0x00 --line-length=44 -o $(OUTPUT_BINARY_DIRECTORY)/sd_app_bootloader.hex -intel
+# At the address 0x3FC00 the bootloader stores its information. The first byte (0x01) marks that a
+# valid application exists. The following two bytes are the CRC the application is checked against
+# to determine its validity. This hex-File writes these values to 0x00 which forces the bootloader
 # to ignore the CRC check.
 # See "E. How do I program the original application via programmer (JLINK), not by DFU" at
 # https://devzone.nordicsemi.com/blogs/685/common-faq-on-dfu/

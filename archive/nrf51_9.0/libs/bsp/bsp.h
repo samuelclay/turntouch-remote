@@ -20,7 +20,7 @@
  * @details This module provides a layer of abstraction from the board.
  *          It allows the user to indicate certain states on LEDs in a simple way.
  *          Module functionality can be modified by additional defines:
- *          - BSP_SIMPLE reduces functionality of this module to enable 
+ *          - BSP_SIMPLE reduces functionality of this module to enable
  *            and read state of the buttons
  *          - BSP_UART_SUPPORT enables support for UART
  */
@@ -79,7 +79,7 @@
 #define BSP_INIT_BUTTONS (1 << 1) /**< This bit enables buttons during initialization (@ref bsp_init).*/
 #define BSP_INIT_UART    (1 << 2) /**< This bit enables UART during initialization (@ref bsp_init).*/
 
-#define BSP_LONG_PUSH_TIMEOUT_MS (500) /**< The time to hold for a long push (in milliseconds). */
+#define BSP_LONG_PUSH_TIMEOUT_MS (300) /**< The time to hold for a long push (in milliseconds). */
 
 typedef uint8_t bsp_button_action_t; /**< The different actions that can be performed on a button. */
 
