@@ -6,18 +6,18 @@ GROUP(-lgcc -lc -lnosys)
 MEMORY
 {
   /** Flash start address for the bootloader. This setting will also be stored in UICR to allow the
-   *  MBR to init the bootloader when starting the system. This value must correspond to 
-   *  BOOTLOADER_REGION_START found in dfu_types.h. The system is prevented from starting up if 
+   *  MBR to init the bootloader when starting the system. This value must correspond to
+   *  BOOTLOADER_REGION_START found in dfu_types.h. The system is prevented from starting up if
    *  those values do not match. The check is performed in main.c, see
    *  APP_ERROR_CHECK_BOOL(*((uint32_t *)NRF_UICR_BOOT_START_ADDRESS) == BOOTLOADER_REGION_START);
    */
-  FLASH (rx) : ORIGIN = 0x3C000, LENGTH = 0x3C00
+  FLASH (rx) : ORIGIN = 0x39C00, LENGTH = 0x6000
 
   /** RAM Region for bootloader. This setting is suitable when used with s110, s120, s130, s310. */
-  RAM (rwx) :  ORIGIN = 0x20002C00, LENGTH = 0x1380
+  RAM (rwx) :  ORIGIN = 0x20002000, LENGTH = 0x2000
 
   /** Location of non initialized RAM. Non initialized RAM is used for exchanging bond information
-   *  from application to bootloader when using buttonluss DFU OTA. 
+   *  from application to bootloader when using buttonluss DFU OTA.
    */
   NOINIT (rwx) :  ORIGIN = 0x20003F80, LENGTH = 0x80
 
@@ -33,11 +33,11 @@ SECTIONS
   /* Ensures the bootloader settings are placed at the last flash page. */
   .bootloaderSettings(NOLOAD) :
   {
-	
+
   } > BOOTLOADER_SETTINGS
 
   /* Ensures the Bootloader start address in flash is written to UICR when flashing the image. */
-  .uicrBootStartAddress : 
+  .uicrBootStartAddress :
   {
     KEEP(*(.uicrBootStartAddress))
   } > UICR_BOOTLOADER
