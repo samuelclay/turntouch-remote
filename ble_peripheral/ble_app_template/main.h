@@ -40,7 +40,6 @@
 #define APP_ADV_SLOW_INTERVAL           3200                                        /**< Slow advertising interval (in units of 0.625 ms). The default value corresponds to 2 seconds. */
 #define APP_ADV_FAST_TIMEOUT            30                                          /**< The advertising time-out in units of seconds. */
 #define APP_ADV_SLOW_TIMEOUT            86400                                       /**< The advertising time-out in units of seconds. */
-#define ADV_INTERVAL_FAST_PERIOD        30                                          /**< The duration of the fast advertising period (in seconds). */
 
 #define MIN_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)            /**< Minimum acceptable connection interval (0.5 seconds). */
 #define MAX_CONN_INTERVAL               MSEC_TO_UNITS(200, UNIT_1_25_MS)            /**< Maximum acceptable connection interval (1 second). */
@@ -66,15 +65,16 @@
 
 #define DFU_APP_DATA_RESERVED           0x1000                                      /**< Preserve app data during DFU. 0x1000 is 4 pages (4k) */
 #define DFU_REV_MAJOR                   0x00                                        /** DFU Major revision number to be exposed. */
-#define DFU_REV_MINOR                   0x05                                        /** DFU Minor revision number to be exposed. */
+#define DFU_REV_MINOR                   0x06                                        /** DFU Minor revision number to be exposed. */
 #define DFU_REVISION                    ((DFU_REV_MAJOR << 8) | DFU_REV_MINOR)      /** DFU Revision number to be exposed. Combined of major and minor versions. */
 #define APP_SERVICE_HANDLE_START        0x000C                                      /**< Handle of first application specific service when when service changed characteristic is present. */
 #define BLE_HANDLE_MAX                  0xFFFF                                      /**< Max handle value in BLE. */
 
-#define ADC_REF_VOLTAGE_IN_MILLIVOLTS        1200                                      /**< Reference voltage (in milli volts) used by ADC while doing conversion. */
-#define ADC_PRE_SCALING_COMPENSATION         3                                         /**< The ADC is configured to use VDD with 1/3 prescaling as input. And hence the result of conversion is to be multiplied by 3 to get the actual value of the battery voltage.*/
-#define DIODE_FWD_VOLT_DROP_MILLIVOLTS       270                                       /**< Typical forward voltage drop of the diode (Part no: SD103ATW-7-F) that is connected in series with the voltage supply. This is the voltage drop when the forward current is 1mA. Source: Data sheet of 'SURFACE MOUNT SCHOTTKY BARRIER DIODE ARRAY' available at www.diodes.com. */
-#define DOUBLECLICK_DURATION                300                                     /**< Time in ms for double-click to register individual clicks */
+#define ADC_REF_VOLTAGE_IN_MILLIVOLTS        1200                                   /**< Reference voltage (in milli volts) used by ADC while doing conversion. */
+#define ADC_PRE_SCALING_COMPENSATION         3                                      /**< The ADC is configured to use VDD with 1/3 prescaling as input. And hence the result of conversion is to be multiplied by 3 to get the actual value of the battery voltage.*/
+#define DIODE_FWD_VOLT_DROP_MILLIVOLTS       270                                    /**< Typical forward voltage drop of the diode (Part no: SD103ATW-7-F) that is connected in series with the voltage supply. This is the voltage drop when the forward current is 1mA. Source: Data sheet of 'SURFACE MOUNT SCHOTTKY BARRIER DIODE ARRAY' available at www.diodes.com. */
+#define DOUBLECLICK_DURATION                350                                     /**< Time in ms for double-click to register individual clicks */
+#define UNCONNECTED_BUTTON_PRESS_DURATION   30000                                   /**< Timeout in ms for button presses made while unconnected to be sent upon connection. */
 
 // STATIC_ASSERT(IS_SRVC_CHANGED_CHARACT_PRESENT);                                     /** When having DFU Service support in application the Service Changed Characteristic should always be present. */
 
@@ -100,6 +100,9 @@ static pstorage_handle_t                m_flash_handle;                         
 static ble_dfu_t                        m_dfus;                                     /**< Structure used to identify the DFU service. */
 static bsp_event_t                      m_last_press;                               /**< Most recent button to be pressed, for dblclick */
 static uint32_t                         m_dblclick_timer_start;                     /**< RTC counter ticks, stored to be checked in timers */
+static uint32_t                         m_last_unconnected_button_start;            /**< Send last button press after connection if within alloted time */
+static uint8_t                          m_last_button_state[BUTTON_STATUS_PACKET_BYTES];   /**< Used to repeat button press when connected but not expired */
+
 APP_TIMER_DEF(m_battery_timer_id);
 APP_TIMER_DEF(m_doubleclick_timer_id);
 
@@ -110,3 +113,4 @@ static void on_ble_evt(ble_evt_t * p_ble_evt);
 static void app_context_load(dm_handle_t const * p_handle);
 static void dfu_event_handler(ble_dfu_t * p_dfu, ble_dfu_evt_t * p_evt);
 static void dfu_error_handler(uint32_t nrf_error);
+static void send_last_unconnect_button_status(void);

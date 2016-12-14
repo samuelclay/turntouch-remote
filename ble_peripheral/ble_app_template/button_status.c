@@ -70,7 +70,7 @@ static void on_write(ble_buttonservice_t * p_buttonservice, ble_evt_t * p_ble_ev
     else if (p_evt_write->handle == p_buttonservice->firmware_nickname_char_handles.value_handle)
     {
     	rtt_print(0, "on_write short:\r");
-		SEGGER_RTT_Write(0,(const char *)p_evt_write->data,p_evt_write->len);
+		SEGGER_RTT_Write(0,p_evt_write->data,p_evt_write->len);
 		SEGGER_RTT_printf(0, "\r");
 		p_buttonservice->firmware_nickname_write_handler(p_buttonservice, p_evt_write->data,p_evt_write->len);
     }

@@ -84,6 +84,8 @@ void bsp_evt_handler(bsp_event_t evt) {
             app_button_is_pushed(num, &pushed);
             if (pushed) {
                 button_state[0] ^= (1 << num);
+                strncpy(m_last_button_state, button_state, 2);
+                m_last_unconnected_button_start = NRF_RTC1->COUNTER;
                 rtt_print(0, "%sButton down #%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, evt, BSP_EVENT_KEY_0+num, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
                 switch (num) {
                     case 0:
@@ -137,6 +139,7 @@ void bsp_evt_handler(bsp_event_t evt) {
         if (mode_change) {
             m_last_press = BSP_EVENT_NOTHING; // Ignore subsequent double click
             button_state[1] |= 0xFF;
+            strncpy(m_last_button_state, button_state, 2);
             LEDS_ON(LEDS_MASK);
         }    
         
@@ -716,6 +719,10 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     on_ble_evt(p_ble_evt);
     ble_advertising_on_ble_evt(p_ble_evt);
     ble_buttonstatus_on_ble_evt(&m_buttonservice, p_ble_evt, &m_mem_block);
+    
+    if (p_ble_evt->header.evt_id == BLE_GATTS_EVT_WRITE) {
+        send_last_unconnected_button_status();
+    }
 }
 
 /**@brief Function for handling the Application's BLE Stack events.
@@ -811,6 +818,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
         
         case BLE_EVT_TX_COMPLETE:
             rtt_print(0, "%sTX complete\n", RTT_CTRL_TEXT_BLUE);
+            m_last_unconnected_button_start = 0;
             break;
 
         case BLE_GAP_EVT_CONN_PARAM_UPDATE:
@@ -854,6 +862,39 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             // No implementation needed.
             rtt_print(0, "%sBluetooth event unhandled: %s%X(%d)%s\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, p_ble_evt->header.evt_id, p_ble_evt->header.evt_len, RTT_CTRL_RESET);
             break;
+    }
+}
+
+static void send_last_unconnected_button_status(void) {
+    uint32_t err_code;
+    rtt_print(0, "%ssend_last_unconnected_button_status 1: %s%d - %d < %d\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, NRF_RTC1->COUNTER, m_last_unconnected_button_start, APP_TIMER_TICKS(UNCONNECTED_BUTTON_PRESS_DURATION, APP_TIMER_PRESCALER), RTT_CTRL_RESET);
+    
+    if (m_last_unconnected_button_start == 0) return;
+    if ((NRF_RTC1->COUNTER - m_last_unconnected_button_start) < APP_TIMER_TICKS(UNCONNECTED_BUTTON_PRESS_DURATION, APP_TIMER_PRESCALER)) {
+        rtt_print(0, "%ssend_last_unconnected_button_status 2: %s%d - %d < %d\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, NRF_RTC1->COUNTER, m_last_unconnected_button_start, APP_TIMER_TICKS(UNCONNECTED_BUTTON_PRESS_DURATION, APP_TIMER_PRESCALER), RTT_CTRL_RESET);
+        
+        if (m_conn_handle != BLE_CONN_HANDLE_INVALID) {
+            rtt_print(0, "%ssend_last_unconnected_button_status 3: %s%d - %d < %d\n", RTT_CTRL_TEXT_BLUE, RTT_CTRL_TEXT_BRIGHT_BLUE, NRF_RTC1->COUNTER, m_last_unconnected_button_start, APP_TIMER_TICKS(UNCONNECTED_BUTTON_PRESS_DURATION, APP_TIMER_PRESCALER), RTT_CTRL_RESET);
+            
+            err_code = ble_buttonstatus_on_button_change(&m_buttonservice, m_last_button_state);
+            if ((err_code != NRF_SUCCESS) &&
+                (err_code != BLE_ERROR_INVALID_CONN_HANDLE) &&
+                (err_code != NRF_ERROR_INVALID_STATE) &&
+                (err_code != BLE_ERROR_NO_TX_BUFFERS) &&
+                (err_code != NRF_ERROR_BUSY) &&
+                (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING))
+            {
+                // Can ignore this error, just means that bluetooth is connected but nobody's listening yet
+                rtt_print(0, "BLE_ERROR_GATTS_SYS_ATTR_MISSING (or similar)\n");
+                // Can ignore this error, just means buffer capacity exceeded (too many button pushes)
+                // rtt_print(0, "BLE_ERROR_NO_TX_BUFFERS\n");
+                APP_ERROR_HANDLER(err_code);
+            }
+            
+            bsp_evt_handler(BSP_EVENT_KEY_0);
+        } else {
+            rtt_print(0, "%sIgnoring unconnected button, not connected (!!): %s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, RTT_CTRL_TEXT_BLUE);
+        }
     }
 }
 
