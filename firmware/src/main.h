@@ -113,4 +113,4 @@ static void on_ble_evt(ble_evt_t * p_ble_evt);
 static void app_context_load(dm_handle_t const * p_handle);
 static void dfu_event_handler(ble_dfu_t * p_dfu, ble_dfu_evt_t * p_evt);
 static void dfu_error_handler(uint32_t nrf_error);
-static void send_last_unconnect_button_status(void);
+static void send_last_unconnected_button_status(void);
