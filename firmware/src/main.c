@@ -111,7 +111,7 @@ void bsp_evt_handler(bsp_event_t evt) {
                         rtt_print(0, "%sDouble click! #%X=%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, m_last_press, evt, BSP_EVENT_KEY_0+num, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
                     } else if (!mode_change) {
                         rtt_print(0, "%sStoring double click #(%X) %X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, m_last_press, evt, BSP_EVENT_KEY_0+num, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
-                        m_last_press = BSP_EVENT_KEY_0+num;
+                        m_last_press = (bsp_event_t)(BSP_EVENT_KEY_0+num);
                     }
                 }
                 // button_state[0] |= (1 << 0);

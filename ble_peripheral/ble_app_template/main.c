@@ -84,7 +84,7 @@ void bsp_evt_handler(bsp_event_t evt) {
             app_button_is_pushed(num, &pushed);
             if (pushed) {
                 button_state[0] ^= (1 << num);
-                strncpy(m_last_button_state, button_state, 2);
+                memcpy(m_last_button_state, button_state, 2);
                 m_last_unconnected_button_start = NRF_RTC1->COUNTER;
                 rtt_print(0, "%sButton down #%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, evt, BSP_EVENT_KEY_0+num, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
                 switch (num) {
@@ -111,7 +111,7 @@ void bsp_evt_handler(bsp_event_t evt) {
                         rtt_print(0, "%sDouble click! #%X=%X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, m_last_press, evt, BSP_EVENT_KEY_0+num, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
                     } else if (!mode_change) {
                         rtt_print(0, "%sStoring double click #(%X) %X=%X: %s%X%X(%d)%s\n", RTT_CTRL_TEXT_BRIGHT_BLACK, m_last_press, evt, BSP_EVENT_KEY_0+num, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1], mode_change, RTT_CTRL_RESET);
-                        m_last_press = BSP_EVENT_KEY_0+num;
+                        m_last_press = (bsp_event_t)(BSP_EVENT_KEY_0+num);
                     }
                 }
                 // button_state[0] |= (1 << 0);
@@ -139,7 +139,7 @@ void bsp_evt_handler(bsp_event_t evt) {
         if (mode_change) {
             m_last_press = BSP_EVENT_NOTHING; // Ignore subsequent double click
             button_state[1] |= 0xFF;
-            strncpy(m_last_button_state, button_state, 2);
+            memcpy(m_last_button_state, button_state, 2);
             LEDS_ON(LEDS_MASK);
         }    
         
