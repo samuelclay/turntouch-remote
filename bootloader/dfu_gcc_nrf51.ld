@@ -17,12 +17,12 @@ MEMORY
   BOOTLOADER_SETTINGS (rw) : ORIGIN = 0x0003FC00, LENGTH = 0x0400
 
   /** RAM Region for bootloader. This setting is suitable when used with s110, s120, s130, s310. */
-  RAM (rwx) :  ORIGIN = 0x20002C00, LENGTH = 0x5380
+  RAM (rwx) :  ORIGIN = 0x20002000, LENGTH = 0x5380
 
   /** Location of non initialized RAM. Non initialized RAM is used for exchanging bond information
    *  from application to bootloader when using buttonluss DFU OTA. 
    */
-  NOINIT (rwx) :  ORIGIN = 0x20007F80, LENGTH = 0x80
+  NOINIT (rwx) :  ORIGIN = 0x20007380, LENGTH = 0x80
 
   /** Location in UICR where bootloader start address is stored. */
   UICR_BOOTLOADER (r) : ORIGIN = 0x10001014, LENGTH = 0x04
