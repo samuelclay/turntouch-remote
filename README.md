@@ -43,11 +43,12 @@ To use gcc, you will need to download:
 
     $ C:\Keil_v5\ARM\ARMCC\bin\fromelf.exe --bin --output Z:\remote\ble_peripheral\ble_app_template\pca10028\s110\arm5\_build\nrf51422_xxac_s110.bin Z:\remote\ble_peripheral\ble_app_template\pca10028\s110\arm5\_build\nrf51422_xxac_s110.axf
 
-    $ & 'C:\Program Files (x86)\Nordic Semiconductor\Master Control Panel\3.10.0.14\nrf\nrfutil.exe' dfu genpkg --sd-req 0xfffe --application Z:\remote\ble_peripheral\ble_app_template\pca10028\s110\arm5\_build\nrf51422_xxac_s110.bin --application-version 0x05 --dev-revision 0x01 Z:\remote\ble_peripheral\nrf51_05.zip
+    $ & 'C:\Program Files (x86)\Nordic Semiconductor\Master Control Panel\3.10.0.14\nrf\nrfutil.exe' dfu genpkg --sd-req 0xfffe --application Z:\remote\ble_peripheral\ble_app_template\pca10028\s110\arm5\_build\nrf51422_xxac_s110.bin --application-version 0x06 --dev-revision 0x01 Z:\remote\ble_peripheral\nrf51_06.zip
 
 ### Back on Mac
 
-    $ cp ../ble_peripheral/nrf51_*.zip ../../app/Turn\ Touch\ Remote/DFU/firmwares/
+    $ cp ../ble_peripheral/nrf51_*.zip ../../app/Turn\ Touch\ Mac/DFU/firmwares/
+    $ cp ../ble_peripheral/nrf51_*.zip ../../ios/Turn\ Touch\ iOS/DFU/
 
 ### In Xcode
 

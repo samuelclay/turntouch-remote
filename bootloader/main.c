@@ -202,11 +202,13 @@ int main(void)
     timers_init();
     buttons_init();
 
+    nrf_gpio_pin_set(LED_4);
     (void)bootloader_init();
 
     if (bootloader_dfu_sd_in_progress())
     {
         nrf_gpio_pin_clear(UPDATE_IN_PROGRESS_LED);
+        nrf_gpio_pin_set(LED_2);
 
         err_code = bootloader_dfu_sd_update_continue();
         APP_ERROR_CHECK(err_code);
@@ -232,6 +234,7 @@ int main(void)
     if (dfu_start || (!bootloader_app_is_valid(DFU_BANK_0_REGION_START)))
     {
         nrf_gpio_pin_clear(UPDATE_IN_PROGRESS_LED);
+        nrf_gpio_pin_set(LED_4);
 
         // Initiate an update of the firmware.
         err_code = bootloader_dfu_start();
