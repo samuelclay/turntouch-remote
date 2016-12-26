@@ -258,7 +258,7 @@ flashsdapp:
 	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/sd_app.hex
 	nrfjprog --pin-reset
 
-flashall:
+flashall: erase
 	srec_cat $(SOFTDEVICE_HEX) -intel $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -intel ../bootloader/build/nrf51822_xxac.hex -intel -exclude 0x3FC00 0x3FC20 -generate 0x3FC00 0x3FC04 \
 -constant-l-e 0x01 4 -generate 0x3FC04 0x3FC08 \
 -constant-l-e 0x00 4 -generate 0x3FC08 0x3FC0C \

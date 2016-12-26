@@ -73,7 +73,7 @@
 #define ADC_REF_VOLTAGE_IN_MILLIVOLTS        1200                                   /**< Reference voltage (in milli volts) used by ADC while doing conversion. */
 #define ADC_PRE_SCALING_COMPENSATION         3                                      /**< The ADC is configured to use VDD with 1/3 prescaling as input. And hence the result of conversion is to be multiplied by 3 to get the actual value of the battery voltage.*/
 #define DIODE_FWD_VOLT_DROP_MILLIVOLTS       270                                    /**< Typical forward voltage drop of the diode (Part no: SD103ATW-7-F) that is connected in series with the voltage supply. This is the voltage drop when the forward current is 1mA. Source: Data sheet of 'SURFACE MOUNT SCHOTTKY BARRIER DIODE ARRAY' available at www.diodes.com. */
-#define DOUBLECLICK_DURATION                350                                     /**< Time in ms for double-click to register individual clicks */
+#define DOUBLECLICK_DURATION                300                                     /**< Time in ms for double-click to register individual clicks */
 #define UNCONNECTED_BUTTON_PRESS_DURATION   30000                                   /**< Timeout in ms for button presses made while unconnected to be sent upon connection. */
 
 // STATIC_ASSERT(IS_SRVC_CHANGED_CHARACT_PRESENT);                                     /** When having DFU Service support in application the Service Changed Characteristic should always be present. */
