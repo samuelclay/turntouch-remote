@@ -344,7 +344,7 @@
 <vertex x="-3.81" y="0" curve="-90"/>
 <vertex x="-0.1778" y="3.81"/>
 </polygon>
-<pad name="P$2" x="0" y="1.27" drill="0.3302" diameter="0.508" stop="no" first="yes"/>
+<pad name="P$2" x="0" y="1.27" drill="0.508" diameter="0.762" thermals="no" first="yes"/>
 <wire x1="-7.62" y1="-7.62" x2="-7.62" y2="-6.35" width="0.127" layer="21"/>
 <wire x1="-7.62" y1="-6.35" x2="-7.62" y2="4.55395" width="0.127" layer="21"/>
 <wire x1="-7.62" y1="4.55395" x2="-4.55395" y2="7.62" width="0.127" layer="21" curve="-90"/>
@@ -403,6 +403,7 @@
 <vertex x="-3.81" y="0" curve="-90"/>
 <vertex x="-0.1778" y="3.81"/>
 </polygon>
+<circle x="0" y="0" radius="2.83980625" width="1.905" layer="39"/>
 </package>
 </packages>
 <symbols>
