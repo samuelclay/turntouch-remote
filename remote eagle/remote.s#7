@@ -2203,7 +2203,6 @@ Standard decoupling cap</description>
 <part name="Q1" library="abracon" deviceset="CRYSTAL" device=".ABS07"/>
 <part name="GND10" library="supply1" deviceset="GND" device=""/>
 <part name="C1" library="SparkFun-Capacitors" deviceset="0.1UF-25V(+80/-20%)(0603)" device="" value="1uF"/>
-<part name="P+4" library="SparkFun" deviceset="3.3V" device="" value="3.3V"/>
 </parts>
 <sheets>
 <sheet>
@@ -2234,7 +2233,6 @@ Standard decoupling cap</description>
 <instance part="Q1" gate="G$1" x="45.72" y="55.88"/>
 <instance part="GND10" gate="1" x="99.06" y="33.02"/>
 <instance part="C1" gate="G$1" x="22.86" y="17.78"/>
-<instance part="P+4" gate="G$1" x="116.84" y="96.52"/>
 </instances>
 <busses>
 </busses>
@@ -2341,12 +2339,6 @@ Standard decoupling cap</description>
 <pinref part="C1" gate="G$1" pin="1"/>
 <wire x1="22.86" y1="22.86" x2="22.86" y2="27.94" width="0.1524" layer="91"/>
 <junction x="22.86" y="27.94"/>
-</segment>
-<segment>
-<pinref part="U$5" gate="G$1" pin="DEC2"/>
-<wire x1="111.76" y1="91.44" x2="116.84" y2="91.44" width="0.1524" layer="91"/>
-<wire x1="116.84" y1="91.44" x2="116.84" y2="96.52" width="0.1524" layer="91"/>
-<pinref part="P+4" gate="G$1" pin="3.3V"/>
 </segment>
 </net>
 <net name="BLE_SWCLK" class="0">

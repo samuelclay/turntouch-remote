@@ -405,7 +405,7 @@ Rev. 30</text>
 <vertex x="-3.81" y="0" curve="-90"/>
 <vertex x="-0.1778" y="3.81"/>
 </polygon>
-<circle x="0" y="0" radius="2.83980625" width="1.905" layer="39"/>
+<circle x="0" y="0" radius="2.83980625" width="1.905" layer="41"/>
 </package>
 </packages>
 </library>

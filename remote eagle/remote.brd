@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.2.0">
+<eagle version="7.3.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="yes"/>
@@ -755,7 +755,7 @@ design rules under a new name.</description>
 <element name="J1" library="connector" package="TC2030-IDC-NL" value="TC2030-JLINK-NL" x="10.16" y="33.02" smashed="yes">
 <attribute name="NAME" x="14.732" y="33.782" size="0.762" layer="25" font="vector" ratio="12" align="bottom-center"/>
 </element>
-<element name="U$5" library="MDBT40" package="MDBT40" value="MDBT40SMD" x="28.575" y="28.575" smashed="yes" rot="R315">
+<element name="U$5" library="MDBT40" package="MDBT40" value="MDBT40-256RV3" x="28.575" y="28.575" smashed="yes" rot="R315">
 <attribute name="VALUE" x="19.382609375" y="22.211040625" size="0.8128" layer="27" rot="R315"/>
 </element>
 <element name="C3" library="SparkFun-Capacitors" package="0603-CAP" value="14pF" x="18.288" y="33.02" smashed="yes" rot="R135">

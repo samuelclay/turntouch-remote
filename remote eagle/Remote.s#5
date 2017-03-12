@@ -2476,7 +2476,7 @@ Spark Fun Electronics SKU : Comp-Buzzer</description>
 <part name="Q1" library="abracon" deviceset="CRYSTAL" device=".ABS07"/>
 <part name="GND10" library="supply1" deviceset="GND" device=""/>
 <part name="C1" library="SparkFun-Capacitors" deviceset="0.1UF-25V(+80/-20%)(0603)" device="" value="1uF"/>
-<part name="SG1" library="SparkFun-Electromechanical" deviceset="BUZZER" device="SMD"/>
+<part name="SG1" library="SparkFun-Electromechanical" deviceset="BUZZER" device="SMD3" value="BUZZERSMD3"/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
 </parts>
 <sheets>

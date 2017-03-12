@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.2.0">
+<eagle version="7.3.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="yes"/>
@@ -2194,7 +2194,7 @@ Standard decoupling cap</description>
 <part name="J1" library="connector" deviceset="TC2030-JLINK" device="-NL"/>
 <part name="P+3" library="SparkFun" deviceset="3.3V" device="" value="3.3V"/>
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
-<part name="U$5" library="MDBT40" deviceset="MDBT40" device="SMD"/>
+<part name="U$5" library="MDBT40" deviceset="MDBT40" device="SMD" value="MDBT40-256RV3"/>
 <part name="GND7" library="supply1" deviceset="GND" device=""/>
 <part name="GND8" library="supply1" deviceset="GND" device=""/>
 <part name="GND9" library="supply1" deviceset="GND" device=""/>
