@@ -150,7 +150,8 @@
 </layers>
 <board>
 <plain>
-<text x="26.162" y="17.78" size="0.8382" layer="26" font="vector" ratio="9" rot="SMR0" align="top-center">Rev. 37</text>
+<text x="9.398" y="18.542" size="0.8382" layer="26" font="vector" ratio="9" rot="SMR0" align="top-center">Mar 13 2017
+Rev. 35</text>
 <text x="9.398" y="20.574" size="1.27" layer="26" font="vector" ratio="9" rot="SMR0" align="top-center">TURN TOUCH</text>
 <hole x="2.794" y="34.036" drill="2.032"/>
 <hole x="34.036" y="2.794" drill="2.032"/>
@@ -176,8 +177,9 @@
 <wire x1="31.496" y1="34.544" x2="34.544" y2="34.544" width="1.016" layer="22"/>
 <wire x1="34.544" y1="34.544" x2="34.544" y2="31.496" width="1.016" layer="22"/>
 <hole x="33.528" y="15.494" drill="2.032"/>
-<text x="26.162" y="20.066" size="0.8382" layer="26" font="vector" ratio="9" rot="SMR0" align="top-center">Mar 20 2017</text>
-<text x="24.638" y="12.954" size="0.8382" layer="25" font="vector" ratio="9" rot="SR270" align="top-center">+ side up</text>
+<text x="9.398" y="18.542" size="0.8382" layer="26" font="vector" ratio="9" rot="SMR0" align="top-center">Mar 13 2017
+Rev. 35</text>
+<text x="15.494" y="2.286" size="0.8382" layer="25" font="vector" ratio="9" rot="SR0" align="top-center">+ side up</text>
 </plain>
 <libraries>
 <library name="remote">
@@ -894,7 +896,7 @@ Please make sure your boards conform to these design rules.</description>
 <via x="2.54" y="31.496" extent="1-16" drill="0.3302"/>
 <via x="4.318" y="35.814" extent="1-16" drill="0.3302"/>
 <via x="5.588" y="35.814" extent="1-16" drill="0.3302"/>
-<via x="2.032" y="23.876" extent="1-16" drill="0.3302"/>
+<via x="13.97" y="32.512" extent="1-16" drill="0.3302"/>
 <via x="2.286" y="30.226" extent="1-16" drill="0.3302"/>
 <via x="11.938" y="32.639" extent="1-16" drill="0.3302"/>
 <via x="12.954" y="32.385" extent="1-16" drill="0.3302"/>
@@ -1110,18 +1112,23 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="15.411190625" y1="30.562809375" x2="16.002" y2="29.972" width="0.3048" layer="1"/>
 <wire x1="16.002" y1="29.972" x2="16.01223125" y2="29.972" width="0.3048" layer="1"/>
 <wire x1="16.01223125" y1="29.972" x2="17.150115625" y2="28.834115625" width="0.3048" layer="1"/>
-<wire x1="17.150115625" y1="28.834115625" x2="17.53623125" y2="28.834115625" width="0.4064" layer="1"/>
-<wire x1="17.53623125" y1="28.834115625" x2="17.53623125" y2="28.702" width="0.4064" layer="1"/>
+<wire x1="17.53623125" y1="28.702" x2="17.150115625" y2="28.702" width="0.4064" layer="1"/>
+<wire x1="17.150115625" y1="28.702" x2="17.150115625" y2="28.834115625" width="0.4064" layer="1"/>
 </signal>
 <signal name="N$13">
 <contactref element="U1" pad="9"/>
 <contactref element="C3" pad="1"/>
 <wire x1="17.17895625" y1="31.91095625" x2="16.92495625" y2="32.16495625" width="0.254" layer="1"/>
+<wire x1="21.43321875" y1="28.5042875" x2="19.71150625" y2="30.226" width="0.254" layer="1"/>
+<wire x1="19.71150625" y1="30.226" x2="18.796" y2="30.226" width="0.254" layer="1"/>
+<wire x1="18.796" y1="30.226" x2="18.16611875" y2="30.85588125" width="0.254" layer="1"/>
+<wire x1="18.48803125" y1="30.60188125" x2="18.06795625" y2="31.02195625" width="0.254" layer="1"/>
 <contactref element="Q1" pad="1"/>
-<wire x1="17.17895625" y1="31.91095625" x2="17.60880625" y2="31.91095625" width="0.3048" layer="1"/>
-<wire x1="17.60880625" y1="31.91095625" x2="18.91788125" y2="30.60188125" width="0.3048" layer="1"/>
-<wire x1="18.91788125" y1="30.60188125" x2="19.335625" y2="30.60188125" width="0.254" layer="1"/>
-<wire x1="19.335625" y1="30.60188125" x2="21.43321875" y2="28.5042875" width="0.254" layer="1"/>
+<wire x1="18.06795625" y1="31.02195625" x2="16.92495625" y2="32.16495625" width="0.254" layer="1"/>
+<wire x1="18.91788125" y1="30.60188125" x2="18.06795625" y2="30.60188125" width="0.4064" layer="1"/>
+<wire x1="18.06795625" y1="30.60188125" x2="18.06795625" y2="31.02195625" width="0.4064" layer="1"/>
+<wire x1="18.16611875" y1="30.85588125" x2="18.91788125" y2="30.85588125" width="0.4064" layer="1"/>
+<wire x1="18.91788125" y1="30.85588125" x2="18.91788125" y2="30.60188125" width="0.4064" layer="1"/>
 </signal>
 <signal name="P0.20">
 <contactref element="U1" pad="40"/>
@@ -1223,4 +1230,10 @@ Please make sure your boards conform to these design rules.</description>
 </errors>
 </board>
 </drawing>
+<compatibility>
+<note version="6.3" minversion="6.2.2" severity="warning">
+Since Version 6.2.2 text objects can contain more than one line,
+which will not be processed correctly with this version.
+</note>
+</compatibility>
 </eagle>

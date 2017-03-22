@@ -177,7 +177,7 @@
 <wire x1="34.544" y1="34.544" x2="34.544" y2="31.496" width="1.016" layer="22"/>
 <hole x="33.528" y="15.494" drill="2.032"/>
 <text x="26.162" y="20.066" size="0.8382" layer="26" font="vector" ratio="9" rot="SMR0" align="top-center">Mar 20 2017</text>
-<text x="24.638" y="12.954" size="0.8382" layer="25" font="vector" ratio="9" rot="SR270" align="top-center">+ side up</text>
+<text x="15.494" y="2.286" size="0.8382" layer="25" font="vector" ratio="9" rot="SR0" align="top-center">+ side up</text>
 </plain>
 <libraries>
 <library name="remote">
@@ -1118,8 +1118,9 @@ Please make sure your boards conform to these design rules.</description>
 <contactref element="C3" pad="1"/>
 <wire x1="17.17895625" y1="31.91095625" x2="16.92495625" y2="32.16495625" width="0.254" layer="1"/>
 <contactref element="Q1" pad="1"/>
-<wire x1="17.17895625" y1="31.91095625" x2="17.60880625" y2="31.91095625" width="0.3048" layer="1"/>
-<wire x1="17.60880625" y1="31.91095625" x2="18.91788125" y2="30.60188125" width="0.3048" layer="1"/>
+<wire x1="18.91788125" y1="30.60188125" x2="18.48803125" y2="30.60188125" width="0.254" layer="1"/>
+<wire x1="17.17895625" y1="31.91095625" x2="17.60880625" y2="31.91095625" width="0.254" layer="1"/>
+<wire x1="17.60880625" y1="31.91095625" x2="18.91788125" y2="30.60188125" width="0.254" layer="1"/>
 <wire x1="18.91788125" y1="30.60188125" x2="19.335625" y2="30.60188125" width="0.254" layer="1"/>
 <wire x1="19.335625" y1="30.60188125" x2="21.43321875" y2="28.5042875" width="0.254" layer="1"/>
 </signal>

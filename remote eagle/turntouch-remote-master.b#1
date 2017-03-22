@@ -177,7 +177,7 @@
 <wire x1="34.544" y1="34.544" x2="34.544" y2="31.496" width="1.016" layer="22"/>
 <hole x="33.528" y="15.494" drill="2.032"/>
 <text x="26.162" y="20.066" size="0.8382" layer="26" font="vector" ratio="9" rot="SMR0" align="top-center">Mar 20 2017</text>
-<text x="24.638" y="12.954" size="0.8382" layer="25" font="vector" ratio="9" rot="SR270" align="top-center">+ side up</text>
+<text x="15.494" y="2.286" size="0.8382" layer="25" font="vector" ratio="9" rot="SR0" align="top-center">+ side up</text>
 </plain>
 <libraries>
 <library name="remote">
