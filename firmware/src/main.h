@@ -38,7 +38,7 @@
 
 #define APP_ADV_FAST_INTERVAL           40                                          /**< The advertising interval (in units of 0.625 ms). The default value corresponds to 25 ms. */
 #define APP_ADV_SLOW_INTERVAL           3200                                        /**< Slow advertising interval (in units of 0.625 ms). The default value corresponds to 2 seconds. */
-#define APP_ADV_FAST_TIMEOUT            30                                          /**< The advertising time-out in units of seconds. */
+#define APP_ADV_FAST_TIMEOUT            5                                          /**< The advertising time-out in units of seconds. */
 #define APP_ADV_SLOW_TIMEOUT            86400                                       /**< The advertising time-out in units of seconds. */
 
 #define MIN_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)            /**< Minimum acceptable connection interval (0.5 seconds). */

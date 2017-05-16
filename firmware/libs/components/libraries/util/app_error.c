@@ -49,12 +49,11 @@ const uint8_t * m_p_file_name;
 /*lint -save -e14 */
 __WEAK void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p_file_name)
 {
-    rtt_print(0, "%sError 0x%X at line %d: %X%s\n", RTT_CTRL_TEXT_BRIGHT_RED, error_code, line_num, *p_file_name, RTT_CTRL_RESET);
-
     // On assert, the system can only recover with a reset.
 #ifndef DEBUG
     NVIC_SystemReset();
 #else
+    rtt_print(0, "%sError 0x%X at line %d: %X%s\n", RTT_CTRL_TEXT_BRIGHT_RED, error_code, line_num, *p_file_name, RTT_CTRL_RESET);
 
 #ifdef BSP_DEFINES_ONLY 
     LEDS_ON(LEDS_MASK);

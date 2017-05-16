@@ -46,6 +46,10 @@
 #include "main.h"
 
 
+#ifdef DEBUG
+#pragma message "---> DEBUG mode turned on!"
+#endif
+
 // ===========
 // = Buttons =
 // ===========
@@ -168,6 +172,10 @@ void bsp_evt_handler(bsp_event_t evt) {
             }
         } else {
             rtt_print(0, "%sIgnoring button, not connected: %s%X:%X\n", RTT_CTRL_TEXT_BRIGHT_BLACK, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1]);
+            
+            // err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
+            // rtt_print(0, "%sStarted BLE advertising fast%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+            // APP_ERROR_CHECK(err_code);
         }
     } else {
         rtt_print(0, "%sUnhandled bsp_evt: %s%X%s\n", RTT_CTRL_TEXT_RED, RTT_CTRL_TEXT_BRIGHT_RED, evt, RTT_CTRL_RESET);
@@ -668,7 +676,10 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
 
         case BLE_ADV_EVT_IDLE:
             rtt_print(0, "%sAdvertising idle%s\n", RTT_CTRL_TEXT_BRIGHT_CYAN, RTT_CTRL_RESET);
-            sleep_mode_enter();
+            // sleep_mode_enter();
+            err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
+            rtt_print(0, "%sRestarted BLE advertising fast%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+            APP_ERROR_CHECK(err_code);
             break;
 
         case BLE_ADV_EVT_WHITELIST_REQUEST:

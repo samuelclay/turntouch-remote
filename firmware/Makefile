@@ -133,11 +133,9 @@ CFLAGS += -Wall -Werror -O3 -g3
 CFLAGS += -Wno-pointer-sign
 CFLAGS += -fomit-frame-pointer
 CFLAGS += -mfloat-abi=soft
-# keep every function in separate section. This will allow linker to dump unused functions
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 #CFLAGS += -fno-builtin --short-enums
 
-# keep every function in separate section. This will allow linker to dump unused functions
 LDFLAGS += -Xlinker -Map=$(LISTING_DIRECTORY)/$(OUTPUT_FILENAME).map
 LDFLAGS += -mthumb -mabi=aapcs -L $(TEMPLATE_PATH) -T$(LINKER_SCRIPT)
 LDFLAGS += -mcpu=cortex-m0
