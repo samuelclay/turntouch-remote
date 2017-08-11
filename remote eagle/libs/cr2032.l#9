@@ -71,7 +71,7 @@
 <library>
 <packages>
 <package name="CR2032">
-<smd name="GND" x="0" y="0" dx="17" dy="17" layer="1" roundness="100"/>
+<smd name="GND" x="0" y="0" dx="17.8" dy="17.8" layer="1" roundness="100"/>
 <smd name="P$1" x="-11.45" y="0" dx="2.5" dy="5.1" layer="1"/>
 <smd name="P$2" x="11.45" y="0" dx="2.5" dy="5.1" layer="1"/>
 <text x="-13" y="3.5" size="0.6096" layer="25">&gt;NAME</text>

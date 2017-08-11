@@ -724,7 +724,7 @@ Please make sure your boards conform to these design rules.</description>
 </element>
 <element name="C5" library="SparkFun-Capacitors" package="0603-CAP" value="100nF" x="34.671" y="20.574" smashed="yes" rot="R90">
 <attribute name="PROD_ID" value="CAP-00810" x="34.671" y="20.574" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="33.782" y="20.447" size="0.6" layer="25" font="vector" ratio="9" rot="R90"/>
+<attribute name="NAME" x="33.782" y="19.177" size="0.6" layer="25" font="vector" ratio="9" rot="R90"/>
 <attribute name="VALUE" x="35.814" y="19.558" size="0.6" layer="27" font="vector" ratio="9" rot="R90"/>
 </element>
 <element name="C6" library="SparkFun-Capacitors" package="0603-CAP" value="100nF" x="30.734" y="14.732" smashed="yes" rot="R90">

@@ -150,11 +150,11 @@
 </layers>
 <board>
 <plain>
-<text x="26.162" y="17.78" size="0.8382" layer="26" font="vector" ratio="9" rot="SMR0" align="top-center">Rev. 37</text>
+<text x="26.162" y="17.78" size="0.8382" layer="26" font="vector" ratio="9" rot="SMR0" align="top-center">Rev. 38</text>
 <text x="9.398" y="20.32" size="1.27" layer="26" font="vector" ratio="9" rot="SMR0" align="top-center">TURN TOUCH</text>
 <hole x="2.794" y="34.036" drill="2.032"/>
 <hole x="34.036" y="2.794" drill="2.032"/>
-<hole x="23.622" y="34.036" drill="2.032"/>
+<hole x="23.368" y="34.036" drill="2.032"/>
 <hole x="2.54" y="2.794" drill="2.032"/>
 <wire x1="0" y1="31.75" x2="0" y2="11.73" width="0.4064" layer="20"/>
 <wire x1="0" y1="4.214" x2="0" y2="4.12710625" width="0.4064" layer="20"/>
@@ -176,7 +176,7 @@
 <wire x1="31.496" y1="34.544" x2="34.544" y2="34.544" width="1.016" layer="22"/>
 <wire x1="34.544" y1="34.544" x2="34.544" y2="31.496" width="1.016" layer="22"/>
 <hole x="33.528" y="15.494" drill="2.032"/>
-<text x="26.162" y="20.066" size="0.8382" layer="26" font="vector" ratio="9" rot="SMR0" align="top-center">Mar 28 2017</text>
+<text x="26.162" y="20.066" size="0.8382" layer="26" font="vector" ratio="9" rot="SMR0" align="top-center">April 10 2017</text>
 <text x="24.892" y="12.954" size="1" layer="25" font="vector" ratio="9" rot="SR270" align="top-center">+ side up</text>
 </plain>
 <libraries>
@@ -713,7 +713,7 @@ Please make sure your boards conform to these design rules.</description>
 </element>
 <element name="C2" library="SparkFun-Capacitors" package="0603-CAP" value="1uF" x="20.828" y="32.766" smashed="yes" rot="R135">
 <attribute name="PROD_ID" value="CAP-00810" x="20.828" y="32.766" size="1.778" layer="27" rot="R135" display="off"/>
-<attribute name="NAME" x="20.019778125" y="31.957775" size="0.6" layer="25" font="vector" ratio="9" rot="R135"/>
+<attribute name="NAME" x="22.813778125" y="32.719775" size="0.6" layer="25" font="vector" ratio="9" rot="R135"/>
 </element>
 <element name="Q1" library="abracon" package="ABS07" value="CRYSTAL.ABS07" x="18.034" y="29.718" smashed="yes" rot="R225">
 <attribute name="NAME" x="18.23543125" y="27.308740625" size="0.6" layer="25" ratio="9" rot="R45"/>
@@ -837,8 +837,8 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="25.4" y1="13.716" x2="25.146" y2="13.462" width="0.254" layer="1"/>
 <wire x1="29.37095625" y1="18.70295625" x2="28.702" y2="18.034" width="0.254" layer="1"/>
 <wire x1="28.702" y1="18.034" x2="25.180884375" y2="18.034" width="0.254" layer="1"/>
-<wire x1="13.87695625" y1="29.11695625" x2="14.13095625" y2="28.813621875" width="0.508" layer="1"/>
-<wire x1="14.13095625" y1="28.813621875" x2="13.979290625" y2="28.9652875" width="0.508" layer="1"/>
+<wire x1="13.87695625" y1="29.11695625" x2="13.87695625" y2="29.067621875" width="0.508" layer="1"/>
+<wire x1="13.87695625" y1="29.067621875" x2="13.979290625" y2="28.9652875" width="0.508" layer="1"/>
 <wire x1="30.734" y1="13.882" x2="31.154" y2="13.882" width="0.254" layer="1"/>
 <wire x1="31.154" y1="13.882" x2="30.988" y2="13.716" width="0.254" layer="1"/>
 <wire x1="30.988" y1="13.716" x2="27.852" y2="13.716" width="0.254" layer="1"/>
@@ -899,9 +899,9 @@ Please make sure your boards conform to these design rules.</description>
 <via x="17.526" y="35.814" extent="1-16" drill="0.3302"/>
 <via x="19.304" y="35.814" extent="1-16" drill="0.3302"/>
 <via x="25.908" y="35.052" extent="1-16" drill="0.3302"/>
-<via x="21.844" y="34.798" extent="1-16" drill="0.3302"/>
+<via x="25.146" y="33.274" extent="1-16" drill="0.3302"/>
 <via x="22.86" y="35.814" extent="1-16" drill="0.3302"/>
-<via x="21.844" y="33.782" extent="1-16" drill="0.3302"/>
+<via x="21.59" y="33.782" extent="1-16" drill="0.3302"/>
 <via x="30.861" y="30.099" extent="1-16" drill="0.3302"/>
 <via x="33.782" y="28.956" extent="1-16" drill="0.3302"/>
 <via x="32.766" y="28.194" extent="1-16" drill="0.3302"/>
@@ -941,7 +941,7 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="17.132234375" y1="17.272" x2="12.7770375" y2="12.916803125" width="0.508" layer="1"/>
 <via x="22.098" y="16.256" extent="1-16" drill="0.3302"/>
 <via x="31.75" y="3.302" extent="1-16" drill="0.3302"/>
-<via x="17.018" y="26.924" extent="1-16" drill="0.3302"/>
+<via x="17.018" y="26.67" extent="1-16" drill="0.3302"/>
 <via x="3.429" y="25.654" extent="1-16" drill="0.3302"/>
 <via x="3.429" y="23.114" extent="1-16" drill="0.3302"/>
 <via x="3.048" y="17.78" extent="1-16" drill="0.3302"/>
@@ -949,8 +949,7 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="13.979290625" y1="27.67670625" x2="14.38495625" y2="27.271040625" width="0.508" layer="1"/>
 <wire x1="14.38495625" y1="27.271040625" x2="14.799915625" y2="27.686" width="0.508" layer="1"/>
 <wire x1="14.799915625" y1="27.686" x2="16.002" y2="27.686" width="0.508" layer="1"/>
-<wire x1="16.002" y1="27.686" x2="16.764" y2="26.924" width="0.508" layer="1"/>
-<wire x1="16.764" y1="26.924" x2="17.018" y2="26.924" width="0.508" layer="1"/>
+<wire x1="16.002" y1="27.686" x2="17.018" y2="26.67" width="0.508" layer="1"/>
 </signal>
 <signal name="N$1">
 </signal>
