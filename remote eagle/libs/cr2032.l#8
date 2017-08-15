@@ -85,7 +85,7 @@
 </packages>
 <symbols>
 <symbol name="CR2032">
-<pin name="P$1" x="-8.89" y="0" visible="pad" length="middle"/>
+<pin name="P$1" x="-10.16" y="0" visible="pad" length="middle"/>
 <pin name="P$2" x="8.89" y="0" visible="pad" length="middle" rot="R180"/>
 <wire x1="-1.27" y1="2.54" x2="-1.27" y2="0" width="0.254" layer="94"/>
 <wire x1="-1.27" y1="0" x2="-1.27" y2="-2.54" width="0.254" layer="94"/>

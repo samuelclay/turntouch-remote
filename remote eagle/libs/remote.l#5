@@ -620,7 +620,6 @@
 <wire x1="6.35" y1="10.16" x2="6.35" y2="7.62" width="0.127" layer="21"/>
 <circle x="0" y="0" radius="4.4958" width="1.778" layer="29"/>
 <circle x="0" y="0" radius="4.4958" width="1.778" layer="1"/>
-<wire x1="5.207" y1="-2.0574" x2="5.4864" y2="-1.1176" width="0.127" layer="41" curve="-350"/>
 <circle x="0" y="0" radius="2.83980625" width="1.4224" layer="42"/>
 </package>
 </packages>

@@ -2169,6 +2169,10 @@ Used for things that can directly connect to a USB port, say USB key</descriptio
 </gates>
 <devices>
 <device name="" package="DOME-M-SERIES">
+<connects>
+<connect gate="G$1" pin="B" pad="P$1 P$2"/>
+<connect gate="G$1" pin="V" pad="P$3"/>
+</connects>
 <technologies>
 <technology name=""/>
 </technologies>
