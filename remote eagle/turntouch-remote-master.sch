@@ -1904,30 +1904,27 @@ Standard decoupling cap</description>
 </packages>
 <symbols>
 <symbol name="A4L-LOC">
-<wire x1="304.44" y1="3.81" x2="304.44" y2="8.89" width="0.1016" layer="94"/>
-<wire x1="304.44" y1="8.89" x2="304.44" y2="13.97" width="0.1016" layer="94"/>
-<wire x1="304.44" y1="13.97" x2="304.44" y2="19.05" width="0.1016" layer="94"/>
-<wire x1="304.44" y1="19.05" x2="304.44" y2="24.13" width="0.1016" layer="94"/>
-<wire x1="209.19" y1="3.81" x2="209.19" y2="24.13" width="0.1016" layer="94"/>
-<wire x1="209.19" y1="24.13" x2="263.165" y2="24.13" width="0.1016" layer="94"/>
-<wire x1="263.165" y1="24.13" x2="304.44" y2="24.13" width="0.1016" layer="94"/>
-<wire x1="294.28" y1="3.81" x2="294.28" y2="8.89" width="0.1016" layer="94"/>
-<wire x1="294.28" y1="8.89" x2="304.44" y2="8.89" width="0.1016" layer="94"/>
-<wire x1="294.28" y1="8.89" x2="263.165" y2="8.89" width="0.1016" layer="94"/>
-<wire x1="263.165" y1="8.89" x2="263.165" y2="3.81" width="0.1016" layer="94"/>
-<wire x1="263.165" y1="8.89" x2="263.165" y2="13.97" width="0.1016" layer="94"/>
-<wire x1="263.165" y1="13.97" x2="304.44" y2="13.97" width="0.1016" layer="94"/>
-<wire x1="263.165" y1="13.97" x2="263.165" y2="19.05" width="0.1016" layer="94"/>
-<wire x1="263.165" y1="19.05" x2="304.44" y2="19.05" width="0.1016" layer="94"/>
-<wire x1="263.165" y1="19.05" x2="263.165" y2="24.13" width="0.1016" layer="94"/>
-<frame x1="0" y1="0" x2="309.2" y2="203.2" columns="6" rows="4" layer="94"/>
-<text x="264.9" y="5" size="1.778" layer="92">Date:</text>
-<text x="210.9" y="21" size="1.778" layer="92">Board size:</text>
-<text x="210.9" y="18" size="1.778" layer="92">Board thicknes:</text>
-<text x="210.9" y="15" size="1.778" layer="92">Number of layers:</text>
-<text x="210.9" y="12" size="1.778" layer="92">Minimum trace width:</text>
-<text x="210.9" y="9" size="1.778" layer="92">Utilized minimum trace width:</text>
-<text x="210.9" y="6" size="1.778" layer="92">Minimum hole size:</text>
+<wire x1="256.54" y1="3.81" x2="256.54" y2="8.89" width="0.1016" layer="94"/>
+<wire x1="256.54" y1="8.89" x2="256.54" y2="13.97" width="0.1016" layer="94"/>
+<wire x1="256.54" y1="13.97" x2="256.54" y2="19.05" width="0.1016" layer="94"/>
+<wire x1="256.54" y1="19.05" x2="256.54" y2="24.13" width="0.1016" layer="94"/>
+<wire x1="161.29" y1="3.81" x2="161.29" y2="24.13" width="0.1016" layer="94"/>
+<wire x1="161.29" y1="24.13" x2="215.265" y2="24.13" width="0.1016" layer="94"/>
+<wire x1="215.265" y1="24.13" x2="256.54" y2="24.13" width="0.1016" layer="94"/>
+<wire x1="246.38" y1="3.81" x2="246.38" y2="8.89" width="0.1016" layer="94"/>
+<wire x1="246.38" y1="8.89" x2="256.54" y2="8.89" width="0.1016" layer="94"/>
+<wire x1="246.38" y1="8.89" x2="215.265" y2="8.89" width="0.1016" layer="94"/>
+<wire x1="215.265" y1="8.89" x2="215.265" y2="3.81" width="0.1016" layer="94"/>
+<wire x1="215.265" y1="8.89" x2="215.265" y2="13.97" width="0.1016" layer="94"/>
+<wire x1="215.265" y1="13.97" x2="256.54" y2="13.97" width="0.1016" layer="94"/>
+<wire x1="215.265" y1="13.97" x2="215.265" y2="19.05" width="0.1016" layer="94"/>
+<wire x1="215.265" y1="19.05" x2="256.54" y2="19.05" width="0.1016" layer="94"/>
+<wire x1="215.265" y1="19.05" x2="215.265" y2="24.13" width="0.1016" layer="94"/>
+<text x="217.17" y="15.24" size="2.54" layer="94">&gt;DRAWING_NAME</text>
+<text x="217.17" y="10.16" size="2.286" layer="94">&gt;LAST_DATE_TIME</text>
+<text x="230.505" y="5.08" size="2.54" layer="94">&gt;SHEET</text>
+<text x="216.916" y="4.953" size="2.54" layer="94">Sheet:</text>
+<frame x1="0" y1="0" x2="260.35" y2="179.07" columns="6" rows="4" layer="94"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -1950,7 +1947,7 @@ DIN A4, landscape with location and doc. field</description>
 <library name="cr2032">
 <packages>
 <package name="CR2032">
-<smd name="GND" x="0" y="0" dx="17.8" dy="17.8" layer="1" roundness="100"/>
+<smd name="GND" x="0" y="0" dx="17.8" dy="17.8" layer="1" roundness="100" cream="no"/>
 <smd name="P$1" x="-11.45" y="0" dx="2.5" dy="5.1" layer="1"/>
 <smd name="P$2" x="11.45" y="0" dx="2.5" dy="5.1" layer="1"/>
 <text x="-13" y="3.5" size="0.6096" layer="25">&gt;NAME</text>
@@ -1961,6 +1958,12 @@ DIN A4, landscape with location and doc. field</description>
 <wire x1="-9.5" y1="5" x2="-9.5" y2="-7" width="0.25" layer="25" style="shortdash"/>
 <wire x1="9.5" y1="5" x2="9.5" y2="-7" width="0.25" layer="25" style="shortdash"/>
 <circle x="0" y="0" radius="10" width="0.3" layer="51"/>
+<polygon width="0.127" layer="41">
+<vertex x="0" y="8.89" curve="90"/>
+<vertex x="-8.89" y="0" curve="90"/>
+<vertex x="0" y="-8.89" curve="90"/>
+<vertex x="8.89" y="0" curve="90"/>
+</polygon>
 </package>
 </packages>
 <symbols>
