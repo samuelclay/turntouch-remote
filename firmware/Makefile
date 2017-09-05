@@ -38,6 +38,9 @@ SIZE     		:= "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-size"
 remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-out $(firstword $1),$1))))
 
 SOFTDEVICE_HEX = ./libs/components/softdevice/s110/hex/s110_nrf51_8.0.0_softdevice.hex
+# NRFJPROG = /Users/sclay/projects/code/nRF5x-Command-Line-Tools_9_4_0_OSX/nrfjprog/nrfjprog
+NRFJPROG = /usr/local/bin/nrfjprog
+SREC_CAT = /usr/local/bin/srec_cat
 
 #source common to all targets
 C_SOURCE_FILES += \
@@ -129,6 +132,7 @@ CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs --std=gnu99
 CFLAGS += -Wall -Werror -O3 -g3
+# CFLAGS += -Wall -Werror -ggdb
 #CFLAGS += -Wno-unused-variable
 CFLAGS += -Wno-pointer-sign
 CFLAGS += -fomit-frame-pointer
@@ -242,22 +246,22 @@ cleanobj:
 
 flash: $(MAKECMDGOALS)
 	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
-	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
-	nrfjprog --pin-reset
+	$(NRFJPROG) --flash $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
+	$(NRFJPROG) --pin-reset
 
 erase:
-	nrfjprog --erase-all
+	$(NRFJPROG) --erase-all
 
 flashsd:
-	nrfjprog --flash-softdevice $(SOFTDEVICE_HEX)
+	$(NRFJPROG) --flash-softdevice $(SOFTDEVICE_HEX)
 
 flashsdapp:
-	srec_cat $(SOFTDEVICE_HEX) -intel $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -intel --line-length=44 -o $(OUTPUT_BINARY_DIRECTORY)/sd_app.hex -intel
-	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/sd_app.hex
-	nrfjprog --pin-reset
+	$(SREC_CAT) $(SOFTDEVICE_HEX) -intel $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -intel --line-length=44 -o $(OUTPUT_BINARY_DIRECTORY)/sd_app.hex -intel
+	$(NRFJPROG) --flash $(OUTPUT_BINARY_DIRECTORY)/sd_app.hex
+	$(NRFJPROG) --pin-reset
 
 flashall: erase
-	srec_cat $(SOFTDEVICE_HEX) -intel $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -intel ../bootloader/build/nrf51822_xxac.hex -intel -exclude 0x3FC00 0x3FC20 -generate 0x3FC00 0x3FC04 \
+	$(SREC_CAT) $(SOFTDEVICE_HEX) -intel $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -intel ../bootloader/build/nrf51822_xxac.hex -intel -exclude 0x3FC00 0x3FC20 -generate 0x3FC00 0x3FC04 \
 -constant-l-e 0x01 4 -generate 0x3FC04 0x3FC08 \
 -constant-l-e 0x00 4 -generate 0x3FC08 0x3FC0C \
 -constant-l-e 0xFE 4 -generate 0x3FC0C 0x3FC20 -constant 0x00 --line-length=44 -o $(OUTPUT_BINARY_DIRECTORY)/sd_app_bootloader.hex -intel
@@ -268,8 +272,11 @@ flashall: erase
 # See "E. How do I program the original application via programmer (JLINK), not by DFU" at
 # https://devzone.nordicsemi.com/blogs/685/common-faq-on-dfu/
 	sed -i.bak 's/10FC00000100000000000000FE00000000000000F5/10FC00000100000000000000FE000000FFFFFFFFF9/' build/sd_app_bootloader.hex
-	nrfjprog --flash $(OUTPUT_BINARY_DIRECTORY)/sd_app_bootloader.hex
-	nrfjprog --pin-reset
+	$(NRFJPROG) --flash $(OUTPUT_BINARY_DIRECTORY)/sd_app_bootloader.hex
+	$(NRFJPROG) --pin-reset
 
 flashwin:
-	nrfjprog --flash ../ble_peripheral/nrf51_sd_bootloader_app.hex
+	$(NRFJPROG) --flash ../ble_peripheral/nrf51_sd_bootloader_app.hex
+
+rtt:
+	$(NRFJPROG) --rtt
