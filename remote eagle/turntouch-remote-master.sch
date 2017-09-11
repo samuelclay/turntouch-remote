@@ -1959,10 +1959,10 @@ DIN A4, landscape with location and doc. field</description>
 <wire x1="9.5" y1="5" x2="9.5" y2="-7" width="0.25" layer="25" style="shortdash"/>
 <circle x="0" y="0" radius="10" width="0.3" layer="51"/>
 <polygon width="0.127" layer="41">
-<vertex x="0" y="8.89" curve="90"/>
-<vertex x="-8.89" y="0" curve="90"/>
-<vertex x="0" y="-8.89" curve="90"/>
-<vertex x="8.89" y="0" curve="90"/>
+<vertex x="0" y="8.763" curve="90"/>
+<vertex x="-8.763" y="0" curve="90"/>
+<vertex x="0" y="-8.763" curve="90"/>
+<vertex x="8.763" y="0" curve="90"/>
 </polygon>
 </package>
 </packages>
