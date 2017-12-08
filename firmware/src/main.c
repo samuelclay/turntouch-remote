@@ -173,6 +173,7 @@ void bsp_evt_handler(bsp_event_t evt) {
         } else {
             rtt_print(0, "%sIgnoring button, not connected: %s%X:%X\n", RTT_CTRL_TEXT_BRIGHT_BLACK, RTT_CTRL_TEXT_BLUE, button_state[0], button_state[1]);
             
+            LEDS_ON(LEDS_MASK);
             // err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
             // rtt_print(0, "%sStarted BLE advertising fast%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
             // APP_ERROR_CHECK(err_code);

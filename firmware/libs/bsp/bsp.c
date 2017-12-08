@@ -264,7 +264,7 @@ static uint32_t bsp_led_indication(bsp_indication_t indicate)
 
         case BSP_INDICATE_SCANNING:
         case BSP_INDICATE_ADVERTISING:
-            LEDS_OFF(LEDS_MASK & ~BSP_LED_0_MASK & ~m_alert_mask);
+            // LEDS_OFF(LEDS_MASK & ~BSP_LED_0_MASK & ~m_alert_mask);
 
             // in advertising blink LED_0
             if (LED_IS_ON(BSP_LED_0_MASK))
@@ -287,7 +287,7 @@ static uint32_t bsp_led_indication(bsp_indication_t indicate)
             break;
 
         case BSP_INDICATE_ADVERTISING_WHITELIST:
-            LEDS_OFF(LEDS_MASK & ~BSP_LED_0_MASK & ~m_alert_mask);
+            // LEDS_OFF(LEDS_MASK & ~BSP_LED_0_MASK & ~m_alert_mask);
 
             // in advertising quickly blink LED_0
             if (LED_IS_ON(BSP_LED_0_MASK))
@@ -311,7 +311,7 @@ static uint32_t bsp_led_indication(bsp_indication_t indicate)
             break;
 
         case BSP_INDICATE_ADVERTISING_SLOW:
-            LEDS_OFF(LEDS_MASK & ~BSP_LED_0_MASK & ~m_alert_mask);
+            // LEDS_OFF(LEDS_MASK & ~BSP_LED_0_MASK & ~m_alert_mask);
 
             // in advertising slowly blink LED_0
             if (LED_IS_ON(BSP_LED_0_MASK))
