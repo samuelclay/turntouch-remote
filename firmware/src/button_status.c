@@ -263,7 +263,7 @@ static uint32_t firmware_nickname_char_add(ble_buttonservice_t * p_buttonservice
     attr_char_value.max_len      = 32;
     attr_char_value.p_value      = (uint8_t *)p_buttonservice->nickname_str;
 
-    rtt_print(0, "At firmware_nickname_char_add 0: %s/%X (%X)\n", attr_char_value.p_value, p_buttonservice->nickname_str, sizeof(p_buttonservice->nickname_str));
+    // rtt_print(0, "At firmware_nickname_char_add 0: %s/%X (%X)\n", attr_char_value.p_value, p_buttonservice->nickname_str, sizeof(p_buttonservice->nickname_str));
     
     return sd_ble_gatts_characteristic_add(p_buttonservice->service_handle, 
                                            &char_md,

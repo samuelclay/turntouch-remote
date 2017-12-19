@@ -273,7 +273,7 @@ flashall: erase
 # https://devzone.nordicsemi.com/blogs/685/common-faq-on-dfu/
 	sed -i.bak 's/10FC00000100000000000000FE00000000000000F5/10FC00000100000000000000FE000000FFFFFFFFF9/' build/sd_app_bootloader.hex
 	$(NRFJPROG) --flash $(OUTPUT_BINARY_DIRECTORY)/sd_app_bootloader.hex
-	$(NRFJPROG) --pin-reset
+	$(NRFJPROG) --reset
 
 flashwin:
 	$(NRFJPROG) --flash ../ble_peripheral/nrf51_sd_bootloader_app.hex

@@ -557,10 +557,11 @@ static void conn_params_init(void)
     cp_init.evt_handler                    = on_conn_params_evt;
     cp_init.error_handler                  = conn_params_error_handler;
 
+    // rtt_print(0, "%sConnection params initializing.%s\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET);
     err_code = ble_conn_params_init(&cp_init);
     APP_ERROR_CHECK(err_code);
-    
     // rtt_print(0, "%sConnection params initialized.%s\n", RTT_CTRL_TEXT_MAGENTA, RTT_CTRL_RESET);
+    
 }
 
 /**@brief Function for initializing security parameters.
@@ -704,6 +705,8 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
         }
 
         default:
+            rtt_print(0, "%sUnknown advertising?%s\n", RTT_CTRL_TEXT_BRIGHT_CYAN, RTT_CTRL_RESET);
+        
             break;
     }
 }
@@ -918,6 +921,8 @@ static void send_last_unconnected_button_status(void) {
  */
 static void advertising_stop(void)
 {
+    rtt_print(0, "%sStopping advertising%s\n", RTT_CTRL_TEXT_BRIGHT_CYAN, RTT_CTRL_RESET);
+
     uint32_t err_code;
 
     err_code = sd_ble_gap_adv_stop();
@@ -925,6 +930,7 @@ static void advertising_stop(void)
 
     err_code = bsp_indication_set(BSP_INDICATE_IDLE);
     APP_ERROR_CHECK(err_code);
+    
 }
 
 
@@ -1056,13 +1062,15 @@ static void pstorage_callback_handler(pstorage_handle_t * handle,
 								rtt_print(0, "pstorage load error: %x\n", reason);
 						} else {
 								rtt_print(0, "pstorage load success: \n");
-								for (int i = 0; i <param_len; i++)
-								{
-										SEGGER_RTT_printf(0,"%02X ", p_data[i]);
-								}
-								SEGGER_RTT_printf(0,"\n\r");
-								SEGGER_RTT_Write(0,(const char *)p_data,param_len);
-								SEGGER_RTT_printf(0,"\n\r");
+                                // for (int i = 0; i <param_len; i++)
+                                // {
+                                //         SEGGER_RTT_printf(0,"%02X ", p_data[i]);
+                                // }
+                                // SEGGER_RTT_printf(0,"\n\r");
+                                //                                 if (p_data[0] != 0xFF) {
+                                //                                     SEGGER_RTT_Write(0,(const char *)p_data,param_len);
+                                //                                 }
+                                // SEGGER_RTT_printf(0,"\n\r");
 						}
             break;
         case PSTORAGE_CLEAR_OP_CODE:
@@ -1264,39 +1272,39 @@ int main(void)
     
     // Initialize buttons
     clock_initialization();
-    rtt_print(0, "%sInitialized clock%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    // rtt_print(0, "%sInitialized clock%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     timers_init();
-    rtt_print(0, "%sInitialized timers%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    // rtt_print(0, "%sInitialized timers%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     bsp_configuration();
-    rtt_print(0, "%sInitialized BSP%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    // rtt_print(0, "%sInitialized BSP%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
 
     // Initialize
     ble_stack_init();
-    rtt_print(0, "%sInitialized BLE stack%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    // rtt_print(0, "%sInitialized BLE stack%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     scheduler_init();
-    rtt_print(0, "%sInitialized scheduler%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    // rtt_print(0, "%sInitialized scheduler%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     device_manager_init();
-    rtt_print(0, "%sInitialized device manager%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    // rtt_print(0, "%sInitialized device manager%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     gap_params_init();
-    rtt_print(0, "%sInitialized GAP Params%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    // rtt_print(0, "%sInitialized GAP Params%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     advertising_init();
     rtt_print(0, "%sInitialized advertising%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     services_init();
-    rtt_print(0, "%sInitialized services%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    // rtt_print(0, "%sInitialized services%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     conn_params_init();
-    rtt_print(0, "%sInitialized connection params%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    // rtt_print(0, "%sInitialized connection params%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     sec_params_init();
-    rtt_print(0, "%sInitialized security params%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    // rtt_print(0, "%sInitialized security params%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     battery_level_update();
-    rtt_print(0, "%sInitialized battery level updater%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    // rtt_print(0, "%sInitialized battery level updater%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
 
     // Start execution
     gpio_start();
-    rtt_print(0, "%sStarted GPIO%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    // rtt_print(0, "%sStarted GPIO%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     application_timers_start();
-    rtt_print(0, "%sStarted application timers%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    // rtt_print(0, "%sStarted application timers%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
-    rtt_print(0, "%sStarted BLE advertising fast%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
+    // rtt_print(0, "%sStarted BLE advertising fast%s\n", RTT_CTRL_TEXT_BRIGHT_BLUE, RTT_CTRL_RESET);
     APP_ERROR_CHECK(err_code);
     err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
     APP_ERROR_CHECK(err_code);

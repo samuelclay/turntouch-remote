@@ -103,7 +103,7 @@ elif [ "$1" = "--rtt" ]; then
         return
     }
     echo -e "${STATUS_COLOR}Starting RTT Server...${RESET}"
-    JLinkExe -device nrf51822 -if swd -speed 1000 &
+    JLinkExe -device nrf51822 -if swd -speed 4000 -AutoConnect 1 &
     JLINK_PID=$!
     sleep 1
     echo -e "\n${STATUS_COLOR}Connecting to RTT Server...${RESET}"
