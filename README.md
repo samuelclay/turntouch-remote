@@ -7,7 +7,22 @@
 [![Platform](https://img.shields.io/cocoapods/p/LFAlertController.svg?style=flat)](http://cocoapods.org/pods/LFAlertController)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-## Features
+## Screenshots of the board design files
+
+| PCB | EAGLE |
+|:---:|:---:|
+| ![](https://s3.amazonaws.com/static.newsblur.com/turntouch/blog/1*65BkQmv6MTMZ3EYkQaNnGg.jpeg) | ![](https://s3.amazonaws.com/static.newsblur.com/turntouch/blog/1*IsayLJdUYwWGvWpHBCoEXQ.png) |
+
+
+| Top | Bottom |
+|:---:|:---:|
+| ![](https://s3.amazonaws.com/static.newsblur.com/turntouch/blog/1*eVM-tGHwvdzFM5jSw-JUDw.png) | ![](https://s3.amazonaws.com/static.newsblur.com/turntouch/blog/1*S1fzU2aXV_PYRxSvP-Ydcw.png) |
+
+## Background
+
+You can read the complete documentation and background on the [Turn Touch blog series](http://ofbrooklyn.com/2019/01/3/building-turntouch/#firmware).
+
+## Features of the remote
 
 [Turn Touch](https://turntouch.com) is a smart home remote control carved out of beautiful mahogany wood. This is a remote control for Hue lights, Sonos speakers, and all the other connected devices in your home. Turn Touch works on iOS and macOS, giving you control of your music, videos, presentations, and more. 
 
