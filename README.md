@@ -1,5 +1,5 @@
-# Turn Touch Mac OS App
-> A native Objective-C app for configuring and using the Turn Touch smart wooden remote on Mac OS X.
+# Turn Touch remote firmware, schematic, and board layout
+> The design files used for the nrf51-based Turn Touch remote.
 
 <a href="https://turntouch.com"><img src="https://s3.amazonaws.com/static.newsblur.com/turntouch/blog/1*1_w7IlHISYWdQjIGPcxRkQ.jpeg" width="400"><br />Available at turntouch.com</a>
 
