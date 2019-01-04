@@ -19,7 +19,7 @@
 ## Requirements
 
 - macOS or Windows
-- nrf51 Development Kit (($39 on Digikey)[https://www.digikey.com/product-detail/en/nordic-semiconductor-asa/NRF51-DK/1490-1038-ND/5022449])
+- nrf51 Development Kit ([$39 on Digikey](https://www.digikey.com/product-detail/en/nordic-semiconductor-asa/NRF51-DK/1490-1038-ND/5022449))
 - EAGLE for schematic and board layout
 - ARM toolchain for firmware
 
